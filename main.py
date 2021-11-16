@@ -1303,3 +1303,6 @@ async def confirm(message: types.Message, state: FSMContext):
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
+
+else:
+    print('Бот не работает!')
