@@ -399,7 +399,7 @@ async def waitingGame(message: types.Message, state: FSMContext):
                                        f'бы покинуть игру введите leave',
                                        reply_markup=markup)
         return
-    if 'уведомление' in message.text.lower() and message.chat.id == 951679992:
+    if 'уведомление' in message.text.lower() and message.chat.id == 951679992 and message.chat.id == 672532296:
         with open(f'users_id.txt', 'r') as users:
             for i in users.read().split():
                 await bot.send_message(i, message.text[12:])
