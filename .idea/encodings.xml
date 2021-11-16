@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/users/1471181262/consumption.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/users/1471181262/income.txt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/users/1471181262/last_action.txt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/users/1471181262/stock.txt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/users/672532296/income.txt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/users/672532296/stock.txt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/users/951679992/consumption.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/users/951679992/income.txt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/users/951679992/insurance.txt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/users/951679992/investment.txt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/users/951679992/statistic.txt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/users/951679992/stock.txt" charset="windows-1251" />
+  </component>
+</project>
