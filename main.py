@@ -5,6 +5,7 @@ import os
 import pole
 import random
 import datetime
+import config
 import aiogram.utils.markdown as md
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -18,9 +19,7 @@ if not os.path.exists('users'):
 
 logging.basicConfig(level=logging.INFO)
 
-API_TOKEN = '1957878149:AAH4OYE0JMITxUulgjESb1Cu131hLtwSVbc'
-
-bot = Bot(token=API_TOKEN)
+bot = Bot(token=config.TOKEN)
 
 
 class game(StatesGroup):
