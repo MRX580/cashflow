@@ -96,12 +96,12 @@ class Level:
         return str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
 
     def level_1(self):
-        # self.vivod()
-        # self.work()
-        # self.unexpectedExpensesFunc()
-        # self.stockMarket()
-        # self.insuranceFunc()
-        # self.investmentFunc()
+        self.vivod()
+        self.work()
+        self.unexpectedExpensesFunc()
+        self.stockMarket()
+        self.insuranceFunc()
+        self.investmentFunc()
         self.businessFunc()
 
 levelOne = Level(32, 0)
