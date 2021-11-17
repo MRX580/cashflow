@@ -1,4 +1,4 @@
-import sqlite3, logging, math, os, random, datetime, config, levels
+import sqlite3, logging, math, os, random, datetime, config, level.levels
 import aiogram.utils.markdown as md
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -36,9 +36,9 @@ async def start(message: types.Message):
         conn.commit()
     except sqlite3.IntegrityError:
         pass
-    sqlite_select_query = """SELECT * from users where levelNow = ?"""
-    #cur.execute(sqlite_select_query, (developer_id, ))
-    record = cur.fetchone()
+    sqlite_select_query = """SELECT * FROM users"""
+    cur.execute(sqlite_select_query)
+    record = cur.fetchall()
     print(record)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add('Начать игру')
@@ -53,6 +53,7 @@ async def start(message: types.Message):
                         reply_markup=markup)
     await bot.send_message(message.chat.id, 'Work')
 
+
 @dp.message_handler(commands='rules')
 async def rules(message: types.Message):
     print('[INFO] ' + str(
@@ -60,6 +61,7 @@ async def rules(message: types.Message):
         datetime.datetime.now()))
     await bot.send_message(message.chat.id, md.text('coming soon'),
                            parse_mode=ParseMode.MARKDOWN)
+
 
 @dp.message_handler(content_types='text')
 async def main(message: types.Message):
@@ -69,6 +71,7 @@ async def main(message: types.Message):
     if message.text.lower() == 'начать игру':
         await bot.send_message(message.chat.id, 'Для начала вам нужно выбрать уровень')
         await game.choiceLevel.set()
+
 
 @dp.message_handler(state=game.choiceLevel)
 async def choicelevel(message: types.Message):
