@@ -5,7 +5,7 @@ import os
 import pole
 import random
 import datetime
-
+import configBot
 import aiogram.utils.markdown as md
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -18,8 +18,8 @@ if not os.path.exists('users'):
     os.mkdir('users')
 
 logging.basicConfig(level=logging.INFO)
-API_TOKEN = '1957878149:AAH4OYE0JMITxUulgjESb1Cu131hLtwSVbc'
-bot = Bot(token=API_TOKEN)
+
+bot = Bot(token=configBot.TOKEN)
 
 
 class game(StatesGroup):
@@ -304,7 +304,7 @@ async def waitingGame(message: types.Message, state: FSMContext):
         datetime.datetime.now()))
     try:
         async with state.proxy() as data:
-            if float(str(datetime.datetime.now()-data['time']).replace(':', '')) < 0.3:
+            if float(str(datetime.datetime.now() - data['time']).replace(':', '')) < 0.3:
                 return
     except Exception:
         async with state.proxy() as data:
@@ -367,6 +367,7 @@ async def waitingGame(message: types.Message, state: FSMContext):
             playersName = playersName.read().split()
         with open(f'users/{message.chat.id}/players.txt', 'r') as players:
             players = players.read().split()
+
         if len(playersName) - 1 >= int(message.text.lower().split()[1]) >= 1:
             state = dp.current_state(chat=players[int(message.text.lower().split()[1])],
                                      user=players[int(message.text.lower().split()[1])])
@@ -390,13 +391,11 @@ async def waitingGame(message: types.Message, state: FSMContext):
                 stat = stat.read().split()
             if len(stat) == 5:
                 await bot.send_message(i,
-                                       f'Игра начата\nВаша профессия:{stat[0]}. Зарплата - {stat[1]}\nЧто бы покинуть '
-                                       f'игру введите leave',
+                                       f'Игра начата\nВаша профессия:{stat[0]}. Зарплата - {stat[1]}\nЧто бы покинуть 'f'игру введите leave',
                                        reply_markup=markup)
             else:
                 await bot.send_message(i,
-                                       f'Игра начата\nВаша профессия: {stat[0]} {stat[1]}. Зарплата - {stat[2]}\nЧто '
-                                       f'бы покинуть игру введите leave',
+                                       f'Игра начата\nВаша профессия: {stat[0]} {stat[1]}. Зарплата - {stat[2]}\nЧто ' f'бы покинуть игру введите leave',
                                        reply_markup=markup)
         return
     if 'уведомление' in message.text.lower() and message.chat.id == 951679992 and message.chat.id == 672532296:
@@ -468,8 +467,8 @@ async def waitingGame(message: types.Message, state: FSMContext):
                     if progress[int(progress[
                                         3]) - 1] == 'stock':  ######################################################## АКЦИИ
                         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-                        markup.add('Купить', 'Продолжить', 'Продать', 'Статистика',
-                                   'Отключить/включить подтверждение', 'Магазин страховок')
+                        markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Отключить/включить подтверждение',
+                                   'Магазин страховок')
                         stock = str(pole.firstCircleFuncStockMarket()[0])
                         with open(f'users/{message.chat.id}/last_action.txt', 'w') as last:
                             last.write(stock)
@@ -487,8 +486,8 @@ async def waitingGame(message: types.Message, state: FSMContext):
                     elif progress[
                         int(progress[3]) - 1] == 'business':  ################################################### БИЗНЕС
                         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-                        markup.add('Купить', 'Продолжить', 'Статистика',
-                                   'Отключить/включить подтверждение', 'Магазин страховок')
+                        markup.add('Купить', 'Продолжить', 'Статистика', 'Отключить/включить подтверждение',
+                                   'Магазин страховок')
                         business = str(pole.firstCircleFuncStockMarket()[1])
                         with open(f'users/{message.chat.id}/last_action.txt', 'w') as last:
                             last.write(business)
@@ -506,8 +505,8 @@ async def waitingGame(message: types.Message, state: FSMContext):
                     elif progress[int(progress[
                                           3]) - 1] == 'investment':  ################################################# ОБЛИГАЦИИ
                         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-                        markup.add('Купить', 'Продолжить', 'Продать', 'Статистика',
-                                   'Отключить/включить подтверждение', 'Магазин страховок')
+                        markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Отключить/включить подтверждение',
+                                   'Магазин страховок')
                         investment = str(pole.firstCircleFuncStockMarket()[5])
                         with open(f'users/{message.chat.id}/last_action.txt', 'w') as last:
                             last.write(investment)
@@ -525,8 +524,8 @@ async def waitingGame(message: types.Message, state: FSMContext):
                     elif progress[int(progress[
                                           3]) - 1] == 'realestate':  ################################################# ВОЗМОЖНОСТИ
                         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-                        markup.add('Купить', 'Продолжить', 'Статистика',
-                                   'Отключить/включить подтверждение', 'Магазин страховок')
+                        markup.add('Купить', 'Продолжить', 'Статистика', 'Отключить/включить подтверждение',
+                                   'Магазин страховок')
                         realestate = str(pole.firstCircleFuncStockMarket()[3])
                         with open(f'users/{message.chat.id}/last_action.txt', 'w') as last:
                             last.write(realestate)
@@ -594,7 +593,8 @@ async def waitingGame(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         try:
             if os.path.exists(
-                    f'users/{games}/move.txt') and message.text.lower() == 'страховка на жизнь' and data['magazine']:  ##################### СТРАХОВКА НА ЖИЗНТ
+                    f'users/{games}/move.txt') and message.text.lower() == 'страховка на жизнь' and data[
+                'magazine']:  ##################### СТРАХОВКА НА ЖИЗНТ
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                 markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Отключить/включить подтверждение',
                            'Магазин страховок')
@@ -622,7 +622,8 @@ async def waitingGame(message: types.Message, state: FSMContext):
                 await bot.send_message(message.chat.id, 'Вы купили страховку на жизнь на 1 год', reply_markup=markup)
                 return
             if os.path.exists(
-                    f'users/{games}/move.txt') and message.text.lower() == 'страховка на имущество' and data['magazine']:  ################# СТРАХОВКА НА ИМУЩЕСТВО
+                    f'users/{games}/move.txt') and message.text.lower() == 'страховка на имущество' and data[
+                'magazine']:  ################# СТРАХОВКА НА ИМУЩЕСТВО
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                 markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Отключить/включить подтверждение',
                            'Магазин страховок')
@@ -647,7 +648,8 @@ async def waitingGame(message: types.Message, state: FSMContext):
                 with open(f'users/{message.chat.id}/insurance.txt', 'w') as insurance:
                     insurance.write(
                         insuranceR[0] + ' ' + insuranceR[1] + '\n' + insuranceR[2] + ' ' + str(int(insuranceR[3]) + 12))
-                await bot.send_message(message.chat.id, 'Вы купили страховку на имущество на 1 год', reply_markup=markup)
+                await bot.send_message(message.chat.id, 'Вы купили страховку на имущество на 1 год',
+                                       reply_markup=markup)
                 return
         except KeyError:
             async with state.proxy() as data:
@@ -798,8 +800,7 @@ async def process_age_invalid(message: types.Message, state: FSMContext):
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Отключить/включить подтверждение',
-               'Магазин страховок')
+    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Отключить/включить подтверждение', 'Магазин страховок')
     await bot.send_message(message.chat.id, 'Дейсвие отменено', reply_markup=markup)
     await game.waitingGame.set()
 
@@ -819,7 +820,7 @@ async def process_age_invalid(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(
-    lambda message: message.text.lower() != 'продать все' and message.text.lower() != 'купить на все' and message.text.lower() != 'взять кредит' and  message.text.lower() == 'взять кредит' and message.text.lower() != 'да' and message.text.lower() != 'нет' and int(
+    lambda message: message.text.lower() != 'продать все' and message.text.lower() != 'купить на все' and message.text.lower() != 'взять кредит' and message.text.lower() == 'взять кредит' and message.text.lower() != 'да' and message.text.lower() != 'нет' and int(
         message.text) <= 0, state=[game.confirm, game.confirmsell, game.investment, game.investmentsell])
 async def process_age_invalid(message: types.Message, state: FSMContext):
     print('[INFO] ' + str(
@@ -870,8 +871,8 @@ async def confirm(message: types.Message,
                 num = num.read().split()
             async with state.proxy() as data:
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика',
-                           'Отключить/включить подтверждение', 'Магазин страховок')
+                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Отключить/включить подтверждение',
+                           'Магазин страховок')
                 with open(f'users/{message.chat.id}/income.txt', 'r') as income:
                     income = income.read().split()
                     oldIncome = income[1]
@@ -998,8 +999,8 @@ async def confirm(message: types.Message, state: FSMContext):
                 num = num.read().split()
             async with state.proxy() as data:
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика',
-                           'Отключить/включить подтверждение', 'Магазин страховок')
+                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Отключить/включить подтверждение',
+                           'Магазин страховок')
                 with open(f'users/{message.chat.id}/income.txt', 'r') as income:
                     income = income.read().split()
                 with open(f'users/{message.chat.id}/investment.txt', 'r') as stock:
@@ -1031,8 +1032,8 @@ async def confirm(message: types.Message, state: FSMContext):
                     return
                 else:
                     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика',
-                               'Отключить/включить подтверждение', 'Магазин страховок')
+                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Отключить/включить подтверждение',
+                               'Магазин страховок')
                     await bot.send_message(message.chat.id,
                                            'У вас не хватает облигаций, введите количевство еще раз\nИли введите '
                                            '"Отмена" что бы '
@@ -1056,7 +1057,6 @@ async def confirm(message: types.Message, state: FSMContext):
                                    3]) + f' на сумму {str(int(data["num"]) * int(data["investment"].split()[3]))} Пассивный доход -{int(data["num"]) * int(data["investment"].split()[11])}\n'
                                          f'Остаток наличных {str(int(income[1]) + int(data["num"]) * int(data["investment"].split()[3]))}\nДа/Нет (Введите число акций еще раз если хотите продать другое количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить подтверждение"',
                            reply_markup=markup)
-
 
 
 @dp.message_handler(state=game.confirm)
@@ -1097,8 +1097,8 @@ async def confirm(message: types.Message,
                 num = num.read().split()
             async with state.proxy() as data:
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика',
-                           'Отключить/включить подтверждение', 'Магазин страховок')
+                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Отключить/включить подтверждение',
+                           'Магазин страховок')
                 with open(f'users/{message.chat.id}/income.txt', 'r') as income:
                     income = income.read().split()
                     oldIncome = income[1]
@@ -1155,11 +1155,14 @@ async def confirm(message: types.Message,
                     income = income.read().split()
                 with open(f'users/{message.chat.id}/consumption.txt', 'r') as consumption:
                     consumption = consumption.read().split()
-                consumptionCredit = int(consumption[1]) + int(consumption[3]) + int(consumption[5]) + int(consumption[7]) + int(consumption[9])
-                incomeCredit = int(income[1]) + int(income[3]) + int(income[5]) + int(income[7]) + int(income[9]) + int(income[12])
+                consumptionCredit = int(consumption[1]) + int(consumption[3]) + int(consumption[5]) + int(
+                    consumption[7]) + int(consumption[9])
+                incomeCredit = int(income[1]) + int(income[3]) + int(income[5]) + int(income[7]) + int(income[9]) + int(
+                    income[12])
                 with open(f'users/{message.chat.id}/temp.txt', 'r') as num:
                     num = num.read().split()
-                    if -incomeCredit - -consumptionCredit < int(income[1]) - int(num[0]) * int(data["stock"].split()[3]):# Остаток наличных
+                    if -incomeCredit - -consumptionCredit < int(income[1]) - int(num[0]) * int(
+                            data["stock"].split()[3]):  # Остаток наличных
                         await bot.send_message(message.chat.id, 'Вы взяли кредит')
                 return
         except Exception:
@@ -1242,8 +1245,8 @@ async def confirm(message: types.Message, state: FSMContext):
                 num = num.read().split()
             async with state.proxy() as data:
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика',
-                           'Отключить/включить подтверждение', 'Магазин страховок')
+                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Отключить/включить подтверждение',
+                           'Магазин страховок')
                 with open(f'users/{message.chat.id}/income.txt', 'r') as income:
                     income = income.read().split()
                 with open(f'users/{message.chat.id}/stock.txt', 'r') as stock:
@@ -1274,8 +1277,8 @@ async def confirm(message: types.Message, state: FSMContext):
                     return
                 else:
                     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика',
-                               'Отключить/включить подтверждение', 'Магазин страховок')
+                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Отключить/включить подтверждение',
+                               'Магазин страховок')
                     await bot.send_message(message.chat.id,
                                            'У вас не хватает акций, введите количевство еще раз\nили введите '
                                            '"Отмена" что бы '
