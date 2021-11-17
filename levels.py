@@ -15,6 +15,4 @@ class Level:
         if level == 108:
             print(f"Ваш уровень: {mssLevel[0]}")
 
-
 Level().lvl_user()
-
