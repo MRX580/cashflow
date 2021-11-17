@@ -1,18 +1,12 @@
-import random
+class level:
+    def __init__(self, moves, target, salary, expenses):
+        self.moves = moves
+        self.target = target
+        self.zp = salary
+        self.rasxodi = expenses
+    def vivod(self):
+        print('У вас %s ходов ваша цель %s\nВаша зарплата %s, расходы %s' % (self.moves,self.target,self.zp,self.rasxodi))
 
-class Level:
-    def profession(self):
-        num = random.randint(0, 11)
-        Professions = [
-            ['Стройщик', 'Менеджер продаж', 'Бариста', 'Продавец-консультант', 'Администратор магазина',
-            'Бармен', 'Банкир', 'Юрист', 'Копирайтер', 'Логопед', 'Системный администратор', 'Педагог'],
-                  [25000, 20000, 15000, 18000, 17000, 19000, 23000, 22000, 20000, 16000, 17000, 21000]
-        ]
-        return Professions[0][num] + ' ' + str(Professions[1][num])
-    def lvl_user(self):
-        mssLevel = [1,2]
-        level = 0
-        if level == 108:
-            print(f"Ваш уровень: {mssLevel[0]}")
+levelOne = level(32, '100к', 10000, 5000)
 
-Level().lvl_user()
+levelOne.vivod()
