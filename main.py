@@ -1,4 +1,4 @@
-import sqlite3, logging, math, os, random, datetime, config
+import sqlite3, logging, math, os, random, datetime, config, levels
 import aiogram.utils.markdown as md
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -36,6 +36,10 @@ async def start(message: types.Message):
         conn.commit()
     except sqlite3.IntegrityError:
         pass
+    sqlite_select_query = """SELECT * from users where levelNow = ?"""
+    #cur.execute(sqlite_select_query, (developer_id, ))
+    record = cur.fetchone()
+    print(record)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add('Начать игру')
     await dp.bot.set_my_commands([
@@ -68,6 +72,9 @@ async def main(message: types.Message):
 
 @dp.message_handler(state=game.choiceLevel)
 async def choicelevel(message: types.Message):
-    pass
+    print('[INFO] ' + str(
+        message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
+        datetime.datetime.now()))
+    await bot.send_message(message.chat.id, levels.Level(32, 1000).stockMarket())
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)

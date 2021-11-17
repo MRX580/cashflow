@@ -8,11 +8,11 @@ class Level:
 
     def insuranceFunc(self):
         mass = ['Страховка 5000']
-        print(mass)
+        #print(mass)
         return mass[0]
     def vivod(self):
         start_game = ('У вас %s ходов \nВаш баланс %s' % (self.moves,self.money))
-        print(start_game)
+        #print(start_game)
         return start_game
     def work(self):
         num = random.randint(0, 12)
@@ -20,14 +20,14 @@ class Level:
                   'Бармен', 'Банкир', 'Юрист', 'Копирайтер', 'Логопед', 'Системный администратор', 'Социальный педагог','курьер'],
                   [25000, 20000, 11000, 11500, 13000, 11000, 12000, 14000, 14000, 10000, 21500, 8500,16500]
                  ]
-        print(works[0][num] + ' ' + str(works[1][num]))
+        #print(works[0][num] + ' ' + str(works[1][num]))
         return works[0][num] + ' ' + str(works[1][num])
 
     def unexpectedExpensesFunc(self):
         UnexpectedExpenses = (f'(СИ) Непредвиденные расходы вы попали в ДТП -800',
                               f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -1000')
         rand = random.randint(0, len(UnexpectedExpenses) - 1)
-        print(UnexpectedExpenses[rand])
+        #print(UnexpectedExpenses[rand])
         return UnexpectedExpenses[rand]
 
     def stockMarket(self):
@@ -53,7 +53,7 @@ class Level:
                   'price': random.randint(45, 70)},
                  ]
         rand = random.randint(0, len(stock) - 1)
-        print(str('Акция ' + str(stock[rand]['name']) + '\nЦена: ' + str(stock[rand]['price']) + ' руб\nСправедливая цена: ' + str(stock[rand]['defaultPrice']) + ' руб'))
+        #print(str('Акция ' + str(stock[rand]['name']) + '\nЦена: ' + str(stock[rand]['price']) + ' руб\nСправедливая цена: ' + str(stock[rand]['defaultPrice']) + ' руб'))
         return str('Акция ' + str(stock[rand]['name']) + '\nЦена: ' + str(stock[rand]['price']) + ' руб\nСправедливая цена: ' + str(stock[rand]['defaultPrice']) + ' руб')
 
     def investmentFunc(self):
@@ -66,7 +66,7 @@ class Level:
                        'passive': 300},
                       ]
         rand = random.randint(0, len(investment) - 1)
-        print(str('Облигация ' + str(investment[rand]['name']) + '\nЦена: ' + str(investment[rand]['price']) + ' руб\nСправедливая цена: ' + str(investment[rand]['defaultPrice']) + ' руб\nПассивный доход ' + str(investment[rand]['passive']) + ' руб'))
+        #print(str('Облигация ' + str(investment[rand]['name']) + '\nЦена: ' + str(investment[rand]['price']) + ' руб\nСправедливая цена: ' + str(investment[rand]['defaultPrice']) + ' руб\nПассивный доход ' + str(investment[rand]['passive']) + ' руб'))
         return str('Облигация ' + str(investment[rand]['name']) + '\nЦена: ' + str(investment[rand]['price']) + ' руб\nСправедливая цена: ' + str(investment[rand]['defaultPrice']) + ' руб\nПассивный доход ' + str(investment[rand]['passive']) + ' руб')
 
     def businessFunc(self):
@@ -92,7 +92,7 @@ class Level:
                      'passive': 1200}
                     ]
         rand = random.randint(0, len(business) - 1)
-        print(str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive'])))
+        #print(str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive'])))
         return str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
 
     def level_1(self):
@@ -103,6 +103,6 @@ class Level:
         self.insuranceFunc()
         self.investmentFunc()
         self.businessFunc()
-
-levelOne = Level(32, 0)
-levelOne.level_1()
+if __name__ == '__main__':
+    levelOne = Level(32, 0)
+    levelOne.level_1()
