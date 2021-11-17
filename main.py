@@ -13,25 +13,31 @@ cur.execute("""CREATE TABLE IF NOT EXISTS users(
    username TEXT,
    fname TEXT,
    lname TEXT,
-   money INT);
+   money INT,
+   isgame BOOLEAN,
+   levelOpen INT,
+   levelNow INT);
 """)
 conn.commit()
 logging.basicConfig(level=logging.INFO)
 memory = MemoryStorage()
 bot = Bot(config.TOKEN)
 dp = Dispatcher(bot=bot, storage=memory)
+class game(StatesGroup):
+    choiceLevel = State()
+
 @dp.message_handler(commands='start')
-async def start(message: types.Message, state: FSMContext):
+async def start(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
     try:
-        cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?);", (message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name, 0))
+        cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?);", (message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name, 0, False, 1, 0))
         conn.commit()
-    except sqlite3.InternalError:
+    except sqlite3.IntegrityError:
         pass
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-    markup.add('Старт')
+    markup.add('Начать игру')
     await dp.bot.set_my_commands([
         types.BotCommand("rules", "Правила игры"),
     ])
@@ -39,16 +45,29 @@ async def start(message: types.Message, state: FSMContext):
                         'и не будете жить от зарплаты до зарплаты, здесь будут ситуации максимально приближённые к '
                         'реальной жизни, по этому курс точно не будет скучным!\nЕсли вы никогда не играли в подобные '
                         'игры рекомендую ознакомиться с правилами - /rules\nЧто бы присоедениться к группе - join ('
-                        'id)\nЧто создать лобби - старт',
+                        'id)\nЧто начать игру введите - Начать игру',
                         reply_markup=markup)
     await bot.send_message(message.chat.id, 'Work')
 
 @dp.message_handler(commands='rules')
-async def rules(message: types.Message, state: FSMContext):
+async def rules(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
     await bot.send_message(message.chat.id, md.text('coming soon'),
                            parse_mode=ParseMode.MARKDOWN)
+
+@dp.message_handler(content_types='text')
+async def main(message: types.Message):
+    print('[INFO] ' + str(
+        message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
+        datetime.datetime.now()))
+    if message.text.lower() == 'начать игру':
+        await bot.send_message(message.chat.id, 'Для начала вам нужно выбрать уровень')
+        await game.choiceLevel.set()
+
+@dp.message_handler(state=game.choiceLevel)
+async def choicelevel(message: types.Message):
+    pass
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
