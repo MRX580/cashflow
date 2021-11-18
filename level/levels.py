@@ -94,8 +94,6 @@ class Level:
                     ]
         rand = random.randint(0, len(business) - 1)
         return str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
-    def dataBase(self):
-        pass
     def move_1(self):
         step = 0
         rand = random.randint(1, 4)
@@ -144,7 +142,21 @@ class Level:
         if rand == 4:
             step = step + 1
             self.unexpectedExpensesFunc()
+    def dataBase(self):
+        conn = sqlite3.connect('users.db')
+        cur = conn.cursor()
+        cur.execute("""CREATE TABLE IF NOT EXISTS game(
+           userid INT PRIMARY KEY,
+           move1 TEXT,
+           move2 TEXT,
+           move3 TEXT,
+           step INT);
+        """)
+        conn.commit()
 
 if __name__ == '__main__':
     levelOne = Level(35, 5000, 4000, 50000)
-    levelOne.move_1()
+    # levelOne.move_1()
+    # levelOne.move_2()
+    # levelOne.move_3()
+    levelOne.dataBase()
