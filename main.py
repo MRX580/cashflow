@@ -1,4 +1,4 @@
-import sqlite3, logging, math, os, random, datetime, config, level.choicelevel as levels
+import sqlite3, logging, math, os, random, datetime, config, level.choicelevel as levels, data
 import aiogram.utils.markdown as md
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -30,30 +30,13 @@ class game(StatesGroup):
     waitingGame = State()
 
 
-async def datebase_user(userid):
-    sqlite_select_query = """SELECT * FROM users"""
-    cur.execute(sqlite_select_query)
-    record = cur.fetchall()
-    print(record)
-    for i in record:
-        if i[0] == userid:
-            return i
-
-
-async def addDatebase(userid, userName, userFirst, userLast):
-    try:
-        cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?);", (userid, userName, userFirst, userLast, 0, False, 1, 0))
-        conn.commit()
-    except sqlite3.IntegrityError:
-        pass
-
 
 @dp.message_handler(commands='start')
 async def start(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
-    await addDatebase(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name)
+    data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add('Начать игру')
     await dp.bot.set_my_commands([
@@ -73,7 +56,7 @@ async def rules(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
-    await addDatebase(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name)
+    data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).databaseNewUser()
     await bot.send_message(message.chat.id, md.text('coming soon'),
                            parse_mode=ParseMode.MARKDOWN)
 
@@ -83,12 +66,10 @@ async def main(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
-    await addDatebase(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name)
+    data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).databaseNewUser()
     if message.text.lower() == 'начать игру':
-        await addDatebase(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name)
-        data = await datebase_user(message.chat.id)
-        print(data[0])
-        await bot.send_message(message.chat.id, f'Для начала вам нужно выбрать уровень\nВаши доступные уровни {data[6]}')
+        dataU = data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).dataUser()
+        await bot.send_message(message.chat.id, f'Для начала вам нужно выбрать уровень\nВаши доступные уровни {dataU[6]}')
         await game.choiceLevel.set()
 
 
@@ -102,12 +83,11 @@ async def choicelevel(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
-    await addDatebase(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name)
-    data = await datebase_user(message.chat.id)
-    if int(data[6]) < int(message.text):
+    dataU = data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).dataUser()
+    if int(dataU[6]) < int(message.text):
         await bot.send_message(message.chat.id, 'Вам еще не доступен этот уровень')
         return
-    await bot.send_message(message.chat.id, levels.choiceLevel(int(data[6])).work())
+    await bot.send_message(message.chat.id, levels.choiceLevel(int(dataU[6])).work())
     await game.waitingGame.set()
 
 
