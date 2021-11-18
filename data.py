@@ -30,7 +30,6 @@ class data:
         sqlite_select_query = """SELECT * FROM users"""
         self.cur.execute(sqlite_select_query)
         record = self.cur.fetchall()
-        print(record)
         for i in record:
             if i[0] == self.userid:
                 return i
