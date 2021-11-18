@@ -1,4 +1,4 @@
-import levels
+import level.levels as levels
 
 def choiceLevel(num):
     if num == 1:
