@@ -1,34 +1,36 @@
-import math
 import random
+import sqlite3
 
 class Level:
-    def __init__(self, moves,money):
+    def __init__(self, moves, income, costs, target, userid):
         self.moves = moves
-        self.money = money
+        self.income = income
+        self.costs = costs
+        self.target = target
+        self.userid = userid
 
     def insuranceFunc(self):
         mass = ['Страховка 5000']
-        print(mass)
         return mass[0]
-    def vivod(self):
-        start_game = ('У вас %s ходов \nВаш баланс %s' % (self.moves,self.money))
-        print(start_game)
-        return start_game
+
+
     def work(self):
         num = random.randint(0, 12)
+        lvl = ['Первый уровень', 'зарплата']
         works = [['Строитель', 'Менеджер продаж', 'Бариста', 'Продавец-консультант', 'Администратор магазина',
                   'Бармен', 'Банкир', 'Юрист', 'Копирайтер', 'Логопед', 'Системный администратор', 'Социальный педагог','курьер'],
                   [25000, 20000, 11000, 11500, 13000, 11000, 12000, 14000, 14000, 10000, 21500, 8500,16500]
                  ]
-        print(works[0][num] + ' ' + str(works[1][num]))
-        return works[0][num] + ' ' + str(works[1][num])
+        # Профессия должна записыватся в базу данных в таблицу "Game" + в всех таблицах 1 столбиком идёт userid как тип данных PRIMARY KEY, добавь что бы я в параметры мог передавать id юзера с бота
+        return lvl[0] + ' ' + works[0][num] + ' ' + lvl[1] + ' ' + str(works[1][num])
+
 
     def unexpectedExpensesFunc(self):
         UnexpectedExpenses = (f'(СИ) Непредвиденные расходы вы попали в ДТП -800',
                               f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -1000')
         rand = random.randint(0, len(UnexpectedExpenses) - 1)
-        print(UnexpectedExpenses[rand])
         return UnexpectedExpenses[rand]
+
 
     def stockMarket(self):
         stock = [{'type': 'stock',
@@ -53,8 +55,8 @@ class Level:
                   'price': random.randint(45, 70)},
                  ]
         rand = random.randint(0, len(stock) - 1)
-        print(str('Акция ' + str(stock[rand]['name']) + '\nЦена: ' + str(stock[rand]['price']) + ' руб\nСправедливая цена: ' + str(stock[rand]['defaultPrice']) + ' руб'))
         return str('Акция ' + str(stock[rand]['name']) + '\nЦена: ' + str(stock[rand]['price']) + ' руб\nСправедливая цена: ' + str(stock[rand]['defaultPrice']) + ' руб')
+
 
     def investmentFunc(self):
         massnum = [8000, 9000, 10000, 11000, 12000]
@@ -66,8 +68,8 @@ class Level:
                        'passive': 300},
                       ]
         rand = random.randint(0, len(investment) - 1)
-        print(str('Облигация ' + str(investment[rand]['name']) + '\nЦена: ' + str(investment[rand]['price']) + ' руб\nСправедливая цена: ' + str(investment[rand]['defaultPrice']) + ' руб\nПассивный доход ' + str(investment[rand]['passive']) + ' руб'))
         return str('Облигация ' + str(investment[rand]['name']) + '\nЦена: ' + str(investment[rand]['price']) + ' руб\nСправедливая цена: ' + str(investment[rand]['defaultPrice']) + ' руб\nПассивный доход ' + str(investment[rand]['passive']) + ' руб')
+
 
     def businessFunc(self):
         business = [{'type': 'business',
@@ -92,17 +94,28 @@ class Level:
                      'passive': 1200}
                     ]
         rand = random.randint(0, len(business) - 1)
-        print(str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive'])))
         return str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
-
     def level_1(self):
-        self.vivod()
+        moves = 0
+        rand = random.randint(1, 4)
         self.work()
-        self.unexpectedExpensesFunc()
-        self.stockMarket()
-        self.insuranceFunc()
-        self.investmentFunc()
-        self.businessFunc()
+        if rand == 1:
+            moves = moves + 1
+            self.businessFunc()
+        if rand == 2:
+            moves = moves + 1
+            self.investmentFunc()
+        if rand == 3:
+            moves = moves + 1
+            self.stockMarket()
+        if rand == 4:
+            moves = moves + 1
+            self.unexpectedExpensesFunc()
+    def level_2(self):
+        pass
+    def level_3(self):
+        pass
 
-levelOne = Level(32, 0)
-levelOne.level_1()
+if __name__ == '__main__':
+    levelOne = Level(35, 5000, 4000, 50000)
+    levelOne.level_1()
