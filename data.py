@@ -18,7 +18,8 @@ class data:
            money INT,
            isgame BOOLEAN,
            levelOpen INT,
-           levelNow INT);
+           levelNow INT,
+           premium BOOLEAN);
         """)
         self.conn.commit()
         print('Database connected')
@@ -38,8 +39,8 @@ class data:
     def databaseNewUser(self):
         self.database_connect()
         try:
-            self.cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?);",
-                        (self.userid, self.userName, self.userFirst, self.userLast, 0, False, 1, 0))
+            self.cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                        (self.userid, self.userName, self.userFirst, self.userLast, 0, False, 1, 0, False))
             self.conn.commit()
         except sqlite3.IntegrityError:
             pass

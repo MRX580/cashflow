@@ -6,19 +6,6 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ParseMode
 from aiogram.utils import executor
-conn = sqlite3.connect('users.db')
-cur = conn.cursor()
-cur.execute("""CREATE TABLE IF NOT EXISTS users(
-   userid INT PRIMARY KEY,
-   username TEXT,
-   fname TEXT,
-   lname TEXT,
-   money INT,
-   isgame BOOLEAN,
-   levelOpen INT,
-   levelNow INT);
-""")
-conn.commit()
 logging.basicConfig(level=logging.INFO)
 memory = MemoryStorage()
 bot = Bot(config.TOKEN)
