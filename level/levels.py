@@ -1,12 +1,13 @@
-import math
 import random
+import sqlite3
 
 class Level:
-    def __init__(self, moves, income, costs, target):
+    def __init__(self, moves, income, costs, target, userid):
         self.moves = moves
         self.income = income
         self.costs = costs
         self.target = target
+        self.userid = userid
 
     def insuranceFunc(self):
         mass = ['Страховка 5000']
@@ -95,33 +96,26 @@ class Level:
         rand = random.randint(0, len(business) - 1)
         return str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
     def level_1(self):
-        xod = 0
+        moves = 0
+        rand = random.randint(1, 4)
         self.work()
-        print(self.work())
-        while True:
-            rand = random.randint(1, 4)
-            num = input('Введи продолжить ')
-            if num == 'продолжить':
-                if rand == 1:
-                    self.businessFunc()
-                    xod = xod + 1
-                    print(xod)
-                    print(self.businessFunc())
-                if rand == 2:
-                    self.investmentFunc()
-                    xod = xod + 1
-                    print(xod)
-                    print(self.investmentFunc())
-                if rand == 3:
-                    self.stockMarket()
-                    xod = xod + 1
-                    print(xod)
-                    print(self.stockMarket())
-                if rand == 4:
-                    self.unexpectedExpensesFunc()
-                    xod = xod + 1
-                    print(xod)
-                    print(self.unexpectedExpensesFunc())
+        if rand == 1:
+            moves = moves + 1
+            self.businessFunc()
+        if rand == 2:
+            moves = moves + 1
+            self.investmentFunc()
+        if rand == 3:
+            moves = moves + 1
+            self.stockMarket()
+        if rand == 4:
+            moves = moves + 1
+            self.unexpectedExpensesFunc()
+    def level_2(self):
+        pass
+    def level_3(self):
+        pass
+
 if __name__ == '__main__':
     levelOne = Level(35, 5000, 4000, 50000)
     levelOne.level_1()
