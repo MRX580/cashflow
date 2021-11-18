@@ -2,12 +2,11 @@ import random
 import sqlite3
 
 class Level:
-    def __init__(self, moves, income, costs, target, userid):
+    def __init__(self, moves, income, costs, target):
         self.moves = moves
         self.income = income
         self.costs = costs
         self.target = target
-        self.userid = userid
 
     def insuranceFunc(self):
         mass = ['Страховка 5000']
@@ -77,7 +76,7 @@ class Level:
                      'startPrice': 19000,
                      'fullPrice': 100000,
                      'passive': 500},
-                    {'type': 'business2',
+                    {'type': 'business',
                      'name': 'Intel',
                      'startPrice': 21000,
                      'fullPrice': 120000,
@@ -95,27 +94,69 @@ class Level:
                     ]
         rand = random.randint(0, len(business) - 1)
         return str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
-    def level_1(self):
-        moves = 0
+    def dataBase(self):
+        conn = sqlite3.connect('users.db')
+        cur = conn.cursor()
+        cur.execute("""CREATE TABLE IF NOT EXISTS users(
+           userid INT PRIMARY KEY,
+           username TEXT,
+           fname TEXT,
+           lname TEXT,
+           money INT,
+           isgame BOOLEAN,
+           levelOpen INT,
+           levelNow INT);
+        """)
+        conn.commit()
+    def move_1(self):
+        step = 0
         rand = random.randint(1, 4)
         self.work()
         if rand == 1:
-            moves = moves + 1
+            step = step + 1
             self.businessFunc()
         if rand == 2:
-            moves = moves + 1
+            step = step + 1
             self.investmentFunc()
         if rand == 3:
-            moves = moves + 1
+            step = step + 1
             self.stockMarket()
         if rand == 4:
-            moves = moves + 1
+            step = step + 1
             self.unexpectedExpensesFunc()
-    def level_2(self):
-        pass
-    def level_3(self):
-        pass
+    def move_2(self):
+        step = 0
+        rand = random.randint(1, 4)
+        self.work()
+        if rand == 1:
+            step = step + 1
+            self.businessFunc()
+        if rand == 2:
+            step = step + 1
+            self.investmentFunc()
+        if rand == 3:
+            step = step + 1
+            self.stockMarket()
+        if rand == 4:
+            step = step + 1
+            self.unexpectedExpensesFunc()
+    def move_3(self):
+        step = 0
+        rand = random.randint(1, 4)
+        self.work()
+        if rand == 1:
+            step = step + 1
+            self.businessFunc()
+        if rand == 2:
+            step = step + 1
+            self.investmentFunc()
+        if rand == 3:
+            step = step + 1
+            self.stockMarket()
+        if rand == 4:
+            step = step + 1
+            self.unexpectedExpensesFunc()
 
 if __name__ == '__main__':
     levelOne = Level(35, 5000, 4000, 50000)
-    levelOne.level_1()
+    levelOne.move_1()
