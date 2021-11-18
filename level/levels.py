@@ -95,19 +95,7 @@ class Level:
         rand = random.randint(0, len(business) - 1)
         return str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
     def dataBase(self):
-        conn = sqlite3.connect('users.db')
-        cur = conn.cursor()
-        cur.execute("""CREATE TABLE IF NOT EXISTS users(
-           userid INT PRIMARY KEY,
-           username TEXT,
-           fname TEXT,
-           lname TEXT,
-           money INT,
-           isgame BOOLEAN,
-           levelOpen INT,
-           levelNow INT);
-        """)
-        conn.commit()
+        pass
     def move_1(self):
         step = 0
         rand = random.randint(1, 4)
