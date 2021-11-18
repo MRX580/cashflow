@@ -36,6 +36,7 @@ class data:
 
 
     def databaseNewUser(self):
+        self.database_connect()
         try:
             self.cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?);",
                         (self.userid, self.userName, self.userFirst, self.userLast, 0, False, 1, 0))
