@@ -2,13 +2,12 @@ import random
 import sqlite3
 
 class Level:
-    def __init__(self, moves, income, costs, target, userid,step):
+    def __init__(self, moves, income, costs, target, userid):
         self.moves = moves
         self.income = income
         self.costs = costs
         self.target = target
         self.userid = userid
-        self.step = step
 
     def database_connect(self):
         self.conn = sqlite3.connect('../users.db')
@@ -107,32 +106,31 @@ class Level:
                     ]
         rand = random.randint(0, len(business) - 1)
         return str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
-    def step(self):
-        step = 0
-        step = step + 1
-        return step
     def move_1(self):
-        rand = random.randint(1, 4)
-        self.work()
-        if rand == 1:
-            return self.businessFunc()
-        if rand == 2:
-            return self.investmentFunc()
-        if rand == 3:
-            return self.stockMarket()
-        if rand == 4:
-            return self.unexpectedExpensesFunc()
+        while True:
+            rand = random.randint(1, 4)
+            self.work()
+            if rand == 1:
+                return self.businessFunc()
+            if rand == 2:
+                return self.investmentFunc()
+            if rand == 3:
+                return self.stockMarket()
+            if rand == 4:
+                return self.unexpectedExpensesFunc()
     def dataBaseupt(self):
         try:
+            step = 1
+            step = step + 1
             self.conn = sqlite3.connect('../users.db')
             self.cur = self.conn.cursor()
             self.cur.execute("INSERT INTO game VALUES(?,?,?,?,?);",
-                             (self.userid, self.move_1(),self.move_1(),self.move_1(), self.step))
+                             (self.userid, self.move_1(),self.move_1(),self.move_1(), step))
             self.conn.commit()
         except sqlite3.IntegrityError:
             pass
 if __name__ == '__main__':
-    levelOne = Level(35, 5000, 4000, 50000, 672532296, 1)
+    levelOne = Level(35, 5000, 4000, 50000, 672532296)
     levelOne.database_connect()
     levelOne.move_1()
     levelOne.dataBaseupt()
