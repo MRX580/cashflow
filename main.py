@@ -37,7 +37,7 @@ async def start(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
-    data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name)
+    data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).databaseNewUser()
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add('Начать игру')
     await dp.bot.set_my_commands([
@@ -97,6 +97,7 @@ async def choicelevel(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
+    #await bot.send_message(message.chat.id, f'Магазин криптовалют')
 
 
 if __name__ == '__main__':
