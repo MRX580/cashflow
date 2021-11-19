@@ -2,17 +2,29 @@ import random
 import sqlite3
 
 class Level:
-    def __init__(self, moves, income, costs, target, userid):
+    def __init__(self, moves, income, costs, target, userid,step):
         self.moves = moves
         self.income = income
         self.costs = costs
         self.target = target
         self.userid = userid
+        self.step = step
+
+    def database_connect(self):
+        self.conn = sqlite3.connect('../users.db')
+        self.cur = self.conn.cursor()
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS game(
+           userid INT PRIMARY KEY,
+           move1 TEXT,
+           move2 TEXT,
+           move3 TEXT,
+           step INT);
+        """)
+        self.conn.commit()
 
     def insuranceFunc(self):
         mass = ['Страховка 5000']
         return mass[0]
-
 
     def work(self):
         num = random.randint(0, 12)
@@ -95,56 +107,32 @@ class Level:
                     ]
         rand = random.randint(0, len(business) - 1)
         return str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
-    def move_1(self):
+    def step(self):
         step = 0
+        step = step + 1
+        return step
+    def move_1(self):
         rand = random.randint(1, 4)
         self.work()
         if rand == 1:
-            self.businessFunc()
-            return step + 1
+            return self.businessFunc()
         if rand == 2:
-            self.investmentFunc()
-            return step + 1
+            return self.investmentFunc()
         if rand == 3:
-            self.stockMarket()
-            return step + 1
+            return self.stockMarket()
         if rand == 4:
-            self.unexpectedExpensesFunc()
-            return step + 1
-
-    def database_connect(self):
-        self.conn = sqlite3.connect('../users.db')
-        self.cur = self.conn.cursor()
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS game(
-           userid INT PRIMARY KEY,
-           move1 TEXT,
-           move2 TEXT,
-           move3 TEXT,
-           step INT);
-        """)
-        self.conn.commit()
-
-    def update_sqlite_table(self):
+            return self.unexpectedExpensesFunc()
+    def dataBaseupt(self):
         try:
-            sqlite_connection = sqlite3.connect('../users.db')
-            cursor = sqlite_connection.cursor()
-            print("Подключен к SQLite")
-
-            sql_update_query = """Update userid set userid = None where id = 4"""
-            cursor.execute(sql_update_query)
-            sqlite_connection.commit()
-            print("Запись успешно обновлена")
-            cursor.close()
-
-        except sqlite3.Error as error:
-            print("Ошибка при работе с SQLite", error)
-        finally:
-            if sqlite_connection:
-                sqlite_connection.close()
-                print("Соединение с SQLite закрыто")
-
+            self.conn = sqlite3.connect('../users.db')
+            self.cur = self.conn.cursor()
+            self.cur.execute("INSERT INTO game VALUES(?,?,?,?,?);",
+                             (self.userid, self.move_1(),self.move_1(),self.move_1(), self.step))
+            self.conn.commit()
+        except sqlite3.IntegrityError:
+            pass
 if __name__ == '__main__':
-    levelOne = Level(35, 5000, 4000, 50000, 672532296)
-    levelOne.move_1()
+    levelOne = Level(35, 5000, 4000, 50000, 672532296, 1)
     levelOne.database_connect()
-    levelOne.update_sqlite_table()
+    levelOne.move_1()
+    levelOne.dataBaseupt()
