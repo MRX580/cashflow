@@ -111,11 +111,50 @@ class Level:
         if rand == 4:
             step = step + 1
             self.unexpectedExpensesFunc()
+<<<<<<< Updated upstream
 
     def database_connect(self):
         self.conn = sqlite3.connect('../users.db')
         self.cur = self.conn.cursor()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS game(
+=======
+    def move_2(self):
+        step = 0
+        rand = random.randint(1, 4)
+        self.work()
+        if rand == 1:
+            step = step + 1
+            self.businessFunc()
+        if rand == 2:
+            step = step + 1
+            self.investmentFunc()
+        if rand == 3:
+            step = step + 1
+            self.stockMarket()
+        if rand == 4:
+            step = step + 1
+            self.unexpectedExpensesFunc()
+    def move_3(self):
+        step = 0
+        rand = random.randint(1, 4)
+        self.work()
+        if rand == 1:
+            step = step + 1
+            self.businessFunc()
+        if rand == 2:
+            step = step + 1
+            self.investmentFunc()
+        if rand == 3:
+            step = step + 1
+            self.stockMarket()
+        if rand == 4:
+            step = step + 1
+            self.unexpectedExpensesFunc()
+    def dataBase(self):
+        conn = sqlite3.connect('../users.db')
+        cur = conn.cursor()
+        cur.execute("""CREATE TABLE IF NOT EXISTS game(
+>>>>>>> Stashed changes
            userid INT PRIMARY KEY,
            move1 TEXT,
            move2 TEXT,
