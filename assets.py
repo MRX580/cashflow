@@ -1,8 +1,11 @@
 import random
 import sqlite3
 class assets:
-    def __init__(self, userid):
+    def __init__(self, userid, kripta, colvo, price):
         self.userid = userid
+        self.userid = kripta
+        self.userid = colvo
+        self.userid = price
     def random_cript(self):
         btc_price = random.randint(54000, 64000)
         bnb_price = random.randint(450, 540)
@@ -13,27 +16,35 @@ class assets:
         return 'Выбери крипту:\n1.Bitcoin ' + str(btc_price) + '$\n2.Binance Coin' + str(bnb_price) + '$\n3.Avalanche' + str(avax_price) + '$\n4.Solana' + str(sol_price) + '$\n5.Ethereum' + str(eth_price) + '$'
 
     def database_connect(self):
-        self.conn = sqlite3.connect('users.db')
+        self.conn = sqlite3.connect('kripta.db')
         self.cur = self.conn.cursor()
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS users(
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS kripta(
            userid INT PRIMARY KEY,
-           username TEXT,
-           fname TEXT,
-           lname TEXT,
-           money INT,
-           isgame BOOLEAN,
-           levelOpen INT,
-           levelNow INT);
+           btc INT,
+           bnb INT,
+           avax INT,
+           sol INT,
+           eth INT);
         """)
         self.conn.commit()
         print('Database connected')
 
+    def kriptaUser(self):
+        self.database_connect()
+        sqlite_select_query = """SELECT * FROM kripta"""
+        self.cur.execute(sqlite_select_query)
+        record = self.cur.fetchall()
+        for i in record:
+            if i[0] == self.userid:
+                return i
+
 
 
 if __name__ == '__main__':
-    cript1 = assets(1)
-    cript1.random_cript()
-    cript1.database_connect()
+    assets = assets(1, 2, 3, 4)
+    assets.random_cript()
+    assets.database_connect()
+    assets.kriptaUser()
 
 
 
