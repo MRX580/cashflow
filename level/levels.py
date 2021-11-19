@@ -100,61 +100,22 @@ class Level:
         rand = random.randint(1, 4)
         self.work()
         if rand == 1:
-            step = step + 1
             self.businessFunc()
+            return step + 1
         if rand == 2:
-            step = step + 1
             self.investmentFunc()
+            return step + 1
         if rand == 3:
-            step = step + 1
             self.stockMarket()
+            return step + 1
         if rand == 4:
-            step = step + 1
             self.unexpectedExpensesFunc()
-<<<<<<< Updated upstream
+            return step + 1
 
     def database_connect(self):
         self.conn = sqlite3.connect('../users.db')
         self.cur = self.conn.cursor()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS game(
-=======
-    def move_2(self):
-        step = 0
-        rand = random.randint(1, 4)
-        self.work()
-        if rand == 1:
-            step = step + 1
-            self.businessFunc()
-        if rand == 2:
-            step = step + 1
-            self.investmentFunc()
-        if rand == 3:
-            step = step + 1
-            self.stockMarket()
-        if rand == 4:
-            step = step + 1
-            self.unexpectedExpensesFunc()
-    def move_3(self):
-        step = 0
-        rand = random.randint(1, 4)
-        self.work()
-        if rand == 1:
-            step = step + 1
-            self.businessFunc()
-        if rand == 2:
-            step = step + 1
-            self.investmentFunc()
-        if rand == 3:
-            step = step + 1
-            self.stockMarket()
-        if rand == 4:
-            step = step + 1
-            self.unexpectedExpensesFunc()
-    def dataBase(self):
-        conn = sqlite3.connect('../users.db')
-        cur = conn.cursor()
-        cur.execute("""CREATE TABLE IF NOT EXISTS game(
->>>>>>> Stashed changes
            userid INT PRIMARY KEY,
            move1 TEXT,
            move2 TEXT,
@@ -163,19 +124,27 @@ class Level:
         """)
         self.conn.commit()
 
-    def dataUser(self):
-        self.database_connect()
-        sqlite_select_query = """SELECT * FROM userid"""
-        self.cur.execute(sqlite_select_query)
-        record = self.cur.fetchall()
-        print(record)
-        for i in record:
-            if i[0] == self.userid:
-                print(i)
-                return i
+    def update_sqlite_table(self):
+        try:
+            sqlite_connection = sqlite3.connect('../users.db')
+            cursor = sqlite_connection.cursor()
+            print("Подключен к SQLite")
+
+            sql_update_query = """Update userid set userid = None where id = 4"""
+            cursor.execute(sql_update_query)
+            sqlite_connection.commit()
+            print("Запись успешно обновлена")
+            cursor.close()
+
+        except sqlite3.Error as error:
+            print("Ошибка при работе с SQLite", error)
+        finally:
+            if sqlite_connection:
+                sqlite_connection.close()
+                print("Соединение с SQLite закрыто")
 
 if __name__ == '__main__':
     levelOne = Level(35, 5000, 4000, 50000, 672532296)
     levelOne.move_1()
     levelOne.database_connect()
-    levelOne.dataUser()
+    levelOne.update_sqlite_table()
