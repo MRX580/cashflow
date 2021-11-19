@@ -2,11 +2,12 @@ import random
 import sqlite3
 
 class Level:
-    def __init__(self, moves, income, costs, target):
+    def __init__(self, moves, income, costs, target, userid):
         self.moves = moves
         self.income = income
         self.costs = costs
         self.target = target
+        self.userid = userid
 
     def insuranceFunc(self):
         mass = ['Страховка 5000']
@@ -110,53 +111,32 @@ class Level:
         if rand == 4:
             step = step + 1
             self.unexpectedExpensesFunc()
-    def move_2(self):
-        step = 0
-        rand = random.randint(1, 4)
-        self.work()
-        if rand == 1:
-            step = step + 1
-            self.businessFunc()
-        if rand == 2:
-            step = step + 1
-            self.investmentFunc()
-        if rand == 3:
-            step = step + 1
-            self.stockMarket()
-        if rand == 4:
-            step = step + 1
-            self.unexpectedExpensesFunc()
-    def move_3(self):
-        step = 0
-        rand = random.randint(1, 4)
-        self.work()
-        if rand == 1:
-            step = step + 1
-            self.businessFunc()
-        if rand == 2:
-            step = step + 1
-            self.investmentFunc()
-        if rand == 3:
-            step = step + 1
-            self.stockMarket()
-        if rand == 4:
-            step = step + 1
-            self.unexpectedExpensesFunc()
-    def dataBase(self):
-        conn = sqlite3.connect('users.db')
-        cur = conn.cursor()
-        cur.execute("""CREATE TABLE IF NOT EXISTS game(
+
+    def database_connect(self):
+        self.conn = sqlite3.connect('../users.db')
+        self.cur = self.conn.cursor()
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS game(
            userid INT PRIMARY KEY,
            move1 TEXT,
            move2 TEXT,
            move3 TEXT,
            step INT);
         """)
-        conn.commit()
+        self.conn.commit()
+
+    def dataUser(self):
+        self.database_connect()
+        sqlite_select_query = """SELECT * FROM userid"""
+        self.cur.execute(sqlite_select_query)
+        record = self.cur.fetchall()
+        print(record)
+        for i in record:
+            if i[0] == self.userid:
+                print(i)
+                return i
 
 if __name__ == '__main__':
-    levelOne = Level(35, 5000, 4000, 50000)
-    # levelOne.move_1()
-    # levelOne.move_2()
-    # levelOne.move_3()
-    levelOne.dataBase()
+    levelOne = Level(35, 5000, 4000, 50000, 672532296)
+    levelOne.move_1()
+    levelOne.database_connect()
+    levelOne.dataUser()

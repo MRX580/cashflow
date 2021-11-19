@@ -21,7 +21,8 @@ cur.execute("""CREATE TABLE IF NOT EXISTS users(
 conn.commit()
 logging.basicConfig(level=logging.INFO)
 memory = MemoryStorage()
-bot = Bot(config.TOKEN)
+API_TOKEN = '2053817098:AAEnEIiZno_7vwOCusmq1KBehlpjrS0WkM8'
+bot = Bot(API_TOKEN)
 dp = Dispatcher(bot=bot, storage=memory)
 
 
