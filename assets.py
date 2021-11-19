@@ -37,6 +37,12 @@ class assets:
         for i in record:
             if i[0] == self.userid:
                 return i
+            elif i[1] == self.kripta:
+                return i
+            elif i[2] == self.colvo:
+                return i
+            elif i[3] == self.price:
+                return i
 
 
 
