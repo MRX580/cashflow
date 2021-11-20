@@ -83,18 +83,35 @@ async def choicelevel(message: types.Message):
 
 
 @dp.message_handler(state=game.waitingGame)
-async def choicelevel(message: types.Message):
+async def choicelevel(message: types.Message, state: FSMContext):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
+    try:
+        async with state.proxy() as datas:
+            if float(str(datetime.datetime.now()-datas['time']).replace(':', '')) < 0.3:
+                return
+    except Exception:
+        async with state.proxy() as datas:
+            datas['time'] = datetime.datetime.now()
+        pass
     dataU = data.data(message.chat.id, message.chat.username, message.chat.first_name,
                       message.chat.last_name).dataUser()
     levels.choiceLevel(dataU[6], message.chat.id).dataBaseUpt()
     dataG = data.data(message.chat.id, message.chat.username, message.chat.first_name,
                       message.chat.last_name).dataGame()
     print(dataG)
-    if dataG[dataG[4]] == '':
-        pass
-
+    if dataG[dataG[4]].split()[0].lower() == 'акция':
+        await bot.send_message(message.chat.id, dataG[dataG[4]])
+    elif dataG[dataG[4]].split()[0].lower() == 'облигация':
+        await bot.send_message(message.chat.id, dataG[dataG[4]])
+    elif dataG[dataG[4]].split()[0].lower() == 'бизнес':
+        await bot.send_message(message.chat.id, dataG[dataG[4]])
+    elif dataG[dataG[4]].split()[0].lower() == '(сж)':
+        await bot.send_message(message.chat.id, dataG[dataG[4]])
+    elif dataG[dataG[4]].split()[0].lower() == '(си)':
+        await bot.send_message(message.chat.id, dataG[dataG[4]])
+    async with state.proxy() as datas:
+        datas['time'] = datetime.datetime.now()
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
