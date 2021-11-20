@@ -47,7 +47,11 @@ class assets:
             self.cur.execute(f"""Update stock set {self.kripta} = {self.colvo} where userid = {self.userid}""")
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
-
+        elif self.colvo / self.price >= dataUser[4]:
+            summ_back = dataUser[4] + (self.colvo * self.price)
+            self.cur.execute(f"""Update stock set {self.kripta} = {self.colvo} where userid = {self.userid}""")
+            self.cur.execute(f"""Update users set money = {summ_back} where userid = {self.userid}""")
+            self.conn.commit()
 
 if __name__ == '__main__':
     assets = assets(951679992, 'Связьком', 10, 10)
