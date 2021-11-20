@@ -54,6 +54,12 @@ class assets:
             self.conn.commit()
 
 if __name__ == '__main__':
+<<<<<<< Updated upstream
     assets = assets(951679992, 'Связьком', 10, 10)
     assets.random_cript()
     assets.database_buys_stock()
+=======
+    cript1 = assets(1)
+    cript1.random_cript()
+    cript1.database_connect()
+>>>>>>> Stashed changes

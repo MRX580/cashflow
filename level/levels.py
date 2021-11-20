@@ -9,18 +9,6 @@ class Level:
         self.target = target
         self.userid = userid
 
-    def database_connect(self):
-        self.conn = sqlite3.connect('../users.db')
-        self.cur = self.conn.cursor()
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS game(
-           userid INT PRIMARY KEY,
-           move1 TEXT,
-           move2 TEXT,
-           move3 TEXT,
-           step INT);
-        """)
-        self.conn.commit()
-
     def insuranceFunc(self):
         mass = ['Страховка 5000']
         return mass[0]
@@ -107,28 +95,82 @@ class Level:
         rand = random.randint(0, len(business) - 1)
         return str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
     def move_1(self):
-        while True:
-            rand = random.randint(1, 4)
-            self.work()
-            if rand == 1:
-                return self.businessFunc()
-            if rand == 2:
-                return self.investmentFunc()
-            if rand == 3:
-                return self.stockMarket()
-            if rand == 4:
-                return self.unexpectedExpensesFunc()
+        rand = random.randint(1, 4)
+        self.work()
+        if rand == 1:
+            return self.businessFunc()
+        if rand == 2:
+            return self.investmentFunc()
+        if rand == 3:
+            return self.stockMarket()
+        if rand == 4:
+            return self.unexpectedExpensesFunc()
+    def database_connect(self):
+        self.conn = sqlite3.connect('../users.db')
+        self.cur = self.conn.cursor()
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS game(
+           userid INT PRIMARY KEY,
+           move1 TEXT,
+           move2 TEXT,
+           move3 TEXT,
+           step INT);
+        """)
+        self.conn.commit()
+
     def dataBaseupt(self):
+        x = 1
+        mss = [self.move_1(), self.move_1(), self.move_1()]
         try:
-            step = 1
-            step = step + 1
+            self.step = 1
             self.conn = sqlite3.connect('../users.db')
             self.cur = self.conn.cursor()
-            self.cur.execute("INSERT INTO game VALUES(?,?,?,?,?);",
-                             (self.userid, self.move_1(),self.move_1(),self.move_1(), step))
+            self.cur.execute("INSERT INTO game VALUES(?,?,?,?,?);",(self.userid, mss[1], mss[1], mss[2], self.step))
             self.conn.commit()
+            self.cur.close()
         except sqlite3.IntegrityError:
             pass
+        try:
+            self.conn = sqlite3.connect('../users.db')
+            self.cur = self.conn.cursor()
+            print("Подключен к SQLite")
+
+            self.sqlite_select_query = """SELECT * from game"""
+            self.cur.execute(self.sqlite_select_query)
+            self.records = self.cur.fetchall()
+            print("Всего строк:  ", len(self.records))
+            print("Вывод каждой строки")
+            for row in self.records:
+                #print("userID",row[0], "\n")
+                print(row[1], "\n")
+                print(row[2], "\n")
+                print(row[3], "\n")
+                print(row[4], "\n")
+                x = row[4]
+                print()
+            self.cur.close()
+
+        except sqlite3.Error as error:
+            print("Ошибка при работе с SQLite", error)
+        finally:
+            if self.conn:
+                self.conn.close()
+                print("Соединение с SQLite закрыто")
+        try:
+            self.conn = sqlite3.connect('../users.db')
+            self.cur = self.conn.cursor()
+            print("Подключен к SQLite")
+            self.cur.execute(f"""Update game set step = {x + 1} where userid = 672532296""")
+            self.conn.commit()
+            print("Запись успешно обновлена")
+            self.cur.close()
+
+        except sqlite3.Error as error:
+            print("Ошибка при работе с SQLite", error)
+        finally:
+            if self.conn:
+                self.conn.close()
+                print("Соединение с SQLite закрыто")
+
 if __name__ == '__main__':
     levelOne = Level(35, 5000, 4000, 50000, 672532296)
     levelOne.database_connect()

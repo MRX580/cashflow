@@ -87,6 +87,5 @@ async def choicelevel(message: types.Message):
         datetime.datetime.now()))
     #await bot.send_message(message.chat.id, f'Магазин криптовалют')
 
-
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
