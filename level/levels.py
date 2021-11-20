@@ -2,12 +2,13 @@ import random
 import sqlite3
 
 class Level:
-    def __init__(self, moves, income, costs, target, userid):
+    def __init__(self, moves, income, costs, target, userid,userid1):
         self.moves = moves
         self.income = income
         self.costs = costs
         self.target = target
         self.userid = userid
+        self.userid = userid1
 
     def insuranceFunc(self):
         mass = ['Страховка 5000']
@@ -106,60 +107,49 @@ class Level:
         if rand == 4:
             return self.unexpectedExpensesFunc()
     def database_connect(self):
+        self.step = 0
+        self.sqlite_select_query = """SELECT * from game"""
         self.conn = sqlite3.connect('../users.db')
         self.cur = self.conn.cursor()
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS game(
-           userid INT PRIMARY KEY,
-           move1 TEXT,
-           move2 TEXT,
-           move3 TEXT,
-           step INT);
-        """)
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS game(userid INT PRIMARY KEY,move1 TEXT,move2 TEXT,move3 TEXT,step INT);""")
+        if self.cur.fetchall() is None:
+            self.cur.execute("""CREATE TABLE IF NOT EXISTS game(userid INT PRIMARY KEY,move1 TEXT,move2 TEXT,move3 TEXT,step INT);""")
+        else:
+            print('Такая бд уже есть!')
         self.conn.commit()
 
-    def dataBaseupt(self):
-        x = 1
-        mss = [self.move_1(), self.move_1(), self.move_1()]
+    def dataBaseRec(self):
+        mss = ['ggwp']
         try:
-            self.step = 1
             self.conn = sqlite3.connect('../users.db')
             self.cur = self.conn.cursor()
-            self.cur.execute("INSERT INTO game VALUES(?,?,?,?,?);",(self.userid, mss[1], mss[1], mss[2], self.step))
+            self.cur.execute("INSERT INTO game VALUES(?,?,?,?,?);",(self.userid, self.move_1(),self.move_1(),self.move_1(), self.step))
             self.conn.commit()
             self.cur.close()
         except sqlite3.IntegrityError:
             pass
+
+    def dataBaseUpt(self):
         try:
             self.conn = sqlite3.connect('../users.db')
             self.cur = self.conn.cursor()
-            print("Подключен к SQLite")
-
-            self.sqlite_select_query = """SELECT * from game"""
             self.cur.execute(self.sqlite_select_query)
             self.records = self.cur.fetchall()
-            print("Всего строк:  ", len(self.records))
-            print("Вывод каждой строки")
             for row in self.records:
-                #print("userID",row[0], "\n")
-                print(row[1], "\n")
-                print(row[2], "\n")
-                print(row[3], "\n")
-                print(row[4], "\n")
-                x = row[4]
-                print()
+                self.step = row[4]
             self.cur.close()
-
         except sqlite3.Error as error:
-            print("Ошибка при работе с SQLite", error)
+            print(error)
         finally:
             if self.conn:
                 self.conn.close()
                 print("Соединение с SQLite закрыто")
+
         try:
             self.conn = sqlite3.connect('../users.db')
             self.cur = self.conn.cursor()
             print("Подключен к SQLite")
-            self.cur.execute(f"""Update game set step = {x + 1} where userid = 672532296""")
+            self.cur.execute(f"""Update game set step = {self.step + 1} where userid = {self.userid}""")
             self.conn.commit()
             print("Запись успешно обновлена")
             self.cur.close()
@@ -170,9 +160,33 @@ class Level:
             if self.conn:
                 self.conn.close()
                 print("Соединение с SQLite закрыто")
+        try:
+            text = ['move1']
+            self.conn = sqlite3.connect('../users.db')
+            self.cur = self.conn.cursor()
+            print("Подключен к SQLite")
+            self.cur.execute("SELECT * from game")
+            if self.step == 3:
+                self.step = 1
+                self.cur.execute(f"""Update game set move1 = "{self.move_1()}" where userid = {self.userid}""")
+                self.cur.execute(f"""Update game set move2 = "{self.move_1()}" where userid = {self.userid}""")
+                self.cur.execute(f"""Update game set move3 = "{self.move_1()}" where userid = {self.userid}""")
+                self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
+                self.conn.commit()
+                print("Запись успешно обновлена")
+                self.cur.close()
+            else:
+                print('wp')
+        except sqlite3.Error as error:
+            print(error)
+        finally:
+            if self.conn:
+                self.conn.close()
+                print("Соединение с SQLite закрыто")
 
 if __name__ == '__main__':
-    levelOne = Level(35, 5000, 4000, 50000, 672532296)
+    levelOne = Level(35, 5000, 4000, 50000, 672532296,1)
     levelOne.database_connect()
     levelOne.move_1()
-    levelOne.dataBaseupt()
+    levelOne.dataBaseRec()
+    levelOne.dataBaseUpt()
