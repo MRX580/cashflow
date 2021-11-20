@@ -71,12 +71,12 @@ async def choicelevel(message: types.Message):
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
     dataU = data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).dataUser()
-    levels.choiceLevel(1).dataBaseupt()
+    levels.choiceLevel(1, message.chat.id).dataBaseupt()
     print(dataU)
     if int(dataU[6]) < int(message.text):
         await bot.send_message(message.chat.id, 'Вам еще не доступен этот уровень')
         return
-    await bot.send_message(message.chat.id, levels.choiceLevel(int(dataU[6])).work())
+    await bot.send_message(message.chat.id, levels.choiceLevel(dataU[6], message.chat.id).work())
     await game.waitingGame.set()
 
 
