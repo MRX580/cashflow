@@ -2,13 +2,12 @@ import random
 import sqlite3
 
 class Level:
-    def __init__(self, moves, income, costs, target, userid,userid1):
+    def __init__(self, moves, income, costs, target, userid):
         self.moves = moves
         self.income = income
         self.costs = costs
         self.target = target
         self.userid = userid
-        self.userid = userid1
 
     def insuranceFunc(self):
         mass = ['Страховка 5000']
@@ -185,7 +184,7 @@ class Level:
                 print("Соединение с SQLite закрыто")
 
 if __name__ == '__main__':
-    levelOne = Level(35, 5000, 4000, 50000, 672532296,1)
+    levelOne = Level(35, 5000, 4000, 50000, 672532296)
     levelOne.database_connect()
     levelOne.move_1()
     levelOne.dataBaseRec()
