@@ -6,6 +6,9 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ParseMode
 from aiogram.utils import executor
+
+import level.levels
+
 logging.basicConfig(level=logging.INFO)
 memory = MemoryStorage()
 bot = Bot(config.TOKEN)
@@ -71,12 +74,11 @@ async def choicelevel(message: types.Message):
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
     dataU = data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).dataUser()
-    levels.choiceLevel(1, message.chat.id).dataBaseupt()
-    print(dataU)
     if int(dataU[6]) < int(message.text):
         await bot.send_message(message.chat.id, 'Вам еще не доступен этот уровень')
         return
     await bot.send_message(message.chat.id, levels.choiceLevel(dataU[6], message.chat.id).work())
+    data.data(message.chat.id, column='levelNow', changes=dataU[6]).dataChanges()
     await game.waitingGame.set()
 
 
@@ -85,7 +87,14 @@ async def choicelevel(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
-    #await bot.send_message(message.chat.id, f'Магазин криптовалют')
+    dataU = data.data(message.chat.id, message.chat.username, message.chat.first_name,
+                      message.chat.last_name).dataUser()
+    levels.choiceLevel(dataU[6], message.chat.id).dataBaseUpt()
+    dataG = data.data(message.chat.id, message.chat.username, message.chat.first_name,
+                      message.chat.last_name).dataGame()
+    print(dataG)
+    if dataG[dataG[4]] == '':
+        pass
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)

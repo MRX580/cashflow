@@ -1,8 +1,13 @@
 from flask import Flask, request
-import requests, config
+import requests, config, monobank
 app = Flask(__name__)
+api = 'uleg83g61zaIJVBkI-j_HC6As4lhhWgf75k7QN7nvW7U'
 
-def get_from_env(key):
+mono = monobank.Client(api)
+print(mono.get_client_info())
+
+
+'''def get_from_env(key):
     return eval(f'config.{key}')
 
 def send_message(chat_id, text):
@@ -19,4 +24,4 @@ def process():
     return {"ok": True}
 
 if __name__ == '__main__':
-    app.run()
+    app.run()'''
