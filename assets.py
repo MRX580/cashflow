@@ -6,6 +6,7 @@ class assets:
         self.colvo = colvo
         self.price = price
         self.conn = sqlite3.connect('users.db')
+        self.conn = sqlite3.connect('game.db')
         self.cur = self.conn.cursor()
         self.conn.commit()
         print('Database connected')
@@ -17,12 +18,22 @@ class assets:
         eth_price = random.randint(3950, 4022)
         return 'Выбери крипту:\n1.Bitcoin ' + str(btc_price) + '$\n2.Binance Coin' + str(bnb_price) + '$\n3.Avalanche' + str(avax_price) + '$\n4.Solana' + str(sol_price) + '$\n5.Ethereum' + str(eth_price) + '$'
 
+    def buy_insurance(self):
+        return '1.Страховка на жизнь - 5 000 руб\n2.Страховка на имущество - 3000 руб'
 
-    def kriptaUser(self):
-        sqlite_select_query = """SELECT * FROM kripta"""
+    def insuranceUser(self):
+        sqlite_select_query = """SELECT * FROM game"""
         self.cur.execute(sqlite_select_query)
         record = self.cur.fetchall()
         for i in record:
+            if i[0] == self.userid:
+                return i
+
+    def kriptaUser(self):
+        sqlite_select_query1 = """SELECT * FROM kripta"""
+        self.cur.execute(sqlite_select_query1)
+        record1 = self.cur.fetchall()
+        for i in record1:
             if i[0] == self.userid:
                 return i
 
@@ -48,4 +59,7 @@ class assets:
 if __name__ == '__main__':
     assets = assets(951679992, 'Связьком', 10, 10)
     assets.random_cript()
-    assets.database_buys_stock()
+    assets.buy_insurance()
+
+
+
