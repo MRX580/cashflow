@@ -125,7 +125,6 @@ class Level:
             pass
 
     def dataBaseUpt(self):
-<<<<<<< Updated upstream
         try:
             self.conn = sqlite3.connect('users.db')
             self.cur = self.conn.cursor()
@@ -138,7 +137,6 @@ class Level:
             self.cur.close()
         except sqlite3.Error as error:
             print("Ошибка при работе с SQLite", error)
-=======
         self.conn = sqlite3.connect('../users.db')
         self.cur = self.conn.cursor()
         sqlite_select_query = """SELECT * FROM game"""
@@ -148,9 +146,6 @@ class Level:
             self.step = row[4]
             print(self.step)
         self.cur.close()
-
->>>>>>> Stashed changes
-
         try:
             self.conn = sqlite3.connect('../users.db')
             self.cur = self.conn.cursor()
