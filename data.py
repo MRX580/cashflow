@@ -1,6 +1,6 @@
 import sqlite3
 class data:
-    def __init__(self, userid, column = None, changes = None, userName = None, userFirst = None, userLast = None):
+    def __init__(self, userid, column = None, changes = None, userName = None, userFirst = None, userLast = None, comment = None, money = None):
         self.userid = userid
         self.userName = userName
         self.userFirst = userFirst
@@ -41,6 +41,11 @@ class data:
                                     move2 TEXT,
                                     move3 TEXT,
                                     step INT);""")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS donate(
+                                            userid INT PRIMARY KEY,
+                                            summ TEXT,
+                                            comment TEXT,
+                                            time TEXT);""")
         self.conn.commit()
 
 
@@ -58,6 +63,10 @@ class data:
             if i[0] == self.userid:
                 return i
         return False
+
+
+    #def donate(self):
+
 
 
     def databaseNewUser(self):

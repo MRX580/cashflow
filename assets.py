@@ -5,7 +5,6 @@ class assets:
         self.kripta = kripta
         self.colvo = colvo
         self.price = price
-        data.data(0,0,0,0).database_connect()
         self.conn = sqlite3.connect('users.db')
         self.cur = self.conn.cursor()
         self.conn.commit()
@@ -50,4 +49,3 @@ if __name__ == '__main__':
     assets = assets(951679992, 'Связьком', 10, 10)
     assets.random_cript()
     assets.database_buys_stock()
-
