@@ -26,17 +26,18 @@ async def start(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
-    data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).databaseNewUser()
+    data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name, userLast=message.chat.last_name).databaseNewUser()
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     data.data(message.chat.id).donate()
     markup.add('Начать игру')
     await dp.bot.set_my_commands([
         types.BotCommand("rules", "Правила игры"),
+        types.BotCommand("donate", "Покупка премиума"),
     ])
     await message.reply('Привет! Это бот о финансовой грамотности, в этом курсе вы будете иначе мыслить, '
                         'и не будете жить от зарплаты до зарплаты, здесь будут ситуации максимально приближённые к '
                         'реальной жизни, по этому курс точно не будет скучным!\nЕсли вы никогда не играли в подобные '
-                        'игры рекомендую ознакомиться с правилами - /rules\nЧто бы присоедениться к группе - join ('
+                        'игры рекомендую ознакомиться с правилами - /rules\nДонат - /donate\nЧто бы присоедениться к группе - join ('
                         'id)\nЧто начать игру введите - Начать игру',
                         reply_markup=markup)
     await bot.send_message(message.chat.id, 'Work')
@@ -47,7 +48,7 @@ async def rules(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
-    data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).databaseNewUser()
+    data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name, userLast= message.chat.last_name).databaseNewUser()
     await bot.send_message(message.chat.id, md.text('coming soon'),
                            parse_mode=ParseMode.MARKDOWN)
 
@@ -56,7 +57,7 @@ async def rules(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
-    data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).databaseNewUser()
+    data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name, userLast= message.chat.last_name).databaseNewUser()
     await bot.send_message(message.chat.id, data.data(message.chat.id, money=200).donate())
 
 
@@ -65,9 +66,9 @@ async def main(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
-    data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).databaseNewUser()
+    data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name, userLast= message.chat.last_name).databaseNewUser()
     if message.text.lower() == 'начать игру':
-        dataU = data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).dataUser()
+        dataU = data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name, userLast= message.chat.last_name).dataUser()
         await bot.send_message(message.chat.id, f'Для начала вам нужно выбрать уровень\nВаши доступные уровни {dataU[6]}')
         await game.choiceLevel.set()
 
@@ -82,7 +83,7 @@ async def choicelevel(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
-    dataU = data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).dataUser()
+    dataU = data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name, userLast= message.chat.last_name).dataUser()
     if int(dataU[6]) < int(message.text):
         await bot.send_message(message.chat.id, 'Вам еще не доступен этот уровень')
         return
@@ -104,11 +105,11 @@ async def choicelevel(message: types.Message, state: FSMContext):
         async with state.proxy() as datas:
             datas['time'] = datetime.datetime.now()
         pass
-    dataU = data.data(message.chat.id, message.chat.username, message.chat.first_name,
-                      message.chat.last_name).dataUser()
+    dataU = data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name,
+                      userLast=message.chat.last_name).dataUser()
     levels.choiceLevel(dataU[6], message.chat.id).dataBaseUpt()
-    dataG = data.data(message.chat.id, message.chat.username, message.chat.first_name,
-                      message.chat.last_name).dataGame()
+    dataG = data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name,
+                      userLast=message.chat.last_name).dataGame()
     print(dataG)
     if dataG[dataG[4]].split()[0].lower() == 'акция':
         await bot.send_message(message.chat.id, dataG[dataG[4]])
