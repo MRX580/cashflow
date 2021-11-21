@@ -28,6 +28,7 @@ async def start(message: types.Message):
         datetime.datetime.now()))
     data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).databaseNewUser()
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+    data.data(message.chat.id).donate()
     markup.add('Начать игру')
     await dp.bot.set_my_commands([
         types.BotCommand("rules", "Правила игры"),
@@ -49,6 +50,14 @@ async def rules(message: types.Message):
     data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).databaseNewUser()
     await bot.send_message(message.chat.id, md.text('coming soon'),
                            parse_mode=ParseMode.MARKDOWN)
+
+@dp.message_handler(commands='donate')
+async def rules(message: types.Message):
+    print('[INFO] ' + str(
+        message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
+        datetime.datetime.now()))
+    data.data(message.chat.id, message.chat.username, message.chat.first_name, message.chat.last_name).databaseNewUser()
+    await bot.send_message(message.chat.id, data.data(message.chat.id, money=200).donate())
 
 
 @dp.message_handler(content_types='text')
