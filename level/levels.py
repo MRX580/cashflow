@@ -188,24 +188,11 @@ class Level:
         try:
             self.conn = sqlite3.connect('../users.db')
             self.cur = self.conn.cursor()
-            self.cur.execute(f"""Update game set moves = {self.moves - 1} where userid = {self.userid}""")
+            self.cur.execute("SELECT * from game")
+            self.moves = -1
+            self.cur.execute(f"""Update game set moves = {self.moves} where userid = {self.userid}""")
             self.conn.commit()
             self.cur.close()
-
-        except sqlite3.Error as error:
-            print("Ошибка при работе с SQLite", error)
-        finally:
-            if self.conn:
-                self.conn.close()
-        try:
-            self.conn = sqlite3.connect('../users.db')
-            self.cur = self.conn.cursor()
-            self.cur.execute("SELECT * from game")
-            if self.moves == -3:
-                self.moves = 0
-                self.cur.execute(f"""Update game set moves = {self.moves} where userid = {self.userid}""")
-                self.conn.commit()
-                self.cur.close()
         except sqlite3.Error as error:
             print(error)
         finally:
