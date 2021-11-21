@@ -125,17 +125,18 @@ class Level:
             pass
 
     def dataBaseUpt(self):
-        #try:
-        self.conn = sqlite3.connect('users.db')
-        self.cur = self.conn.cursor()
-        sqlite_select_query = """SELECT * FROM game"""
-        self.cur.execute(sqlite_select_query)
-        records = self.cur.fetchall()
-        for row in records:
-            self.step = row[4]
-            print(self.step)
-        self.cur.close()
-
+        try:
+            self.conn = sqlite3.connect('users.db')
+            self.cur = self.conn.cursor()
+            sqlite_select_query = """SELECT * FROM game"""
+            self.cur.execute(sqlite_select_query)
+            records = self.cur.fetchall()
+            for row in records:
+                self.step = row[4]
+                print(self.step)
+            self.cur.close()
+        except sqlite3.Error as error:
+            print("Ошибка при работе с SQLite", error)
 
         try:
             self.conn = sqlite3.connect('users.db')
