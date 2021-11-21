@@ -72,10 +72,10 @@ class data:
             self.cur.execute("INSERT INTO donate VALUES(?, ?, ?, ?);",
                              (self.userid, self.money, code, datetime.datetime.now()))
             self.conn.commit()
-            return f"К оплате %s на эту карту 44411144257586\nОБЕЗАТЕЛЬНО - к оплате добавьте комментарий %s без него " \
+            return f"К оплате %s на эту карту 4441114425447586\nОБЕЗАТЕЛЬНО - к оплате добавьте комментарий %s без него " \
                    f"покупка не будет совершена\nКомментарий будет действовать сутки после сгенерируйте новый\nhttps://send.monobank.ua/2nyBFqiKgz?amount={self.money}&f=enabled&text={code}\nВаш запрос будет обработан в течении 1 минуты" % (self.money, code)
         except sqlite3.IntegrityError:
-            return f"К оплате %s на эту карту 44411144257586\nОБЕЗАТЕЛЬНО - к оплате добавьте комментарий %s без него " \
+            return f"К оплате %s на эту карту 4441114425447586\nОБЕЗАТЕЛЬНО - к оплате добавьте комментарий %s без него " \
                    f"покупка не будет совершена\nКомментарий будет действовать сутки после сгенерируйте новый\nhttps://send.monobank.ua/2nyBFqiKgz?amount={self.dataDonate()[1]}&f=enabled&text={self.dataDonate()[2]}\nВаш запрос будет обработан в течении 1 минуты" % (self.dataDonate()[1], self.dataDonate()[2])
 
     def databaseNewUser(self):
@@ -83,15 +83,18 @@ class data:
             try:
                 self.cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
                             (self.userid, self.userName, self.userFirst, self.userLast, 0, False, 1, 0, False))
+                self.conn.commit()
                 self.cur.execute("INSERT INTO kripta VALUES(?, ?, ?, ?, ?, ?);",
                                  (self.userid, 0, 0, 0, 0, 0))
+                self.conn.commit()
                 self.cur.execute("INSERT INTO stock VALUES(?, ?, ?, ?, ?, ?);",
                                  (self.userid, 0, 0, 0, 0, 0))
+                self.conn.commit()
                 self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?);",
                                  (self.userid, 0, 0, 0, 3))
                 self.conn.commit()
-            except sqlite3.IntegrityError:
-                pass
+            except sqlite3.IntegrityError as e:
+                print(e)
 
 
     def dataGame(self):

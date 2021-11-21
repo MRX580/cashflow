@@ -6,7 +6,6 @@ class assets:
         self.colvo = colvo
         self.price = price
         self.conn = sqlite3.connect('users.db')
-        self.conn = sqlite3.connect('game.db')
         self.cur = self.conn.cursor()
         self.conn.commit()
         print('Database connected')
