@@ -21,6 +21,7 @@ class data:
                                    levelNow INT,
                                    premium BOOLEAN);
                 """)
+        self.conn.commit()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS kripta(
                                    userid INT PRIMARY KEY,
                                    btc INT,
@@ -29,6 +30,7 @@ class data:
                                    sol INT,
                                    eth INT);
                                 """)
+        self.conn.commit()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS stock(
                                    userid INT PRIMARY KEY,
                                    Связьком INT,
@@ -36,12 +38,8 @@ class data:
                                    Инвестбанк INT,
                                    Агросбыт INT,
                                    Металлпром INT);""")
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS game(
-                                    userid INT PRIMARY KEY,
-                                    move1 TEXT,
-                                    move2 TEXT,
-                                    move3 TEXT,
-                                    step INT);""")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS game(userid INT PRIMARY KEY,move1 TEXT,move2 TEXT,move3 TEXT,step INT, moves INT, income INT, costs INT, target INT);""")
+        self.conn.commit()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS donate(
                                             userid INT PRIMARY KEY,
                                             summ INT,
@@ -72,11 +70,11 @@ class data:
             self.cur.execute("INSERT INTO donate VALUES(?, ?, ?, ?);",
                              (self.userid, self.money, code, datetime.datetime.now()))
             self.conn.commit()
-            return f"К оплате %s на эту карту 4441114425447586\nОБЕЗАТЕЛЬНО - к оплате добавьте комментарий %s без него " \
-                   f"покупка не будет совершена\nКомментарий будет действовать сутки после сгенерируйте новый\nhttps://send.monobank.ua/2nyBFqiKgz?amount={self.money}&f=enabled&text={code}\nВаш запрос будет обработан в течении 1 минуты" % (self.money, code)
+            return f"К оплате {self.money} грн\nОБЕЗАТЕЛЬНО - к оплате добавьте комментарий {code} без него " \
+                   f"покупка не будет совершена\nКомментарий будет действовать сутки после сгенерируйте новый\nhttps://send.monobank.ua/2nyBFqiKgz?amount={self.money}&f=enabled&text={code}\nВаш запрос будет обработан в течении 1 минуты"
         except sqlite3.IntegrityError:
-            return f"К оплате %s на эту карту 4441114425447586\nОБЕЗАТЕЛЬНО - к оплате добавьте комментарий %s без него " \
-                   f"покупка не будет совершена\nКомментарий будет действовать сутки после сгенерируйте новый\nhttps://send.monobank.ua/2nyBFqiKgz?amount={self.dataDonate()[1]}&f=enabled&text={self.dataDonate()[2]}\nВаш запрос будет обработан в течении 1 минуты" % (self.dataDonate()[1], self.dataDonate()[2])
+            return f"К оплате {self.dataDonate()[1]} грн\nОБЕЗАТЕЛЬНО - к оплате добавьте комментарий {self.dataDonate()[2]} без него " \
+                   f"покупка не будет совершена\nКомментарий будет действовать сутки после сгенерируйте новый\nhttps://send.monobank.ua/2nyBFqiKgz?amount={self.dataDonate()[1]}&f=enabled&text={self.dataDonate()[2]}\nВаш запрос будет обработан в течении 1 минуты"
 
     def databaseNewUser(self):
         if self.dataUser() == False:
@@ -90,8 +88,8 @@ class data:
                 self.cur.execute("INSERT INTO stock VALUES(?, ?, ?, ?, ?, ?);",
                                  (self.userid, 0, 0, 0, 0, 0))
                 self.conn.commit()
-                self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?);",
-                                 (self.userid, 0, 0, 0, 3))
+                self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                                 (self.userid, 0, 0, 0, 3, 0, 0, 0, 0))
                 self.conn.commit()
             except sqlite3.IntegrityError as e:
                 print(e)
