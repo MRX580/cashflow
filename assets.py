@@ -17,7 +17,7 @@ class assets:
         eth_price = random.randint(3950, 4022)
         return 'Выбери крипту:\n1.Bitcoin ' + str(btc_price) + '$\n2.Binance Coin' + str(bnb_price) + '$\n3.Avalanche' + str(avax_price) + '$\n4.Solana' + str(sol_price) + '$\n5.Ethereum' + str(eth_price) + '$'
 
-    def buy_insurance(self):
+    def choise_insurance(self):
         return '1.Страховка на жизнь - 5 000 руб\n2.Страховка на имущество - 3000 руб'
 
     def insuranceUser(self):
@@ -67,7 +67,7 @@ class assets:
 if __name__ == '__main__':
     assets = assets(951679992, 'Связьком', 10, 10)
     assets.random_cript()
-    assets.buy_insurance()
+    assets.choise_insurance()
 
 
 
