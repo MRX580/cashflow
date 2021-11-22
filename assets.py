@@ -36,23 +36,12 @@ class assets:
             if i[0] == self.userid:
                 return i
 
-    # МОЙ КОД -------------------------------
-
     def database_user_stock(self):
         self.cur.execute("""SELECT * FROM stock""")
         record = self.cur.fetchall()
         for i in record:
             if i[0] == self.userid:
                 return i
-
-    def database_sells_stock(self):
-        dataUser = data.data(self.userid).dataUser()
-        if self.colvo - self.price <= dataUser[4]:
-            summ1 = dataUser[4] + (self.colvo * self.price)
-            self.cur.execute(f"""Update stock set {self.kripta} = {self.colvo} where userid = {self.userid}""")
-            self.cur.execute(f"""Update users set money = {summ1} where userid = {self.userid}""")
-            self.conn.commit()
-
 
     def database_buys_stock(self):
         dataUser = data.data(self.userid).dataUser()
@@ -61,7 +50,6 @@ class assets:
             self.cur.execute(f"""Update stock set {self.kripta} = {self.colvo} where userid = {self.userid}""")
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
-
 
 
 if __name__ == '__main__':
