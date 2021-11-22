@@ -1,4 +1,4 @@
-import sqlite3, logging, math, os, random, datetime, config, level.choicelevel as levels, data
+import sqlite3, logging, math, os, random, datetime, config, level.choicelevel as levels, data, assets
 import aiogram.utils.markdown as md
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -42,6 +42,9 @@ async def start(message: types.Message):
                         reply_markup=markup)
     await bot.send_message(message.chat.id, 'Work')
 
+@dp.message_handler(commands=['proverka'])
+async def proverka(message: types.Message):
+    await bot.send_message(message.chat.id, assets.assets.database_buys_stock())
 
 @dp.message_handler(commands='rules')
 async def rules(message: types.Message):

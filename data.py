@@ -22,7 +22,7 @@ class data:
                                    premium BOOLEAN);
                 """)
         self.conn.commit()
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS kripta(
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS coins(
                                    userid INT PRIMARY KEY,
                                    btc INT,
                                    bnb INT,
@@ -82,7 +82,7 @@ class data:
                 self.cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
                             (self.userid, self.userName, self.userFirst, self.userLast, 0, False, 1, 0, False))
                 self.conn.commit()
-                self.cur.execute("INSERT INTO kripta VALUES(?, ?, ?, ?, ?, ?);",
+                self.cur.execute("INSERT INTO coins VALUES(?, ?, ?, ?, ?, ?);",
                                  (self.userid, 0, 0, 0, 0, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO stock VALUES(?, ?, ?, ?, ?, ?);",
