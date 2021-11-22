@@ -1,4 +1,6 @@
 import random, sqlite3, data
+
+
 class assets:
     def __init__(self, userid, kripta, colvo, price):
         self.userid = userid
@@ -9,13 +11,16 @@ class assets:
         self.cur = self.conn.cursor()
         self.conn.commit()
         print('Database connected')
+
     def random_cript(self):
         btc_price = random.randint(54000, 64000)
         bnb_price = random.randint(450, 540)
         avax_price = random.randint(80, 102)
         sol_price = random.randint(150, 197)
         eth_price = random.randint(3950, 4022)
-        return 'Выбери крипту:\n1.Bitcoin ' + str(btc_price) + '$\n2.Binance Coin' + str(bnb_price) + '$\n3.Avalanche' + str(avax_price) + '$\n4.Solana' + str(sol_price) + '$\n5.Ethereum' + str(eth_price) + '$'
+        return 'Выбери крипту:\n1.Bitcoin ' + str(btc_price) + '$\n2.Binance Coin' + str(
+            bnb_price) + '$\n3.Avalanche' + str(avax_price) + '$\n4.Solana' + str(sol_price) + '$\n5.Ethereum' + str(
+            eth_price) + '$'
 
     def choise_insurance(self):
         return '1.Страховка на жизнь - 5 000 руб\n2.Страховка на имущество - 3000 руб'
@@ -44,6 +49,7 @@ class assets:
         for i in record:
             if i[0] == self.userid:
                 return i
+
     # Не работает
     '''def database_sells_stock(self):
         dataUser = data.data(self.userid).dataUser()
@@ -63,11 +69,7 @@ class assets:
             self.conn.commit()
 
 
-
 if __name__ == '__main__':
     assets = assets(951679992, 'Связьком', 10, 10)
     assets.random_cript()
     assets.choise_insurance()
-
-
-
