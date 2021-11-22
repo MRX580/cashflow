@@ -36,12 +36,7 @@ class data:
                                    Инвестбанк INT,
                                    Агросбыт INT,
                                    Металлпром INT);""")
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS game(
-                                    userid INT PRIMARY KEY,
-                                    move1 TEXT,
-                                    move2 TEXT,
-                                    move3 TEXT,
-                                    step INT);""")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS game(userid INT PRIMARY KEY,move1 TEXT,move2 TEXT,move3 TEXT,step INT, moves INT, income INT, costs INT, target INT""")
         self.cur.execute("""CREATE TABLE IF NOT EXISTS donate(
                                             userid INT PRIMARY KEY,
                                             summ INT,

@@ -131,10 +131,10 @@ class Level:
         self.cur.execute(sqlite_select_query)
         records = self.cur.fetchall()
         for row in records:
-            if self.userid:
+            if self.userid == row[0]:
                 self.step = row[4]
             else:
-                print('нет такого id')
+                print('Нет такого id!')
         self.cur.close()
         try:
             self.conn = sqlite3.connect('users.db')
@@ -153,17 +153,14 @@ class Level:
             self.conn = sqlite3.connect('users.db')
             self.cur = self.conn.cursor()
             self.cur.execute("SELECT * from game")
-            if self.userid:
-                if self.step == 3:
-                    self.step = 1
-                    self.cur.execute(f"""Update game set move1 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move2 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move3 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                    self.conn.commit()
-                    self.cur.close()
-            else:
-                print('нет такого id')
+            if self.step == 3:
+                self.step = 1
+                self.cur.execute(f"""Update game set move1 = "{self.move_1()}" where userid = {self.userid}""")
+                self.cur.execute(f"""Update game set move2 = "{self.move_1()}" where userid = {self.userid}""")
+                self.cur.execute(f"""Update game set move3 = "{self.move_1()}" where userid = {self.userid}""")
+                self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
+                self.conn.commit()
+                self.cur.close()
         except sqlite3.Error as error:
             print(error)
         finally:
@@ -176,7 +173,7 @@ class Level:
         self.cur.execute(sqlite_select_query)
         records = self.cur.fetchall()
         for row in records:
-            self.moves = row[5]
+            self.moves = row[5] - 1
             print(self.moves)
         self.cur.close()
 
@@ -184,7 +181,6 @@ class Level:
             self.conn = sqlite3.connect('users.db')
             self.cur = self.conn.cursor()
             self.cur.execute("SELECT * from game")
-            self.moves = -1
             self.cur.execute(f"""Update game set moves = {self.moves} where userid = {self.userid}""")
             self.conn.commit()
             self.cur.close()
@@ -195,7 +191,7 @@ class Level:
                 self.conn.close()
 
 if __name__ == '__main__':
-    levelOne = Level(0, 5000, 4000, 50000, 672532296)
+    levelOne = Level(42, 5000, 4000, 50000, 672532296)
     levelOne.database_connect()
     levelOne.move_1()
     levelOne.dataBaseRec()
