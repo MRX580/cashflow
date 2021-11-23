@@ -104,7 +104,7 @@ class assets:
             self.cur.execute(f"""Update businesses set ДоходAMD = {self.number * 500} where userid = {self.userid}""")
             self.cur.execute(f"""Update businesses set ДоходIntel = {self.number * 700} where userid = {self.userid}""")
             self.cur.execute(f"""Update businesses set ДоходNvidia = {self.number * 900} where userid = {self.userid}""")
-            self.cur.execute(f"""Update businesses set ДоходNvidia = {self.number * 1200} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходApple = {self.number * 1200} where userid = {self.userid}""")
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             print(summ)
             self.conn.commit()
