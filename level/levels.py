@@ -107,7 +107,7 @@ class Level:
     def database_connect(self):
         self.step = 0
         self.sqlite_select_query = """SELECT * from game"""
-        self.conn = sqlite3.connect('users.db')
+        self.conn = sqlite3.connect('../users.db')
         self.cur = self.conn.cursor()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS game(userid INT PRIMARY KEY,move1 TEXT,move2 TEXT,move3 TEXT,step INT, moves INT, income INT, costs INT, target INT);""")
         if self.cur.fetchall() is None:
@@ -116,7 +116,7 @@ class Level:
 
     def dataBaseRec(self):
         try:
-            self.conn = sqlite3.connect('users.db')
+            self.conn = sqlite3.connect('../users.db')
             self.cur = self.conn.cursor()
             self.cur.execute("INSERT INTO game VALUES(?,?,?,?,?,?,?,?,?);",(self.userid, self.move_1(),self.move_1(),self.move_1(), self.step, self.moves,self.income,self.costs,self.target))
             self.conn.commit()
@@ -126,7 +126,7 @@ class Level:
 
     def dataBaseUpt(self):
         try:
-            self.conn = sqlite3.connect('users.db')
+            self.conn = sqlite3.connect('../users.db')
             self.cur = self.conn.cursor()
             sqlite_select_query = """SELECT * FROM game"""
             self.cur.execute(sqlite_select_query)
@@ -136,8 +136,29 @@ class Level:
             self.cur.close()
         except sqlite3.Error as error:
             print("Ошибка при работе с SQLite", error)
+        self.conn = sqlite3.connect('../users.db')
+        self.cur = self.conn.cursor()
+        sqlite_select_query = """SELECT * FROM game"""
+        self.cur.execute(sqlite_select_query)
+        records = self.cur.fetchall()
+        for row in records:
+            self.step = row[4]
+            print(self.step)
+        self.cur.close()
         try:
-            self.conn = sqlite3.connect('users.db')
+            self.conn = sqlite3.connect('../users.db')
+            self.cur = self.conn.cursor()
+            self.cur.execute(f"""Update game set step = {self.step + 1} where userid = {self.userid}""")
+            self.conn.commit()
+            self.cur.close()
+
+        except sqlite3.Error as error:
+            print("Ошибка при работе с SQLite", error)
+        finally:
+            if self.conn:
+                self.conn.close()
+        try:
+            self.conn = sqlite3.connect('../users.db')
             self.cur = self.conn.cursor()
             self.cur.execute("SELECT * from game")
             if self.step == 3:
@@ -153,31 +174,8 @@ class Level:
         finally:
             if self.conn:
                 self.conn.close()
-        self.conn = sqlite3.connect('users.db')
-        self.cur = self.conn.cursor()
-        sqlite_select_query = """SELECT * FROM game"""
-        self.cur.execute(sqlite_select_query)
-        records = self.cur.fetchall()
-        for row in records:
-            self.step = row[4]
-            print(self.step)
-        self.cur.close()
-        try:
-            self.conn = sqlite3.connect('users.db')
-            self.cur = self.conn.cursor()
-            self.cur.execute(f"""Update game set step = {self.step + 1} where userid = {self.userid}""")
-            self.conn.commit()
-            self.cur.close()
-
-        except sqlite3.Error as error:
-            print("Ошибка при работе с SQLite", error)
-        finally:
-            if self.conn:
-                self.conn.close()
-
-
     def dataBaseMoves(self):
-        self.conn = sqlite3.connect('users.db')
+        self.conn = sqlite3.connect('../users.db')
         self.cur = self.conn.cursor()
         sqlite_select_query = """SELECT * FROM game"""
         self.cur.execute(sqlite_select_query)
@@ -188,7 +186,7 @@ class Level:
         self.cur.close()
 
         try:
-            self.conn = sqlite3.connect('users.db')
+            self.conn = sqlite3.connect('../users.db')
             self.cur = self.conn.cursor()
             self.cur.execute("SELECT * from game")
             self.moves = -1

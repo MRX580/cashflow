@@ -15,7 +15,7 @@ while True:
     print(eval(comm))
     commdatabase = []
     commMono = []
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('cashflow/users.db')
     cur = conn.cursor()
     sqlite_select_query = """SELECT * FROM donate"""
     cur.execute(sqlite_select_query)

@@ -40,7 +40,6 @@ async def start(message: types.Message):
                         'игры рекомендую ознакомиться с правилами - /rules\nДонат - /donate\nЧто бы присоедениться к группе - join ('
                         'id)\nЧто начать игру введите - Начать игру',
                         reply_markup=markup)
-    await bot.send_message(message.chat.id, 'Work')
 
 
 @dp.message_handler(commands='rules')
@@ -53,7 +52,7 @@ async def rules(message: types.Message):
                            parse_mode=ParseMode.MARKDOWN)
 
 @dp.message_handler(commands='donate')
-async def rules(message: types.Message):
+async def donate(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
@@ -70,8 +69,6 @@ async def main(message: types.Message):
         dataU = data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name, userLast= message.chat.last_name).dataUser()
         await bot.send_message(message.chat.id, f'Для начала вам нужно выбрать уровень\nВаши доступные уровни {dataU[6]}')
         await game.choiceLevel.set()
-    if message.text == 10:
-        await bot.send_message(message.chat.id, assets.assets.database_buys_stock())
 
 
 @dp.message_handler(lambda message: not message.text.isdigit(), state=game.choiceLevel)
@@ -88,7 +85,9 @@ async def choicelevel(message: types.Message):
     if int(dataU[6]) < int(message.text):
         await bot.send_message(message.chat.id, 'Вам еще не доступен этот уровень')
         return
-    await bot.send_message(message.chat.id, levels.choiceLevel(dataU[6], message.chat.id).work())
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
+    markup.add('Продолжить')
+    await bot.send_message(message.chat.id, levels.choiceLevel(dataU[6], message.chat.id).work(), reply_markup=markup)
     data.data(message.chat.id, column='levelNow', changes=dataU[6]).dataChanges()
     await game.waitingGame.set()
 
@@ -111,18 +110,24 @@ async def choicelevel(message: types.Message, state: FSMContext):
     levels.choiceLevel(dataU[6], message.chat.id).dataBaseUpt()
     dataG = data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name,
                       userLast=message.chat.last_name).dataGame()
-    print(dataG)
-    if dataG[dataG[4]].split()[0].lower() == 'акция':
-        await bot.send_message(message.chat.id, dataG[dataG[4]])
-    elif dataG[dataG[4]].split()[0].lower() == 'облигация':
-        await bot.send_message(message.chat.id, dataG[dataG[4]])
-    elif dataG[dataG[4]].split()[0].lower() == 'бизнес':
-        await bot.send_message(message.chat.id, dataG[dataG[4]])
-    elif dataG[dataG[4]].split()[0].lower() == '(сж)':
-        await bot.send_message(message.chat.id, dataG[dataG[4]])
-    elif dataG[dataG[4]].split()[0].lower() == '(си)':
-        await bot.send_message(message.chat.id, dataG[dataG[4]])
     async with state.proxy() as datas:
-        datas['time'] = datetime.datetime.now()
+        if message.text.lower() == 'продолжить':
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
+            markup.add('Продолжить')
+            if dataG[dataG[4]].split()[0].lower() == 'акция':
+                datas['stock'] = True
+                markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
+                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика')
+            elif dataG[dataG[4]].split()[0].lower() == 'облигация':
+                datas['stock'] = True
+                markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
+                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика')
+            elif dataG[dataG[4]].split()[0].lower() == 'бизнес':
+                datas['stock'] = True
+                markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
+                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика')
+            await bot.send_message(message.chat.id, dataG[dataG[4]], reply_markup=markup)
+            datas['time'] = datetime.datetime.now()
+            return
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)

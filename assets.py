@@ -2,7 +2,7 @@ import random, sqlite3, data
 
 
 class assets:
-    def __init__(self, userid,coin,bondes,business,number,price):
+    def __init__(self, userid, number, price, coin = None, bondes = None, business = None):
         self.userid = userid
         self.coin = coin
         self.bondes = bondes
@@ -11,7 +11,7 @@ class assets:
         self.price = price
 
 
-        self.conn = sqlite3.connect('users.db')
+        self.conn = sqlite3.connect('cashflow/users.db')
         self.cur = self.conn.cursor()
         self.conn.commit()
         print('Database connected')
@@ -69,9 +69,11 @@ class assets:
         dataUser = data.data(self.userid).dataUser()
         dataStock = self.database_user_stock()
         if self.number * self.price <= dataUser[4]:
-            if self.coin == dataStock[1]:
-                coin = dataStock[1]
-                self.number += coin
+            for i in range(1,5):
+                if self.coin == dataStock[i]:
+                    coin = dataStock[i]
+                    self.number += coin
+                    break
             summ = dataUser[4] - (self.number * self.price)
             self.cur.execute(f"""Update stock set {self.coin} = {self.number} where userid = {self.userid}""")
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
