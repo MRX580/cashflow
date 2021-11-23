@@ -111,6 +111,17 @@ async def choicelevel(message: types.Message, state: FSMContext):
     dataG = data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name,
                       userLast=message.chat.last_name).dataGame()
     async with state.proxy() as datas:
+        data.data(message.chat.id).dataStock()
+        data.data(message.chat.id).dataUser()
+        data.data(message.chat.id).dataCoins()
+        data.data(message.chat.id).dataBonds()
+        data.data(message.chat.id).dataBusinesses()
+        data.data(message.chat.id).dataGame()
+        if dataG[4] == 4:
+            await bot.send_message(message.chat.id, 'Итоги месяца')
+            return
+        if message.text.lower() == 'Статистика':
+            await bot.send_message(message.chat.id, '')
         if message.text.lower() == 'продолжить':
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
             markup.add('Продолжить')
