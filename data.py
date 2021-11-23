@@ -46,7 +46,10 @@ class data:
                                             comment TEXT,
                                             time TEXT);""")
         self.conn.commit()
-
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS bondes(userid INT PRIMARY KEY, Вексель INT, Доход INT);""")
+        self.conn.commit()
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS businesses(userid INT PRIMARY KEY, AMD INT, ДоходAMD INT, Intel INT, ДоходIntel, Nvidia INT, ДоходNvidia, Apple INT, ДоходNvidia INT);""")
+        self.conn.commit()
 
     def dataChanges(self):
         self.cur.execute(f"""Update users set {self.column} = {self.changes} where userid = {self.userid}""")
@@ -90,6 +93,12 @@ class data:
                 self.conn.commit()
                 self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
                                  (self.userid, 0, 0, 0, 3, 0, 0, 0, 0))
+                self.conn.commit()
+                self.cur.execute("INSERT INTO bondes VALUES(?, ?, ?);",
+                                (self.userid, 0, 0))
+                self.conn.commit()
+                self.cur.execute("INSERT INTO businesses VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                                 (self.userid, 0, 0, 0, 0, 0, 0, 0, 0))
                 self.conn.commit()
             except sqlite3.IntegrityError as e:
                 print(e)

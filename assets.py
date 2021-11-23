@@ -2,11 +2,14 @@ import random, sqlite3, data
 
 
 class assets:
-    def __init__(self, userid,coin,number,price):
+    def __init__(self, userid,coin,bondes,business,number,price):
         self.userid = userid
         self.coin = coin
+        self.bondes = bondes
+        self.business = business
         self.number = number
         self.price = price
+
 
         self.conn = sqlite3.connect('users.db')
         self.cur = self.conn.cursor()
@@ -33,37 +36,29 @@ class assets:
             if i[0] == self.userid:
                 return i
 
-    def kriptaUser(self):
-        sqlite_select_query1 = """SELECT * FROM kripta"""
+    def coinUser(self):
+        sqlite_select_query1 = """SELECT * FROM coins"""
         self.cur.execute(sqlite_select_query1)
         record1 = self.cur.fetchall()
         for i in record1:
             if i[0] == self.userid:
                 return i
 
-    def database_connect(self):
-        self.sqlite_select_query = """SELECT * from stock"""
-        self.conn = sqlite3.connect('users.db')
-        self.cur = self.conn.cursor()
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS stock(
-                                           userid INT PRIMARY KEY,
-                                           Связьком INT,
-                                           Нефтехим INT,
-                                           Инвестбанк INT,
-                                           Агросбыт INT,
-                                           Металлпром INT);""")
-        if self.cur.fetchall() is None:
-            self.cur.execute("""CREATE TABLE IF NOT EXISTS stock(
-                                                       userid INT PRIMARY KEY,
-                                                       Связьком INT,
-                                                       Нефтехим INT,
-                                                       Инвестбанк INT,
-                                                       Агросбыт INT,
-                                                       Металлпром INT);""")
-        self.conn.commit()
 
     def database_user_stock(self):
         self.cur.execute("""SELECT * FROM stock""")
+        record = self.cur.fetchall()
+        for i in record:
+            if i[0] == self.userid:
+                return i
+    def database_user_bondes(self):
+        self.cur.execute("""SELECT * FROM bondes""")
+        record = self.cur.fetchall()
+        for i in record:
+            if i[0] == self.userid:
+                return  i
+    def database_user_businesses(self):
+        self.cur.execute("""SELECT * FROM businesses""")
         record = self.cur.fetchall()
         for i in record:
             if i[0] == self.userid:
@@ -81,14 +76,43 @@ class assets:
             self.cur.execute(f"""Update stock set {self.coin} = {self.number} where userid = {self.userid}""")
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
-
+        else:
+            print('Нищеброд!')
+    def database_buys_bondes(self):
+        dataUser = data.data(self.userid).dataUser()
+        dataBondes = self.database_user_bondes()
+        if self.number * self.price <= dataUser[4]:
+            if self.bondes == dataBondes[1]:
+                bondes = dataBondes[1]
+                self.number += bondes
+            summ = dataUser[4] - (self.number * self.price)
+            self.cur.execute(f"""Update bondes set {self.bondes} = {self.number} where userid = {self.userid}""")
+            self.cur.execute(f"""Update bondes set Доход = {self.number * 300} where userid = {self.userid}""")
+            self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
+            self.conn.commit()
+        else:
+            print('Нищеброд!')
+    def database_buys_businesses(self):
+        dataUser = data.data(self.userid).dataUser()
+        dataBusinesses = self.database_user_bondes()
+        if self.number * self.price <= dataUser[4]:
+            if self.business == dataBusinesses[1]:
+                businesses = dataBusinesses[1]
+                self.number += businesses
+            summ = dataUser[4] - (self.number * self.price)
+            self.cur.execute(f"""Update businesses set {self.business} = {self.number} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходAMD = {self.number * 500} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходIntel = {self.number * 700} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходNvidia = {self.number * 900} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходNvidia = {self.number * 1200} where userid = {self.userid}""")
+            self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
+            print(summ)
+            self.conn.commit()
+        else:
+            print('Нищеброд!')
 if __name__ == '__main__':
-    assets = assets(951679992, 'Связьком', 10, 10)
+    assets = assets(672532296, 'Связьком','Вексель','AMD',10, 10,)
     assets.random_cript()
-    assets.database_connect()
     assets.database_buys_stock()
-
-if __name__ == '__main__':
-    assets = assets(951679992, 'Связьком', 10, 10)
-    assets.random_cript()
-    assets.choise_insurance()
+    assets.database_buys_bondes()
+    assets.database_buys_businesses()

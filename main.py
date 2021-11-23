@@ -42,9 +42,6 @@ async def start(message: types.Message):
                         reply_markup=markup)
     await bot.send_message(message.chat.id, 'Work')
 
-@dp.message_handler(commands=['proverka'])
-async def proverka(message: types.Message):
-    await bot.send_message(message.chat.id, assets.assets.database_buys_stock())
 
 @dp.message_handler(commands='rules')
 async def rules(message: types.Message):
@@ -63,7 +60,6 @@ async def rules(message: types.Message):
     data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name, userLast= message.chat.last_name).databaseNewUser()
     await bot.send_message(message.chat.id, data.data(message.chat.id, money=200).donate())
 
-
 @dp.message_handler(content_types='text')
 async def main(message: types.Message):
     print('[INFO] ' + str(
@@ -74,6 +70,8 @@ async def main(message: types.Message):
         dataU = data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name, userLast= message.chat.last_name).dataUser()
         await bot.send_message(message.chat.id, f'Для начала вам нужно выбрать уровень\nВаши доступные уровни {dataU[6]}')
         await game.choiceLevel.set()
+    if message.text == 10:
+        await bot.send_message(message.chat.id, assets.assets.database_buys_stock())
 
 
 @dp.message_handler(lambda message: not message.text.isdigit(), state=game.choiceLevel)
