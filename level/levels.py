@@ -99,11 +99,12 @@ class Level:
         if rand == 1:
             return self.businessFunc()
         if rand == 2:
-            return self.investmentFunc()
-        if rand == 3:
             return self.stockMarket()
+        if rand == 3:
+            return self.investmentFunc()
         if rand == 4:
             return self.unexpectedExpensesFunc()
+
     def database_connect(self):
         self.step = 0
         self.sqlite_select_query = """SELECT * from game"""

@@ -10,8 +10,7 @@ class assets:
         self.number = number
         self.price = price
 
-
-        self.conn = sqlite3.connect('cashflow/users.db')
+        self.conn = sqlite3.connect('users.db')
         self.cur = self.conn.cursor()
         self.conn.commit()
         print('Database connected')
@@ -23,7 +22,7 @@ class assets:
         sol_price = random.randint(150, 197)
         eth_price = random.randint(3950, 4022)
 
-        return str('Выбери крипту:\n1.Bitcoin ' + str(btc_price) + '$\n2.Binance Coin' + str(bnb_price) + '$\n3.Avalanche' + str(avax_price) + '$\n4.Solana' + str(sol_price) + '$\n5.Ethereum' + str(eth_price) + '$')
+        return str('Выбери крипту:\n1.Bitcoin ' + str(btc_price) + '$\n2.Binance Coin ' + str(bnb_price) + '$\n3.Avalanche ' + str(avax_price) + '$\n4.Solana ' + str(sol_price) + '$\n5.Ethereum ' + str(eth_price) + '$')
 
     def choise_insurance(self):
         return '1.Страховка на жизнь - 5 000 руб\n2.Страховка на имущество - 3000 руб'
@@ -80,6 +79,8 @@ class assets:
             self.conn.commit()
         else:
             print('Нищеброд!')
+
+    # Покупка облигаций
     def database_buys_bondes(self):
         dataUser = data.data(self.userid).dataUser()
         dataBondes = self.database_user_bondes()
@@ -89,14 +90,15 @@ class assets:
                 self.number += bondes
             summ = dataUser[4] - (self.number * self.price)
             self.cur.execute(f"""Update bondes set {self.bondes} = {self.number} where userid = {self.userid}""")
-            self.cur.execute(f"""Update bondes set Доход = {self.number * 300} where userid = {self.userid}""")
+            self.cur.execute(f"""Update bondes set Доход_вексель = {self.number * 300} where userid = {self.userid}""")
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
         else:
             print('Нищеброд!')
+    # Покупка бизнесов
     def database_buys_businesses(self):
         dataUser = data.data(self.userid).dataUser()
-        dataBusinesses = self.database_user_bondes()
+        dataBusinesses = self.database_user_businesses()
         if self.number * self.price <= dataUser[4]:
             if self.business == dataBusinesses[1]:
                 businesses = dataBusinesses[1]
@@ -112,9 +114,54 @@ class assets:
             self.conn.commit()
         else:
             print('Нищеброд!')
+    # Продажа акций
+    def database_sell_stock(self):
+        dataUser = data.data(self.userid).dataUser()
+        dataStock = self.database_user_stock()
+        if self.number * self.price:
+            if self.coin == dataStock[1]:
+                coin = dataStock[1]
+                self.number -= coin
+            summ = dataUser[4] + (self.number * self.price)
+            self.cur.execute((f"""Update stock set {self.coin} = {self.number} where userid = {self.userid}"""))
+            print(self.coin, self.number)
+            self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
+            self.conn.commit()
+        else:
+            print('Нищеброд!')
+    # Продажа облигаций
+    def database_sell_bondes(self):
+        dataUser = data.data(self.userid).dataUser()
+        dataBondes = self.database_user_bondes()
+        if self.number * self.price:
+            if self.bondes == dataBondes[1]:
+                bondes = dataBondes[1]
+                self.number -= bondes
+            summ = dataUser[4] + (self.number * self.price)
+            self.cur.execute((f"""Update bondes set {self.bondes} = {self.number} where userid = {self.userid}"""))
+            print(self.bondes, self.number)
+            self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
+            self.conn.commit()
+
+    # Продажа бизнесов
+    def database_sell_businesses(self):
+        dataUser = data.data(self.userid).dataUser()
+        dataBondes = self.database_user_bondes()
+        if self.number * self.price:
+            if self.business == dataBondes[1]:
+                business = dataBondes[1]
+                self.number -= business
+            summ = dataUser[4] + (self.number * self.price)
+            self.cur.execute((f"""Update businesses set {self.business} = {self.number} where userid = {self.userid}"""))
+            print(self.business, self.number)
+            self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
+            self.conn.commit()
+
 if __name__ == '__main__':
-    assets = assets(672532296, 'Связьком','Вексель','AMD',10, 10,)
-    assets.random_cript()
+    assets = assets(672532296, coin='Связьком', bondes='Вексель', business='AMD', number=1, price=10)
     assets.database_buys_stock()
-    assets.database_buys_bondes()
-    assets.database_buys_businesses()
+    # assets.database_buys_bondes()
+    # assets.database_buys_businesses()
+    assets.database_sell_stock()
+    # assets.database_sell_bondes()
+    # assets.database_sell_businesses()
