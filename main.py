@@ -18,6 +18,8 @@ dp = Dispatcher(bot=bot, storage=memory)
 class game(StatesGroup):
     choiceLevel = State()
     waitingGame = State()
+    buys = State()
+    buysBusiness = State()
 
 
 
@@ -105,40 +107,69 @@ async def choicelevel(message: types.Message, state: FSMContext):
         async with state.proxy() as datas:
             datas['time'] = datetime.datetime.now()
         pass
-    dataU = data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name,
-                      userLast=message.chat.last_name).dataUser()
-    levels.choiceLevel(dataU[6], message.chat.id).dataBaseUpt()
-    dataG = data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name,
-                      userLast=message.chat.last_name).dataGame()
+    dataGame = data.data(message.chat.id).dataGame()
+    dataStock = data.data(message.chat.id).dataStock()
+    dataUser = data.data(message.chat.id).dataUser()
+    dataCoins = data.data(message.chat.id).dataCoins()
+    dataBonds = data.data(message.chat.id).dataBonds()
+    dataBusinesses = data.data(message.chat.id).dataBusinesses()
     async with state.proxy() as datas:
-        data.data(message.chat.id).dataStock()
-        data.data(message.chat.id).dataUser()
-        data.data(message.chat.id).dataCoins()
-        data.data(message.chat.id).dataBonds()
-        data.data(message.chat.id).dataBusinesses()
-        data.data(message.chat.id).dataGame()
-        if dataG[4] == 4:
-            await bot.send_message(message.chat.id, 'Итоги месяца')
-            return
         if message.text.lower() == 'Статистика':
             await bot.send_message(message.chat.id, '')
         if message.text.lower() == 'продолжить':
+            levels.choiceLevel(dataUser[6], message.chat.id).dataBaseUpt()
+            datas['stock'] = False
+            datas['bonds'] = False
+            datas['business'] = False
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
             markup.add('Продолжить')
-            if dataG[dataG[4]].split()[0].lower() == 'акция':
-                datas['stock'] = True
-                markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
-                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика')
-            elif dataG[dataG[4]].split()[0].lower() == 'облигация':
-                datas['stock'] = True
-                markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
-                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика')
-            elif dataG[dataG[4]].split()[0].lower() == 'бизнес':
-                datas['stock'] = True
-                markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
-                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика')
-            await bot.send_message(message.chat.id, dataG[dataG[4]], reply_markup=markup)
-            datas['time'] = datetime.datetime.now()
-            return
+            if dataGame[4] != 4:
+                if dataGame[dataGame[4]].split()[0].lower() == 'акция':
+                    datas['stock'] = True
+                    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
+                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика')
+                elif dataGame[dataGame[4]].split()[0].lower() == 'облигация':
+                    datas['bonds'] = True
+                    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
+                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика')
+                elif dataGame[dataGame[4]].split()[0].lower() == 'бизнес':
+                    datas['business'] = True
+                    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
+                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика')
+                await bot.send_message(message.chat.id, dataGame[dataGame[4]], reply_markup=markup)
+                datas['time'] = datetime.datetime.now()
+                return
+            else:
+                await bot.send_message(message.chat.id, 'Итоги месяца')
+                return
+        try:
+            if message.text.lower() == 'купить' and datas['stock']:
+                await bot.send_message(message.chat.id, 'Сколько акций хотите купить?')
+                await game.buys.set()
+            elif message.text.lower() == 'купить' and datas['bonds']:
+                await bot.send_message(message.chat.id, 'Сколько облигаций хотите купить?')
+                await game.buys.set()
+            elif message.text.lower() == 'купить' and datas['business']:
+                await game.buysBusiness.set()
+        except KeyError:
+            datas['stock'] = False
+            datas['bonds'] = False
+            datas['business'] = False
+
+
+@dp.message_handler(lambda message: not message.text.isdigit(), state=game.buys)
+async def error(message: types.Message):
+    await bot.send_message(message.chat.id, 'Не число')
+
+
+@dp.message_handler(state=[game.buys, game.buysBusiness])
+async def buys(message: types.Message):
+    dataGame = data.data(message.chat.id).dataGame()
+    if dataGame[dataGame[4]-1].split()[0].lower() == 'акция':
+        assets.assets(userid=message.chat.id, number=int(message.text), price=int(dataGame[dataGame[4]-1].split()[3]), coin=dataGame[dataGame[4]-1].split()[1]).database_buys_stock()
+    elif dataGame[dataGame[4]-1].split()[0].lower() == 'облигация':
+        assets.assets(userid=message.chat.id, number=int(message.text), price=int(dataGame[dataGame[4] - 1].split()[3]),
+                      bondes=dataGame[dataGame[4] - 1].split()[1]).database_buys_bondes()
+    await bot.send_message(message.chat.id,'buys')
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
