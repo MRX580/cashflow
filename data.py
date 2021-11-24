@@ -49,23 +49,14 @@ class data:
         self.conn.commit()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS bondes(userid INT PRIMARY KEY, Вексель INT, Доход_вексель INT);""")
         self.conn.commit()
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS businesses(userid INT PRIMARY KEY, AMD INT, ДоходAMD INT, Intel INT, ДоходIntel, Nvidia INT, ДоходNvidia, Apple INT, ДоходApple INT);""")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS businesses(userid INT PRIMARY KEY, AMD INT, ДоходAMD INT, 
+        Intel INT, ДоходIntel, Nvidia INT, ДоходNvidia, Apple INT, ДоходApple INT);""")
         self.conn.commit()
 
     def dataChanges(self):
         self.cur.execute(f"""Update users set {self.column} = {self.changes} where userid = {self.userid}""")
         self.conn.commit()
         self.cur.close()
-
-
-    def dataUser(self):
-        sqlite_select_query = """SELECT * FROM users"""
-        self.cur.execute(sqlite_select_query)
-        record = self.cur.fetchall()
-        for i in record:
-            if i[0] == self.userid:
-                return i
-        return False
 
 
     def donate(self):
@@ -121,6 +112,55 @@ class data:
 
     def dataDonate(self):
         sqlite_select_query = """SELECT * FROM donate"""
+        self.cur.execute(sqlite_select_query)
+        record = self.cur.fetchall()
+        for i in record:
+            if i[0] == self.userid:
+                return i
+        return False
+
+    def dataUser(self):
+        sqlite_select_query = """SELECT * FROM users"""
+        self.cur.execute(sqlite_select_query)
+        record = self.cur.fetchall()
+        for i in record:
+            if i[0] == self.userid:
+                return i
+        return False
+
+
+    def dataStock(self):
+        sqlite_select_query = """SELECT * FROM stock"""
+        self.cur.execute(sqlite_select_query)
+        record = self.cur.fetchall()
+        for i in record:
+            if i[0] == self.userid:
+                return i
+        return False
+
+
+    def dataBonds(self):
+        sqlite_select_query = """SELECT * FROM bondes"""
+        self.cur.execute(sqlite_select_query)
+        record = self.cur.fetchall()
+        for i in record:
+            if i[0] == self.userid:
+                return i
+        return False
+
+
+    def dataCoins(self):
+        sqlite_select_query = """SELECT * FROM coins"""
+        self.cur.execute(sqlite_select_query)
+        record = self.cur.fetchall()
+        for i in record:
+            if i[0] == self.userid:
+                return i
+        return False
+
+
+    def dataBusinesses(self):
+        sqlite_select_query = """SELECT * FROM businesses"""
         self.cur.execute(sqlite_select_query)
         record = self.cur.fetchall()
         for i in record:
