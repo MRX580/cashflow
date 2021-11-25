@@ -78,7 +78,7 @@ class assets:
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
         else:
-            print('Нищеброд!')
+            return str('У вас нет денег!')
 
     # Покупка облигаций
     def database_buys_bondes(self):
@@ -94,7 +94,7 @@ class assets:
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
         else:
-            print('Нищеброд!')
+            return str('У вас нет денег!')
     # Покупка бизнесов
     def database_buys_businesses(self):
         dataUser = data.data(self.userid).dataUser()
@@ -113,7 +113,7 @@ class assets:
             print(summ)
             self.conn.commit()
         else:
-            print('Нищеброд!')
+            return str('У вас нет денег!')
     # Продажа акций
     def database_sell_stock(self):
         dataUser = data.data(self.userid).dataUser()
@@ -127,8 +127,6 @@ class assets:
             print(self.coin, self.number)
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
-        else:
-            print('Нищеброд!')
         if self.coin:
             if self.number <= 0:
                 return str('У вас нету этой акции ')
