@@ -19,7 +19,9 @@ class data:
                                    isgame BOOLEAN,
                                    levelOpen INT,
                                    levelNow INT,
-                                   premium BOOLEAN);
+                                   premium BOOLEAN,
+                                   donate INT,
+                                   notification BOOLEAN);
                 """)
         self.conn.commit()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS coins(
@@ -79,7 +81,7 @@ class data:
         if self.dataUser() == False:
             try:
                 self.cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                            (self.userid, self.userName, self.userFirst, self.userLast, 0, False, 1, 0, False))
+                            (self.userid, self.userName, self.userFirst, self.userLast, 0, False, 1, 0, False, 0, True))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO coins VALUES(?, ?, ?, ?, ?, ?);",
                                  (self.userid, 0, 0, 0, 0, 0))
