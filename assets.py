@@ -129,6 +129,9 @@ class assets:
             self.conn.commit()
         else:
             print('Нищеброд!')
+        if self.coin:
+            if self.number <= 0:
+                return str('У вас нету этой акции ')
     # Продажа облигаций
     def database_sell_bondes(self):
         dataUser = data.data(self.userid).dataUser()
@@ -142,6 +145,9 @@ class assets:
             print(self.bondes, self.number)
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
+        if self.bondes:
+            if self.number <= 0:
+                return str('У вас нету этой облигации')
 
     # Продажа бизнесов
     def database_sell_businesses(self):
@@ -156,12 +162,15 @@ class assets:
             print(self.business, self.number)
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
+        if self.business:
+            if self.number <= 0:
+                return str('У вас нету этого бизнеса')
 
 if __name__ == '__main__':
-    assets = assets(672532296, coin='Связьком', bondes='Вексель', business='AMD', number=1, price=10)
+    assets = assets(672532296, coin='Связьком', bondes='Вексель', business='AMD', number=0, price=10)
     assets.database_buys_stock()
-    # assets.database_buys_bondes()
-    # assets.database_buys_businesses()
+    assets.database_buys_bondes()
+    assets.database_buys_businesses()
     assets.database_sell_stock()
-    # assets.database_sell_bondes()
-    # assets.database_sell_businesses()
+    assets.database_sell_bondes()
+    assets.database_sell_businesses()

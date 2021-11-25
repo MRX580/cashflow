@@ -114,7 +114,6 @@ class Level:
         if self.cur.fetchall() is None:
             self.cur.execute("""CREATE TABLE IF NOT EXISTS game(userid INT PRIMARY KEY,move1 TEXT,move2 TEXT,move3 TEXT,step INT, moves INT, income INT, costs INT, target INT);""")
         self.conn.commit()
-
     def dataBaseRec(self):
         try:
             self.conn = sqlite3.connect('users.db')
@@ -205,7 +204,6 @@ class Level:
 if __name__ == '__main__':
     levelOne = Level(0, 5000, 4000, 50000, 672532296)
     levelOne.database_connect()
-    levelOne.move_1()
     levelOne.dataBaseRec()
     levelOne.dataBaseUpt()
     levelOne.dataBaseMoves()
