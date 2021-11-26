@@ -134,9 +134,14 @@ class Level:
             records = self.cur.fetchall()
             user = data.data(self.userid).dataUser()
             for row in records:
+<<<<<<< Updated upstream
                 if user[0] == row[0]:
                     print(row[4])
                     self.step = row[4]
+=======
+                self.userid = row[0]
+                self.step = row[4]
+>>>>>>> Stashed changes
             self.cur.close()
         except sqlite3.Error as error:
             print("Ошибка при работе с SQLite", error)
@@ -152,6 +157,10 @@ class Level:
                 self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
                 self.conn.commit()
                 self.cur.close()
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
         except sqlite3.Error as error:
             print(error)
         finally:

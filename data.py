@@ -89,8 +89,8 @@ class data:
                 self.cur.execute("INSERT INTO stock VALUES(?, ?, ?, ?, ?, ?);",
                                  (self.userid, 0, 0, 0, 0, 0))
                 self.conn.commit()
-                self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                                 (self.userid, 0, 0, 0, 1, 0, 0, 0, 0))
+                self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                                 (self.userid, 0, 0, 0, 3, 0, 0, 0, 0, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO bondes VALUES(?, ?, ?);",
                                 (self.userid, 0, 0))

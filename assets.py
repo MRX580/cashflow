@@ -169,12 +169,7 @@ class assets:
         if self.business:
             if self.number <= 0:
                 return str('У вас нету этого бизнеса')
-    def crediUser(self):
-        dataUser = data.data(self.userid).dataUser()
-        money = dataUser[4] + self.credit
-        self.cur.execute(f"""Update users set money = {money} where userid = {self.userid}""")
-        self.cur.execute(f"""Update users set credit = {self.credit} where userid = {self.userid}""")
-        self.conn.commit()
+
 
 
 
@@ -186,4 +181,3 @@ if __name__ == '__main__':
     assets.database_sell_stock()
     assets.database_sell_bondes()
     assets.database_sell_businesses()
-    assets.crediUser()
