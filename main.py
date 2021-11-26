@@ -7,7 +7,6 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ParseMode
 from aiogram.utils import executor
 
-import level.levels
 
 logging.basicConfig(level=logging.INFO)
 memory = MemoryStorage()
