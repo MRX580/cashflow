@@ -66,11 +66,15 @@ async def main(message: types.Message):
     print('[INFO] ' + str(
         message.chat.id) + f'({message.chat.username}|{message.chat.full_name}) ' + 'написал: ' + message.text + ' ' + str(
         datetime.datetime.now()))
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+    markup.add('Начать игру')
     data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name, userLast= message.chat.last_name).databaseNewUser()
     if message.text.lower() == 'начать игру':
         dataU = data.data(message.chat.id, userName = message.chat.username, userFirst= message.chat.first_name, userLast= message.chat.last_name).dataUser()
-        await bot.send_message(message.chat.id, f'Для начала вам нужно выбрать уровень\nВаши доступные уровни {dataU[6]}')
+        await bot.send_message(message.chat.id, f'Для начала вам нужно выбрать уровень\nВаши доступные уровни {dataU[6]}', reply_markup=markup)
         await game.choiceLevel.set()
+        return
+    await bot.send_message(message.chat.id, 'Введите "Начать игру" что бы начать игру', reply_markup=markup)
 
 
 @dp.message_handler(lambda message: not message.text.isdigit(), state=game.choiceLevel)
@@ -90,7 +94,7 @@ async def choicelevel(message: types.Message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
     markup.add('Продолжить')
     await bot.send_message(message.chat.id, levels.choiceLevel(dataU[6], message.chat.id).work(), reply_markup=markup)
-    data.data(message.chat.id, column='levelNow', changes=dataU[6]).dataChanges()
+    data.data(message.chat.id, column='levelNow', changes=dataU[7]).dataChanges()
     await game.waitingGame.set()
 
 
@@ -117,7 +121,7 @@ async def choicelevel(message: types.Message, state: FSMContext):
         if message.text.lower() == 'Статистика':
             await bot.send_message(message.chat.id, '')
         if message.text.lower() == 'продолжить':
-            levels.choiceLevel(dataUser[6], message.chat.id).dataBaseUpt()
+            levels.choiceLevel(dataUser[7], message.chat.id).dataBaseUpt()
             datas['stock'] = False
             datas['bonds'] = False
             datas['business'] = False
@@ -159,8 +163,11 @@ async def choicelevel(message: types.Message, state: FSMContext):
 
 @dp.message_handler(lambda message: not message.text.isdigit(), state=game.buys)
 async def error(message: types.Message):
-    await bot.send_message(message.chat.id, 'Не число')
+    await bot.send_message(message.chat.id, 'Не коректно указано количевство')
 
+@dp.message_handler(lambda message: int(message.text) > 0)
+async def error(message: types.Message):
+    await bot.send_message(message.chat.id, 'Введите число больше 0')
 
 @dp.message_handler(state=[game.buys, game.buysBusiness])
 async def buys(message: types.Message):
