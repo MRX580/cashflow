@@ -9,13 +9,14 @@ while True:
     data = {"X-Token": api}
     user = requests.get('https://api.monobank.ua/personal/client-info', headers = data).text
     print(eval(user)['accounts'][0])
+    print(mono.get_client_info())
     d = datetime.now()
     unixtime = time.mktime(d.timetuple())
     comm = requests.get(f'https://api.monobank.ua/personal/statement/{0}/{int(unixtime-86400)}', headers = data).text.replace('true', '"da"').replace('false', '"da"')
     print(eval(comm))
     commdatabase = []
     commMono = []
-    conn = sqlite3.connect('cashflow/users.db')
+    conn = sqlite3.connect('users.db')
     cur = conn.cursor()
     sqlite_select_query = """SELECT * FROM donate"""
     cur.execute(sqlite_select_query)

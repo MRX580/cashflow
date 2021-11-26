@@ -69,12 +69,12 @@ class data:
             self.conn.commit()
             return f"К оплате {self.money} грн\nОБЕЗАТЕЛЬНО - к оплате добавьте комментарий {code} без него " \
                    f"покупка не будет совершена\nКомментарий будет действовать сутки после сгенерируйте " \
-                   f"новый\nhttps://send.monobank.ua/2nyBFqiKgz?amount={self.money}&f=enabled&text={code}\nВаш запрос " \
+                   f"новый\nhttps://send.monobank.ua/99NN41RNC8?amount={self.money}&f=enabled&text={code}\nВаш запрос " \
                    f"будет обработан в течении 1 минуты "
         except sqlite3.IntegrityError:
             return f"К оплате {self.dataDonate()[1]} грн\nОБЕЗАТЕЛЬНО - к оплате добавьте комментарий {self.dataDonate()[2]} без него " \
                    f"покупка не будет совершена\nКомментарий будет действовать сутки после сгенерируйте " \
-                   f"новый\nhttps://send.monobank.ua/2nyBFqiKgz?amount={self.dataDonate()[1]}&f=enabled&text=" \
+                   f"новый\nhttps://send.monobank.ua/99NN41RNC8?amount={self.dataDonate()[1]}&f=enabled&text=" \
                    f"{self.dataDonate()[2]}\nВаш запрос будет обработан в течении 1 минуты "
 
     def databaseNewUser(self):
