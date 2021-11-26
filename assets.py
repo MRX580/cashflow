@@ -2,14 +2,14 @@ import random, sqlite3, data
 
 
 class assets:
-    def __init__(self, userid, number, price, coin = None, bondes = None, business = None):
+    def __init__(self, userid, number, price, coin = None, bondes = None, business = None, credit = None):
         self.userid = userid
         self.coin = coin
         self.bondes = bondes
         self.business = business
         self.number = number
         self.price = price
-
+        self.credit = credit
         self.conn = sqlite3.connect('users.db')
         self.cur = self.conn.cursor()
         self.conn.commit()
@@ -58,6 +58,12 @@ class assets:
                 return  i
     def database_user_businesses(self):
         self.cur.execute("""SELECT * FROM businesses""")
+        record = self.cur.fetchall()
+        for i in record:
+            if i[0] == self.userid:
+                return i
+    def database_user_credit(self):
+        self.cur.execute("""SELECT * FROM users""")
         record = self.cur.fetchall()
         for i in record:
             if i[0] == self.userid:
@@ -163,12 +169,21 @@ class assets:
         if self.business:
             if self.number <= 0:
                 return str('У вас нету этого бизнеса')
+    def crediUser(self):
+        dataUser = data.data(self.userid).dataUser()
+        money = dataUser[4] + self.credit
+        self.cur.execute(f"""Update users set money = {money} where userid = {self.userid}""")
+        self.cur.execute(f"""Update users set credit = {self.credit} where userid = {self.userid}""")
+        self.conn.commit()
+
+
 
 if __name__ == '__main__':
-    assets = assets(672532296, coin='Связьком', bondes='Вексель', business='AMD', number=0, price=10)
-    assets.database_buys_stock()
-    assets.database_buys_bondes()
-    assets.database_buys_businesses()
-    assets.database_sell_stock()
-    assets.database_sell_bondes()
-    assets.database_sell_businesses()
+    assets = assets(672532296, coin='Связьком', bondes='Вексель', business='AMD', number=100, price=10, credit=1000)
+    # assets.database_buys_stock()
+    # assets.database_buys_bondes()
+    # assets.database_buys_businesses()
+    # assets.database_sell_stock()
+    # assets.database_sell_bondes()
+    # assets.database_sell_businesses()
+    assets.crediUser()

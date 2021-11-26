@@ -80,7 +80,7 @@ class data:
     def databaseNewUser(self):
         if self.dataUser() == False:
             try:
-                self.cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                self.cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
                             (self.userid, self.userName, self.userFirst, self.userLast, 0, False, 1, 0, False, 0, True))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO coins VALUES(?, ?, ?, ?, ?, ?);",
@@ -90,7 +90,7 @@ class data:
                                  (self.userid, 0, 0, 0, 0, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                                 (self.userid, 0, 0, 0, 3, 0, 0, 0, 0))
+                                 (self.userid, 0, 0, 0, 1, 0, 0, 0, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO bondes VALUES(?, ?, ?);",
                                 (self.userid, 0, 0))
