@@ -1,8 +1,6 @@
 import random
 import sqlite3
-
 import data
-
 
 class Level:
     def __init__(self, moves, income, costs, target, userid):

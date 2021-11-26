@@ -180,10 +180,10 @@ class assets:
 
 if __name__ == '__main__':
     assets = assets(672532296, coin='Связьком', bondes='Вексель', business='AMD', number=100, price=10, credit=1000)
-    # assets.database_buys_stock()
-    # assets.database_buys_bondes()
-    # assets.database_buys_businesses()
-    # assets.database_sell_stock()
-    # assets.database_sell_bondes()
-    # assets.database_sell_businesses()
+    assets.database_buys_stock()
+    assets.database_buys_bondes()
+    assets.database_buys_businesses()
+    assets.database_sell_stock()
+    assets.database_sell_bondes()
+    assets.database_sell_businesses()
     assets.crediUser()
