@@ -1,6 +1,9 @@
 import random
 import sqlite3
 
+import data
+
+
 class Level:
     def __init__(self, moves, income, costs, target, userid):
         self.moves = moves
@@ -94,8 +97,8 @@ class Level:
         rand = random.randint(0, len(business) - 1)
         return str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
     def move_1(self):
+        rand = random.randint(1, 4)
         self.work()
-        rand = random.randint(1,4)
         if rand == 1:
             return self.businessFunc()
         if rand == 2:
@@ -104,8 +107,6 @@ class Level:
             return self.investmentFunc()
         if rand == 4:
             return self.unexpectedExpensesFunc()
-
-
 
     def database_connect(self):
         self.step = 0
@@ -133,8 +134,11 @@ class Level:
             sqlite_select_query = """SELECT * FROM game"""
             self.cur.execute(sqlite_select_query)
             records = self.cur.fetchall()
+            user = data.data(self.userid).dataUser()
             for row in records:
-                self.step = row[4]
+                if user[0] == row[0]:
+                    print(row[4])
+                    self.step = row[4]
             self.cur.close()
         except sqlite3.Error as error:
             print("Ошибка при работе с SQLite", error)
@@ -142,17 +146,14 @@ class Level:
             self.conn = sqlite3.connect('users.db')
             self.cur = self.conn.cursor()
             self.cur.execute("SELECT * from game")
-            if self.userid:
-                if self.step == 4:
-                    self.step = 0
-                    self.cur.execute(f"""Update game set move1 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move2 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move3 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                    self.conn.commit()
-                    self.cur.close()
-            else:
-                print('ggwp')
+            if self.step == 4:
+                self.step = 0
+                self.cur.execute(f"""Update game set move1 = "{self.move_1()}" where userid = {self.userid}""")
+                self.cur.execute(f"""Update game set move2 = "{self.move_1()}" where userid = {self.userid}""")
+                self.cur.execute(f"""Update game set move3 = "{self.move_1()}" where userid = {self.userid}""")
+                self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
+                self.conn.commit()
+                self.cur.close()
         except sqlite3.Error as error:
             print(error)
         finally:
@@ -163,9 +164,10 @@ class Level:
         sqlite_select_query = """SELECT * FROM game"""
         self.cur.execute(sqlite_select_query)
         records = self.cur.fetchall()
+        user = data.data(self.userid).dataUser()
         for row in records:
-            self.step = row[4]
-            print(self.step)
+            if user[0] == row[0]:
+                self.step = row[4]
         self.cur.close()
         try:
             self.conn = sqlite3.connect('users.db')
