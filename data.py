@@ -21,7 +21,8 @@ class data:
                                    levelNow INT,
                                    premium BOOLEAN,
                                    donate INT,
-                                   notification BOOLEAN);
+                                   notification BOOLEAN,
+                                   credit INT);
                 """)
         self.conn.commit()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS coins(
@@ -80,8 +81,8 @@ class data:
     def databaseNewUser(self):
         if self.dataUser() == False:
             try:
-                self.cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                            (self.userid, self.userName, self.userFirst, self.userLast, 0, False, 1, 0, False, 0, True))
+                self.cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                            (self.userid, self.userName, self.userFirst, self.userLast, 0, False, 1, 0, False, 0, True, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO coins VALUES(?, ?, ?, ?, ?, ?);",
                                  (self.userid, 0, 0, 0, 0, 0))

@@ -195,3 +195,4 @@ if __name__ == '__main__':
     assets.database_sell_stock()
     assets.database_sell_bondes()
     assets.database_sell_businesses()
+    assets.crediUser()

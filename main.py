@@ -20,8 +20,6 @@ class game(StatesGroup):
     buys = State()
     buysBusiness = State()
 
-
-
 @dp.message_handler(commands='start')
 async def start(message: types.Message):
     print('[INFO] ' + str(
