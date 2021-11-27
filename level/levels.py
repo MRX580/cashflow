@@ -124,7 +124,6 @@ class Level:
             self.cur.close()
         except sqlite3.IntegrityError:
             pass
-
     def dataBaseUpt(self):
         try:
             self.conn = sqlite3.connect('users.db')
@@ -212,4 +211,3 @@ if __name__ == '__main__':
     levelOne.database_connect()
     levelOne.dataBaseRec()
     levelOne.dataBaseUpt()
-    levelO

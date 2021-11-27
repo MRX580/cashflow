@@ -93,7 +93,7 @@ async def choicelevel(message: types.Message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=3)
     markup.add('Продолжить')
     await bot.send_message(message.chat.id, levels.choiceLevel(dataU[6], message.chat.id).work(), reply_markup=markup)
-    data.data(message.chat.id, column='levelNow', changes=dataU[7]).dataChanges()
+    data.data(message.chat.id, column='levelNow', changes=dataU[6]).dataChanges()
     await game.waitingGame.set()
 
 
@@ -120,6 +120,7 @@ async def choicelevel(message: types.Message, state: FSMContext):
         if message.text.lower() == 'Статистика':
             await bot.send_message(message.chat.id, '')
         if message.text.lower() == 'продолжить':
+            print(dataUser[7])
             levels.choiceLevel(dataUser[7], message.chat.id).dataBaseUpt()
             datas['stock'] = False
             datas['bonds'] = False
