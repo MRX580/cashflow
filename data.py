@@ -1,5 +1,7 @@
 import sqlite3, random, string, datetime, level.levels as levels
 
+import assets
+
 
 class data:
     def __init__(self, userid, column=None, changes=None, userName=None, userFirst=None, userLast=None, money=None):
@@ -29,6 +31,7 @@ class data:
         self.conn.commit()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS coins(
                                    userid INT PRIMARY KEY,
+                                   coinRand TEXT,
                                    btc INT,
                                    bnb INT,
                                    avax INT,
@@ -87,8 +90,8 @@ class data:
                                  (self.userid, self.userName, self.userFirst, self.userLast, 0, False, 1, 0, False, 0,
                                   True, 0))
                 self.conn.commit()
-                self.cur.execute("INSERT INTO coins VALUES(?, ?, ?, ?, ?, ?);",
-                                 (self.userid, 0, 0, 0, 0, 0))
+                self.cur.execute("INSERT INTO coins VALUES(?, ?, ?, ?, ?, ?, ?);",
+                                 (self.userid, assets.assets(self.userid, 0, 0).random_cript(), 0, 0, 0, 0, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO stock VALUES(?, ?, ?, ?, ?, ?);",
                                  (self.userid, 0, 0, 0, 0, 0))
