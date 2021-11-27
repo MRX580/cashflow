@@ -1,6 +1,6 @@
 import random
 import sqlite3
-import CashFlow.data
+import data
 
 class Level:
     def __init__(self, moves, income, costs, target, userid):
@@ -130,7 +130,7 @@ class Level:
             sqlite_select_query = """SELECT * FROM game"""
             self.cur.execute(sqlite_select_query)
             records = self.cur.fetchall()
-            user = CashFlow.data.data(self.userid).dataUser()
+            user = data.data(self.userid).dataUser()
             for row in records:
                 if user[0] == row[0]:
                     print(row[4])
@@ -166,7 +166,7 @@ class Level:
         sqlite_select_query = """SELECT * FROM game"""
         self.cur.execute(sqlite_select_query)
         records = self.cur.fetchall()
-        user = CashFlow.data.data(self.userid).dataUser()
+        user = data.data(self.userid).dataUser()
         for row in records:
             if user[0] == row[0]:
                 self.step = row[4]
