@@ -91,7 +91,7 @@ class data:
                                  (self.userid, 0, 0, 0, 0, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                                 (self.userid, levels.Level(0,0,0,0, self.userid).move_1(), levels.Level(0,0,0,0, self.userid).move_1(), levels.Level(0,0,0,0, self.userid).move_1(), 1, 0, 0, 0, 0))
+                                 (self.userid, levels.Level(0,0,0,0, self.userid).stockMarket(), levels.Level(0,0,0,0, self.userid).move_1(), levels.Level(0,0,0,0, self.userid).move_1(), 1, 0, 0, 0, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO bondes VALUES(?, ?, ?);",
                                 (self.userid, 0, 0))
