@@ -1,4 +1,4 @@
-import sqlite3, random, string, datetime
+import sqlite3, random, string, datetime, level.levels as levels
 class data:
     def __init__(self, userid, column = None, changes = None, userName = None, userFirst = None, userLast = None, money = None):
         self.userid = userid
@@ -90,7 +90,7 @@ class data:
                                  (self.userid, 0, 0, 0, 0, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                                 (self.userid, 0, 0, 0, 1, 0, 0, 0, 0))
+                                 (self.userid, levels.Level(0,0,0,0, self.userid).move_1(), levels.Level(0,0,0,0, self.userid).move_1(), levels.Level(0,0,0,0, self.userid).move_1(), 1, 0, 0, 0, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO bondes VALUES(?, ?, ?);",
                                 (self.userid, 0, 0))
