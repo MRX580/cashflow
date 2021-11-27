@@ -27,7 +27,7 @@ class assets:
             eth_price) + '$')
 
     def choise_insurance(self):
-        return '1.Страховка на жизнь - 5 000 руб\n2.Страховка на имущество - 3000 руб'
+        return str('1.Страховка на жизнь - 5 000 руб\n2.Страховка на имущество - 3000 руб')
 
     def insuranceUser(self):
         sqlite_select_query = """SELECT * FROM game"""
@@ -118,12 +118,9 @@ class assets:
             self.cur.execute(f"""Update businesses set {self.business} = {self.number} where userid = {self.userid}""")
             self.cur.execute(f"""Update businesses set ДоходAMD = {self.number * 500} where userid = {self.userid}""")
             self.cur.execute(f"""Update businesses set ДоходIntel = {self.number * 700} where userid = {self.userid}""")
-            self.cur.execute(
-                f"""Update businesses set ДоходNvidia = {self.number * 900} where userid = {self.userid}""")
-            self.cur.execute(
-                f"""Update businesses set ДоходApple = {self.number * 1200} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходNvidia = {self.number * 900} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходApple = {self.number * 1200} where userid = {self.userid}""")
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
-            print(summ)
             self.conn.commit()
         else:
             return str('У вас нет денег!')
@@ -155,7 +152,6 @@ class assets:
                 self.number -= bondes
             summ = dataUser[4] + (self.number * self.price)
             self.cur.execute((f"""Update bondes set {self.bondes} = {self.number} where userid = {self.userid}"""))
-            print(self.bondes, self.number)
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
         if self.bondes:
@@ -171,8 +167,7 @@ class assets:
                 business = dataBondes[1]
                 self.number -= business
             summ = dataUser[4] + (self.number * self.price)
-            self.cur.execute(
-                (f"""Update businesses set {self.business} = {self.number} where userid = {self.userid}"""))
+            self.cur.execute(f"""Update businesses set {self.business} = {self.number} where userid = {self.userid}""")
             print(self.business, self.number)
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
@@ -182,13 +177,17 @@ class assets:
 
     def crediUser(self):
         dataUser = data.data(self.userid).dataUser()
-        money = dataUser[4] + self.credit
-        self.cur.execute(f"""Update users set money = {money} where userid = {self.userid}""")
-        self.cur.execute(f"""Update users set credit = {self.credit} where userid = {self.userid}""")
+        self.credit = dataUser[11]
+        self.cur.execute(f"""Update stock set {self.coin} = {self.number} where userid = {self.userid}""")
+        self.cur.execute(f"""Update bondes set {self.bondes} = {self.number} where userid = {self.userid}""")
+        self.cur.execute(f"""Update businesses set {self.business} = {self.number} where userid = {self.userid}""")
+        self.cur.execute(f"""Update users set credit = {self.credit + self.number * self.price} where userid = {self.userid}""")
         self.conn.commit()
+        self.conn.close()
+
 
 if __name__ == '__main__':
-    assets = assets(672532296, coin='Связьком', bondes='Вексель', business='AMD', number=100, price=10, credit=1000)
+    assets = assets(672532296, coin='Связьком', bondes='Вексель', business='AMD', number=10, price=80)
     assets.database_buys_stock()
     assets.database_buys_bondes()
     assets.database_buys_businesses()

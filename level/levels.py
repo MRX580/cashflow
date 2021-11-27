@@ -1,6 +1,6 @@
 import random
 import sqlite3
-import data
+import CashFlow.data
 
 class Level:
     def __init__(self, moves, income, costs, target, userid):
@@ -105,7 +105,6 @@ class Level:
             return self.investmentFunc()
         if rand == 4:
             return self.unexpectedExpensesFunc()
-
     def database_connect(self):
         self.step = 0
         self.sqlite_select_query = """SELECT * from game"""
@@ -131,11 +130,16 @@ class Level:
             sqlite_select_query = """SELECT * FROM game"""
             self.cur.execute(sqlite_select_query)
             records = self.cur.fetchall()
-            user = data.data(self.userid).dataUser()
+            user = CashFlow.data.data(self.userid).dataUser()
             for row in records:
                 if user[0] == row[0]:
                     print(row[4])
                     self.step = row[4]
+                    if row[1] == self.investmentFunc() and row[2] == self.investmentFunc() and row[3] == self.investmentFunc() or row[1] == self.unexpectedExpensesFunc() and row[2] == self.unexpectedExpensesFunc() and row[3] == self.unexpectedExpensesFunc() or row[1] == self.businessFunc() and row[2] == self.businessFunc() and row[3] == self.businessFunc():
+                        self.cur.execute(f"""Update game set move1 = "{self.move_1()}" where userid = {self.userid}""")
+                        self.cur.execute(f"""Update game set move2 = "{self.move_1()}" where userid = {self.userid}""")
+                        self.cur.execute(f"""Update game set move3 = "{self.move_1()}" where userid = {self.userid}""")
+                        self.conn.commit()
             self.cur.close()
         except sqlite3.Error as error:
             print("Ошибка при работе с SQLite", error)
@@ -162,7 +166,7 @@ class Level:
         sqlite_select_query = """SELECT * FROM game"""
         self.cur.execute(sqlite_select_query)
         records = self.cur.fetchall()
-        user = data.data(self.userid).dataUser()
+        user = CashFlow.data.data(self.userid).dataUser()
         for row in records:
             if user[0] == row[0]:
                 self.step = row[4]
@@ -208,6 +212,7 @@ class Level:
 
 if __name__ == '__main__':
     levelOne = Level(0, 5000, 4000, 50000, 672532296)
+    levelOne.move_1()
     levelOne.database_connect()
     levelOne.dataBaseRec()
     levelOne.dataBaseUpt()

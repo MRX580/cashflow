@@ -1,4 +1,4 @@
-import sqlite3, random, string, datetime, level.levels as levels
+import sqlite3, random, string, datetime, CashFlow.level.levels as levels
 class data:
     def __init__(self, userid, column = None, changes = None, userName = None, userFirst = None, userLast = None, money = None):
         self.userid = userid
