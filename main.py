@@ -178,10 +178,11 @@ async def buys(message: types.Message, state: FSMContext):
             datas['num'] = message.text
     if dataGame[dataGame[4]-1].split()[0].lower() == 'акция':
         await bot.send_message(message.chat.id,
-                               f'Хотите купить {str(datas["num"])} акций {dataGame[dataGame[4]][1]}. По цене ' + str(dataGame[dataGame[4]][3]) + f' на сумму {str(int(datas["num"]) * int(dataGame[dataGame[4]][3]))}\n'
-                                             f'Остаток наличных {str(int(dataUser) - int(data["num"]) * int(data["stock"].split()[3]))}'
-                                             f'\nДа/Нет (Введите число акций еще раз если хотите купить другое количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить подтверждение"',
-                               reply_markup=markup)
+                               f'Хотите купить {datas["num"]} акций {dataGame[dataGame[4]-1].split()[1]}.'
+                               f' По цене ' + str(dataGame[dataGame[4]-1].split()[3])
+                               + f' на сумму {int(datas["num"]) * int(dataGame[dataGame[4]-1].split()[3])}\n'
+                                             f'Остаток наличных {str(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4]-1].split()[3]))}'
+                                             f'\nДа/Нет (Введите число акций еще раз если хотите купить другое количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить подтверждение"')
         assets.assets(userid=message.chat.id, number=int(message.text), price=int(dataGame[dataGame[4]-1].split()[3]), coin=dataGame[dataGame[4]-1].split()[1]).database_buys_stock()
     elif dataGame[dataGame[4]-1].split()[0].lower() == 'облигация':
         assets.assets(userid=message.chat.id, number=int(message.text), price=int(dataGame[dataGame[4] - 1].split()[3]),
