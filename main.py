@@ -117,11 +117,31 @@ async def choicelevel(message: types.Message, state: FSMContext):
     dataBonds = data.data(message.chat.id).dataBonds()
     dataBusinesses = data.data(message.chat.id).dataBusinesses()
     async with state.proxy() as datas:
-        if message.text.lower() == '1':
+        '''if message.text.lower() == '1':
             await bot.send_message(message.chat.id, f'Сколько хотите купить {dataCoins[1].split()[3]}')
             datas['coin'] = dataCoins[1].split()[3]
             datas['iscoin'] = True
             await game.buys.set()
+        elif message.text.lower() == '2':
+            await bot.send_message(message.chat.id, f'Сколько хотите купить {dataCoins[1].split()[3]}')
+            datas['coin'] = dataCoins[1].split()[3]
+            datas['iscoin'] = True
+            await game.buys.set()
+        elif message.text.lower() == '3':
+            await bot.send_message(message.chat.id, f'Сколько хотите купить {dataCoins[1].split()[3]}')
+            datas['coin'] = dataCoins[1].split()[3]
+            datas['iscoin'] = True
+            await game.buys.set()
+        elif message.text.lower() == '4':
+            await bot.send_message(message.chat.id, f'Сколько хотите купить {dataCoins[1].split()[3]}')
+            datas['coin'] = dataCoins[1].split()[3]
+            datas['iscoin'] = True
+            await game.buys.set()
+        elif message.text.lower() == '5':
+            await bot.send_message(message.chat.id, f'Сколько хотите купить {dataCoins[1].split()[3]}')
+            datas['coin'] = dataCoins[1].split()[3]
+            datas['iscoin'] = True
+            await game.buys.set()'''
         if message.text.lower() == 'отключить/включить подтверждение':
             if dataUser[10] == True:
                 data.data(message.chat.id, column='notification', changes=False).dataChanges()
@@ -145,6 +165,8 @@ async def choicelevel(message: types.Message, state: FSMContext):
                 await bot.send_message(message.chat.id, 'У вас нету криптовалюты')
             if dataBusinesses[1] == 0 and dataBusinesses[3] == 0 and dataBusinesses[5] == 0 and dataBusinesses[7] == 0:
                 await bot.send_message(message.chat.id, 'У вас нету бизнесов')
+            else:
+                await bot.send_message(message.chat.id, '')
         if message.text.lower() == 'магазин криптовалют':
             await bot.send_message(message.chat.id, assets.assets(message.chat.id, 0, 0).random_criptWrite())
         if message.text.lower() == 'продолжить':
@@ -172,6 +194,7 @@ async def choicelevel(message: types.Message, state: FSMContext):
                 return
             else:
                 await bot.send_message(message.chat.id, 'Итоги месяца')
+                #await bot.send_message(message.chat.id, f'Итоги месяца\nВаш текущий баланс: {dataUser[4]}\nОбщие доходы: {int(levels.choiceLevel(dataUser[7], message.chat.id).work().split()[-1]) + int(dataBonds[1] * 300)}')
                 return
         try:
             if message.text.lower() == 'купить' and datas['stock']:
@@ -187,7 +210,10 @@ async def choicelevel(message: types.Message, state: FSMContext):
             datas['bonds'] = False
             datas['business'] = False
 
-
+@dp.message_handler(lambda message: message.text.lower() == 'отмена', state=game.buys)
+async def cancel(message: types.Message):
+    await bot.send_message(message.chat.id, 'Действие отменено')
+    await game.waitingGame.set()
 @dp.message_handler(lambda message: not message.text.isdigit() and message.text.lower() != 'да' and message.text.lower() != 'нет', state=game.buys)
 async def error(message: types.Message):
     await bot.send_message(message.chat.id, 'Не коректно указано количевство')
@@ -202,6 +228,11 @@ async def buys(message: types.Message, state: FSMContext):
     if message.text.isdigit():
         async with state.proxy() as datas:
             datas['num'] = message.text
+            if int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4]-1].split()[3]) < 0:
+                markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+                markup.add('Отмена')
+                await bot.send_message(message.chat.id, 'У вас нехватает денег, введите количевство еще раз\nИли введите "Отмена" что бы отменить покупку', reply_markup=markup)
+                return
     async with state.proxy() as datas:
         if dataUser[10] == False:
             if dataGame[dataGame[4]-1].split()[0].lower() == 'акция':

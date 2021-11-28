@@ -1,4 +1,4 @@
-import sqlite3, random, string, datetime, CashFlow.level.levels as levels
+import sqlite3, random, string, datetime, level.levels as levels
 
 import assets
 
