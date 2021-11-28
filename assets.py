@@ -9,8 +9,8 @@ class assets:
         self.coin = coin
         self.bondes = bondes
         self.business = business
-        self.number = number
-        self.price = price
+        self.number = int(number)
+        self.price = int(price)
         self.credit = credit
         self.conn = sqlite3.connect('users.db')
         self.cur = self.conn.cursor()
@@ -23,24 +23,16 @@ class assets:
         avax_price = random.randint(80, 102)
         sol_price = random.randint(150, 197)
         eth_price = random.randint(3950, 4022)
-        coin = str('Выбери крипту:\n1.Bitcoin ' + str(btc_price) + '$\n2.Binance Coin ' + str(
-            bnb_price) + '$\n3.Avalanche ' + str(avax_price) + '$\n4.Solana ' + str(sol_price) + '$\n5.Ethereum ' + str(
+        coin = str('Выбери крипту:\n1. Bitcoin ' + str(btc_price) + '$\n2. Binance Coin ' + str(
+            bnb_price) + '$\n3. Avalanche ' + str(avax_price) + '$\n4. Solana ' + str(sol_price) + '$\n5. Ethereum ' + str(
             eth_price) + '$')
         return coin
 
     def random_criptWrite(self):
-        btc_price = random.randint(54000, 64000)
-        bnb_price = random.randint(450, 540)
-        avax_price = random.randint(80, 102)
-        sol_price = random.randint(150, 197)
-        eth_price = random.randint(3950, 4022)
-        coin = str('Выбери крипту:\n1.Bitcoin ' + str(btc_price) + '$\n2.Binance Coin ' + str(
-            bnb_price) + '$\n3.Avalanche ' + str(avax_price) + '$\n4.Solana ' + str(sol_price) + '$\n5.Ethereum ' + str(
-            eth_price) + '$')
+        coin = self.random_cript()
         self.cur.execute(f"""UPDATE coins SET coinRand = (?) WHERE userid = {self.userid}""", (coin,))
         self.conn.commit()
         return coin
-
     def choise_insurance(self):
         return str('1.Страховка на жизнь - 5 000 руб\n2.Страховка на имущество - 3000 руб')
 

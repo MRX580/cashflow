@@ -117,6 +117,18 @@ async def choicelevel(message: types.Message, state: FSMContext):
     dataBonds = data.data(message.chat.id).dataBonds()
     dataBusinesses = data.data(message.chat.id).dataBusinesses()
     async with state.proxy() as datas:
+        if message.text.lower() == '1':
+            await bot.send_message(message.chat.id, f'Сколько хотите купить {dataCoins[1].split()[3]}')
+            datas['coin'] = dataCoins[1].split()[3]
+            datas['iscoin'] = True
+            await game.buys.set()
+        if message.text.lower() == 'отключить/включить подтверждение':
+            if dataUser[10] == True:
+                data.data(message.chat.id, column='notification', changes=False).dataChanges()
+                await bot.send_message(message.chat.id, 'Уведомления выключены')
+            else:
+                data.data(message.chat.id, column='notification', changes=True).dataChanges()
+                await bot.send_message(message.chat.id, 'Уведомления включены')
         if message.text.lower() == 'статистика':
             await bot.send_message(message.chat.id, levels.choiceLevel(dataUser[7], message.chat.id).work() + f'\nНаличные: {dataUser[4]}\nОбщий доход: \nРасходы:\nКредит:')
             if dataStock[1] == 0 and dataStock[2] == 0 and dataStock[3] == 0 and dataStock[4] == 0 and dataStock[5] == 0:
@@ -131,10 +143,11 @@ async def choicelevel(message: types.Message, state: FSMContext):
                 await bot.send_message(message.chat.id, f'Вексель: {dataBonds[1]} доход - {dataBonds[1] * 300}')
             if dataCoins[2] == 0 and dataCoins[3] == 0 and dataCoins[4] == 0 and dataCoins[5] == 0 and dataCoins[6] == 0:
                 await bot.send_message(message.chat.id, 'У вас нету криптовалюты')
+            if dataBusinesses[1] == 0 and dataBusinesses[3] == 0 and dataBusinesses[5] == 0 and dataBusinesses[7] == 0:
+                await bot.send_message(message.chat.id, 'У вас нету бизнесов')
         if message.text.lower() == 'магазин криптовалют':
             await bot.send_message(message.chat.id, assets.assets(message.chat.id, 0, 0).random_criptWrite())
         if message.text.lower() == 'продолжить':
-            print(dataUser[7])
             levels.choiceLevel(dataUser[7], message.chat.id).dataBaseUpt()
             datas['stock'] = False
             datas['bonds'] = False
@@ -144,16 +157,16 @@ async def choicelevel(message: types.Message, state: FSMContext):
             if dataGame[4] != 4:
                 if dataGame[dataGame[4]].split()[0].lower() == 'акция':
                     datas['stock'] = True
-                    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=5)
-                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют')
+                    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=6)
+                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Отключить/включить подтверждение')
                 elif dataGame[dataGame[4]].split()[0].lower() == 'облигация':
                     datas['bonds'] = True
-                    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=5)
-                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют')
+                    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=6)
+                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Отключить/включить подтверждение')
                 elif dataGame[dataGame[4]].split()[0].lower() == 'бизнес':
                     datas['business'] = True
-                    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=5)
-                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют')
+                    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=6)
+                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Отключить/включить подтверждение')
                 await bot.send_message(message.chat.id, dataGame[dataGame[4]], reply_markup=markup)
                 datas['time'] = datetime.datetime.now()
                 return
@@ -168,21 +181,20 @@ async def choicelevel(message: types.Message, state: FSMContext):
                 await bot.send_message(message.chat.id, 'Сколько облигаций хотите купить?')
                 await game.buys.set()
             elif message.text.lower() == 'купить' and datas['business']:
-                await game.buysBusiness.set()
+                await game.buys.set()
         except KeyError:
             datas['stock'] = False
             datas['bonds'] = False
             datas['business'] = False
 
 
-@dp.message_handler(lambda message: not message.text.isdigit(), state=game.buys)
+@dp.message_handler(lambda message: not message.text.isdigit() and message.text.lower() != 'да' and message.text.lower() != 'нет', state=game.buys)
 async def error(message: types.Message):
     await bot.send_message(message.chat.id, 'Не коректно указано количевство')
 
-@dp.message_handler(lambda message: int(message.text) > 0)
+@dp.message_handler(lambda message: int(message.text) > 0 and message.text.lower() != 'да' and message.text.lower() != 'нет')
 async def error(message: types.Message):
     await bot.send_message(message.chat.id, 'Введите число больше 0')
-
 @dp.message_handler(state=[game.buys, game.buysBusiness])
 async def buys(message: types.Message, state: FSMContext):
     dataGame = data.data(message.chat.id).dataGame()
@@ -190,53 +202,65 @@ async def buys(message: types.Message, state: FSMContext):
     if message.text.isdigit():
         async with state.proxy() as datas:
             datas['num'] = message.text
-    if dataUser[10] == False:
-        if dataGame[dataGame[4]-1].split()[0].lower() == 'акция':
-            await bot.send_message(message.chat.id,
-                                   f'Вы купили {datas["num"]} акций {dataGame[dataGame[4]-1].split()[1]}.'
-                                   f' По цене ' + str(dataGame[dataGame[4]-1].split()[3])
-                                   + f' на сумму {int(datas["num"]) * int(dataGame[dataGame[4]-1].split()[3])}\n'
-                                                 f'Остаток наличных {str(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4]-1].split()[3]))}')
-                                                 #f'\nДа/Нет (Введите число акций еще раз если хотите купить другое количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить подтверждение"')
-            assets.assets(userid=message.chat.id, number=datas["num"], price=int(dataGame[dataGame[4]-1].split()[3]), coin=dataGame[dataGame[4]-1].split()[1]).database_buys_stock()
-            await game.waitingGame.set()
-        elif dataGame[dataGame[4]-1].split()[0].lower() == 'облигация':
-            await bot.send_message(message.chat.id,
-                                   f'Вы купили {datas["num"]} облигаций {dataGame[dataGame[4] - 1].split()[1]}.'
-                                   f' По цене ' + str(dataGame[dataGame[4] - 1].split()[3])
-                                   + f' на сумму {int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3])}. С пассивным доходом {int(datas["num"]) * 300}\n'
-                                     f'Остаток наличных {str(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))}')
-                                     #f'\nДа/Нет (Введите число акций еще раз если хотите купить другое количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить подтверждение"')
-            assets.assets(userid=message.chat.id, number=datas["num"], price=int(dataGame[dataGame[4] - 1].split()[3]),
-                          bondes=dataGame[dataGame[4] - 1].split()[1]).database_buys_bondes()
-            await game.waitingGame.set()
-    else:
-        if message.text.lower() == 'да':
-            if dataGame[dataGame[4] - 1].split()[0].lower() == 'акция':
+    async with state.proxy() as datas:
+        if dataUser[10] == False:
+            if dataGame[dataGame[4]-1].split()[0].lower() == 'акция':
                 await bot.send_message(message.chat.id,
-                                       f'Вы купили {datas["num"]} акций {dataGame[dataGame[4] - 1].split()[1]}.'
-                                       f' По цене ' + str(dataGame[dataGame[4] - 1].split()[3])
-                                       + f' на сумму {int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3])}\n'
-                                         f'Остаток наличных {str(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))}')
-                # f'\nДа/Нет (Введите число акций еще раз если хотите купить другое количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить подтверждение"')
-                assets.assets(userid=message.chat.id, number=datas["num"],
-                              price=int(dataGame[dataGame[4] - 1].split()[3]),
-                              coin=dataGame[dataGame[4] - 1].split()[1]).database_buys_stock()
+                                       f'Вы купили {datas["num"]} акций {dataGame[dataGame[4]-1].split()[1]}.'
+                                       f' По цене ' + str(dataGame[dataGame[4]-1].split()[3])
+                                       + f' на сумму {int(datas["num"]) * int(dataGame[dataGame[4]-1].split()[3])}\n'
+                                                     f'Остаток наличных {str(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4]-1].split()[3]))}')
+                assets.assets(userid=message.chat.id, number=datas["num"], price=int(dataGame[dataGame[4]-1].split()[3]), coin=dataGame[dataGame[4]-1].split()[1]).database_buys_stock()
                 await game.waitingGame.set()
-            elif dataGame[dataGame[4] - 1].split()[0].lower() == 'облигация':
+            elif dataGame[dataGame[4]-1].split()[0].lower() == 'облигация':
                 await bot.send_message(message.chat.id,
                                        f'Вы купили {datas["num"]} облигаций {dataGame[dataGame[4] - 1].split()[1]}.'
                                        f' По цене ' + str(dataGame[dataGame[4] - 1].split()[3])
                                        + f' на сумму {int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3])}. С пассивным доходом {int(datas["num"]) * 300}\n'
                                          f'Остаток наличных {str(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))}')
-                # f'\nДа/Нет (Введите число акций еще раз если хотите купить другое количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить подтверждение"')
-                assets.assets(userid=message.chat.id, number=datas["num"],
-                              price=int(dataGame[dataGame[4] - 1].split()[3]),
+                assets.assets(userid=message.chat.id, number=datas["num"], price=int(dataGame[dataGame[4] - 1].split()[3]),
                               bondes=dataGame[dataGame[4] - 1].split()[1]).database_buys_bondes()
                 await game.waitingGame.set()
-        elif message.text.lower() == 'нет':
-            await bot.send_message(message.chat.id, 'Действие отменено')
-            await game.waitingGame.set()
-    await bot.send_message(message.chat.id,'buys')
+        else:
+            if message.text.lower() == 'да':
+                if dataGame[dataGame[4] - 1].split()[0].lower() == 'акция':
+                    await bot.send_message(message.chat.id,
+                                           f'Вы купили {datas["num"]} акций {dataGame[dataGame[4] - 1].split()[1]}.'
+                                           f' По цене ' + str(dataGame[dataGame[4] - 1].split()[3])
+                                           + f' на сумму {int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3])}\n'
+                                             f'Остаток наличных {str(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))}')
+                    assets.assets(userid=message.chat.id, number=datas["num"],
+                                  price=int(dataGame[dataGame[4] - 1].split()[3]),
+                                  coin=dataGame[dataGame[4] - 1].split()[1]).database_buys_stock()
+                    await game.waitingGame.set()
+                    return
+                elif dataGame[dataGame[4] - 1].split()[0].lower() == 'облигация':
+                    await bot.send_message(message.chat.id,
+                                           f'Вы купили {datas["num"]} облигаций {dataGame[dataGame[4] - 1].split()[1]}.'
+                                           f' По цене ' + str(dataGame[dataGame[4] - 1].split()[3])
+                                           + f' на сумму {int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3])}. С пассивным доходом {int(datas["num"]) * 300}\n'
+                                             f'Остаток наличных {str(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))}')
+                    assets.assets(userid=message.chat.id, number=datas["num"],
+                                  price=int(dataGame[dataGame[4] - 1].split()[3]),
+                                  bondes=dataGame[dataGame[4] - 1].split()[1]).database_buys_bondes()
+                    await game.waitingGame.set()
+                    return
+            elif message.text.lower() == 'нет':
+                await bot.send_message(message.chat.id, 'Действие отменено')
+                await game.waitingGame.set()
+            if dataGame[dataGame[4] - 1].split()[0].lower() == 'акция':
+                await bot.send_message(message.chat.id,
+                                       f'Хотите купить {datas["num"]} акций {dataGame[dataGame[4] - 1].split()[1]}.'
+                                       f' По цене ' + str(dataGame[dataGame[4] - 1].split()[3])
+                                       + f' на сумму {int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3])}\n'
+                                         f'Остаток наличных {str(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))}'
+                    f'\nДа/Нет (Введите число акций еще раз если хотите купить другое количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить подтверждение"')
+            elif dataGame[dataGame[4] - 1].split()[0].lower() == 'облигация':
+                await bot.send_message(message.chat.id,
+                                       f'Хотите купить {datas["num"]} облигаций {dataGame[dataGame[4] - 1].split()[1]}.'
+                                       f' По цене ' + str(dataGame[dataGame[4] - 1].split()[3])
+                                       + f' на сумму {int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3])}. С пассивным доходом {int(datas["num"]) * 300}\n'
+                                         f'Остаток наличных {str(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))}'
+                                         f'\nДа/Нет (Введите число акций еще раз если хотите купить другое количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить подтверждение"')
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
