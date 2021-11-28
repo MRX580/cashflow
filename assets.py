@@ -1,14 +1,14 @@
 import random, sqlite3, data
 
 class assets:
-    def __init__(self, userid, number, price, coin=None, bondes=None, business=None, credit=None):
+    def __init__(self, userid, number, price = None, coin=None, bondes=None, business=None, kripta = None):
         self.userid = userid
         self.coin = coin
         self.bondes = bondes
         self.business = business
         self.number = int(number)
         self.price = int(price)
-        self.credit = credit
+        self.kripta = kripta
         self.conn = sqlite3.connect('users.db')
         self.cur = self.conn.cursor()
         self.conn.commit()
@@ -124,10 +124,10 @@ class assets:
                     break
             summ = dataUser[4] - (self.number * self.price)
             self.cur.execute(f"""Update businesses set {self.business} = {self.number} where userid = {self.userid}""")
-            self.cur.execute(f"""Update businesses set ДоходAMD = {self.number} where userid = {self.userid}""")
-            self.cur.execute(f"""Update businesses set ДоходIntel = {self.number} where userid = {self.userid}""")
-            self.cur.execute(f"""Update businesses set ДоходNvidia = {self.number} where userid = {self.userid}""")
-            self.cur.execute(f"""Update businesses set ДоходApple = {self.number} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходAMD = {self.number * 500} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходIntel = {self.number * 700} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходNvidia = {self.number * 900} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходApple = {self.number * 1100} where userid = {self.userid}""")
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
         else:
@@ -184,22 +184,57 @@ class assets:
                 return str('У вас нету этого бизнеса')
 
     def crediUser(self):
+        global bondes, stock, businesses, credit, kripta
         dataUser = data.data(self.userid).dataUser()
-        self.credit = dataUser[11]
+        credit = dataUser[11]
         try:
-            self.cur.execute(f"""Update stock set {self.coin} = {self.number} where userid = {self.userid}""")
+            self.cur.execute("""SELECT * FROM stock""")
+            record = self.cur.fetchall()
+            for row in record:
+                if row[0] == self.userid:
+                    stock = row[1]
+            self.cur.execute(f"""Update stock set {self.coin} = {stock + self.number} where userid = {self.userid}""")
         except sqlite3.OperationalError as e:
             print(e)
         try:
-            self.cur.execute(f"""Update bondes set {self.bondes} = {self.number} where userid = {self.userid}""")
+            self.cur.execute("""SELECT * FROM bondes""")
+            record = self.cur.fetchall()
+            for row in record:
+                if row[0] == self.userid:
+                    bondes = row[1]
+            self.cur.execute(f"""Update bondes set {self.bondes} = {bondes + self.number} where userid = {self.userid}""")
+            self.cur.execute(f"""Update bondes set Доход_вексель = {self.number * 300} where userid = {self.userid}""")
         except sqlite3.OperationalError as e:
             print(e)
         try:
-            self.cur.execute(f"""Update businesses set {self.business} = {self.number} where userid = {self.userid}""")
+            self.cur.execute("""SELECT * FROM businesses""")
+            record = self.cur.fetchall()
+            for row in record:
+                if row[0] == self.userid:
+                    businesses = row[1]
+            self.cur.execute(f"""Update businesses set {self.business} = {businesses + self.number} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходAMD = {self.number * 500} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходIntel = {self.number * 700} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходNvidia = {self.number * 900} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходApple = {self.number * 1100} where userid = {self.userid}""")
         except sqlite3.OperationalError as e:
             print(e)
         try:
-            self.cur.execute(f"""Update users set credit = {self.number * self.price} where userid = {self.userid}""")
+            self.cur.execute("""SELECT * FROM coins""")
+            record = self.cur.fetchall()
+            for row in record:
+                if row[0] == self.userid:
+                    kripta = row[2]
+            self.cur.execute(f"""Update coins set {self.kripta} = {kripta + self.number} where userid = {self.userid}""")
+        except sqlite3.OperationalError as e:
+            print(e)
+        try:
+            self.cur.execute("""SELECT * FROM users""")
+            record = self.cur.fetchall()
+            for row in record:
+                if row[0] == self.userid:
+                    credit = row[11]
+            self.cur.execute(f"""Update users set credit = {credit + self.number * self.price} where userid = {self.userid}""")
         except sqlite3.OperationalError as e:
             print(e)
         self.conn.commit()
@@ -207,5 +242,5 @@ class assets:
 
 
 if __name__ == '__main__':
-    assets = assets(951679992, coin='Связьком', bondes='Вексель', business='AMD', number=10, price=80)
+    assets = assets(userid=672532296, number=10)
     assets.random_criptWrite()
