@@ -1,6 +1,6 @@
-import random, sqlite3, data
+import random, sqlite3, CashFlow.data
 
-import level.levels
+import CashFlow.level.levels
 
 
 class assets:
@@ -82,7 +82,7 @@ class assets:
 
     # Покупка акций
     def database_buys_stock(self):
-        dataUser = data.data(self.userid).dataUser()
+        dataUser = CashFlow.data.data(self.userid).dataUser()
         dataStock = self.database_user_stock()
         if self.number * self.price <= dataUser[4]:
             for i in range(1, 5):
@@ -99,7 +99,7 @@ class assets:
 
     # Покупка облигаций
     def database_buys_bondes(self):
-        dataUser = data.data(self.userid).dataUser()
+        dataUser = CashFlow.data.data(self.userid).dataUser()
         dataBondes = self.database_user_bondes()
         if self.number * self.price <= dataUser[4]:
             if self.bondes == dataBondes[1]:
@@ -115,7 +115,7 @@ class assets:
 
     # Покупка бизнесов
     def database_buys_businesses(self):
-        dataUser = data.data(self.userid).dataUser()
+        dataUser = CashFlow.data.data(self.userid).dataUser()
         dataBusinesses = self.database_user_businesses()
         if self.number * self.price <= dataUser[4]:
             if self.business == dataBusinesses[1]:
@@ -134,7 +134,7 @@ class assets:
 
     # Продажа акций
     def database_sell_stock(self):
-        dataUser = data.data(self.userid).dataUser()
+        dataUser = CashFlow.data.data(self.userid).dataUser()
         dataStock = self.database_user_stock()
         if self.number * self.price:
             if self.coin == dataStock[1]:
@@ -151,7 +151,7 @@ class assets:
 
     # Продажа облигаций
     def database_sell_bondes(self):
-        dataUser = data.data(self.userid).dataUser()
+        dataUser = CashFlow.data.data(self.userid).dataUser()
         dataBondes = self.database_user_bondes()
         if self.number * self.price:
             if self.bondes == dataBondes[1]:
@@ -167,7 +167,7 @@ class assets:
 
     # Продажа бизнесов
     def database_sell_businesses(self):
-        dataUser = data.data(self.userid).dataUser()
+        dataUser = CashFlow.data.data(self.userid).dataUser()
         dataBondes = self.database_user_bondes()
         if self.number * self.price:
             if self.business == dataBondes[1]:
@@ -183,7 +183,7 @@ class assets:
                 return str('У вас нету этого бизнеса')
 
     def crediUser(self):
-        dataUser = data.data(self.userid).dataUser()
+        dataUser = CashFlow.data.data(self.userid).dataUser()
         self.credit = dataUser[11]
         self.cur.execute(f"""Update stock set {self.coin} = {self.number} where userid = {self.userid}""")
         self.cur.execute(f"""Update bondes set {self.bondes} = {self.number} where userid = {self.userid}""")

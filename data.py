@@ -1,4 +1,4 @@
-import sqlite3, random, string, datetime, level.levels as levels
+import sqlite3, random, string, datetime, CashFlow.level.levels as levels
 
 import assets
 
@@ -94,7 +94,7 @@ class data:
                 self.conn.commit()
                 self.cur.execute("INSERT INTO stock VALUES(?, ?, ?, ?, ?, ?);",(self.userid, 0, 0, 0, 0, 0))
                 self.conn.commit()
-                self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",(self.userid, levels.Level(0,0,0,0, self.userid).move_1(), levels.Level(0,0,0,0, self.userid).move_1(), levels.Level(0,0,0,0, self.userid).move_1(), 1, 0, 0, 0, 0)),(self.userid, levels.Level(0, 0, 0, 0, self.userid).stockMarket(),levels.Level(0, 0, 0, 0, self.userid).move_1(),levels.Level(0, 0, 0, 0, self.userid).move_1(), 1, 0, 0, 0, 0)
+                self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",(self.userid, levels.Level(0,0,0,0, self.userid).move_1(), levels.Level(0,0,0,0, self.userid).move_1(), levels.Level(0,0,0,0, self.userid).move_1(), 1, 0, 0, 0, 0)),(self.userid, levels.Level(0, 0, 0, 0, self.userid).stockMarket(),levels.Level(0, 0, 0, 0, self.userid).move_1(),levels.Level(0, 0, 0, 0, self.userid).move_1(), 1, 0, 0, 0, 0,levels.Level(0, 0, 0, 0, self.userid).work(), 1, 0, 0, 0, 0)
                 self.conn.commit()
                 self.cur.execute("INSERT INTO bondes VALUES(?, ?, ?);",(self.userid, 0, 0))
                 self.conn.commit()

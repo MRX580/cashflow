@@ -1,6 +1,6 @@
 import random
 import sqlite3
-import data
+import CashFlow.data
 
 class Level:
     def __init__(self, moves = None, income = None, costs = None, target = None, userid = None):
@@ -21,7 +21,7 @@ class Level:
                   'Бармен', 'Банкир', 'Юрист', 'Копирайтер', 'Логопед', 'Системный администратор', 'Социальный педагог','курьер'],
                   [25000, 20000, 11000, 11500, 13000, 11000, 12000, 14000, 14000, 10000, 21500, 8500,16500]
                  ]
-        return lvl[0] + ' ' + works[0][num] + ' ' + lvl[1] + ' ' + str(works[1][num])
+        return str(lvl[0] + ' ' + works[0][num] + ' ' + lvl[1] + ' ' + str(works[1][num]))
 
 
     def unexpectedExpensesFunc(self):
@@ -103,17 +103,17 @@ class Level:
     def database_connect(self):
         self.step = 0
         self.sqlite_select_query = """SELECT * from game"""
-        self.conn = sqlite3.connect('users.db')
+        self.conn = sqlite3.connect('../users.db')
         self.cur = self.conn.cursor()
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS game(userid INT PRIMARY KEY,move1 TEXT,move2 TEXT,move3 TEXT,step INT, moves INT, income INT, costs INT, target INT);""")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS game(userid INT PRIMARY KEY,move1 TEXT,move2 TEXT,move3 TEXT,step INT, moves INT, income INT, costs INT, target INT, profession TEXT);""")
         if self.cur.fetchall() is None:
-            self.cur.execute("""CREATE TABLE IF NOT EXISTS game(userid INT PRIMARY KEY,move1 TEXT,move2 TEXT,move3 TEXT,step INT, moves INT, income INT, costs INT, target INT);""")
+            self.cur.execute("""CREATE TABLE IF NOT EXISTS game(userid INT PRIMARY KEY,move1 TEXT,move2 TEXT,move3 TEXT,step INT, moves INT, income INT, costs INT, target INT, profession TEXT);""")
         self.conn.commit()
     def dataBaseRec(self):
         try:
-            self.conn = sqlite3.connect('users.db')
+            self.conn = sqlite3.connect('../users.db')
             self.cur = self.conn.cursor()
-            self.cur.execute("INSERT INTO game VALUES(?,?,?,?,?,?,?,?,?);",(self.userid, self.move_1(),self.move_1(),self.move_1(), self.step, self.moves,self.income,self.costs,self.target))
+            self.cur.execute("INSERT INTO game VALUES(?,?,?,?,?,?,?,?,?,?);",(self.userid, self.move_1(),self.move_1(),self.move_1(), self.step,self.moves,self.income,self.costs,self.target,self.work()))
             self.conn.commit()
             self.cur.close()
         except sqlite3.IntegrityError:
@@ -122,12 +122,12 @@ class Level:
         mssAssets = [self.stockMarket(), self.investmentFunc(), self.businessFunc(), self.unexpectedExpensesFunc()]
         random.shuffle(mssAssets)
         try:
-            self.conn = sqlite3.connect('users.db')
+            self.conn = sqlite3.connect('../users.db')
             self.cur = self.conn.cursor()
             sqlite_select_query = """SELECT * FROM game"""
             self.cur.execute(sqlite_select_query)
             records = self.cur.fetchall()
-            user = data.data(self.userid).dataUser()
+            user = CashFlow.data.data(self.userid).dataUser()
             for row in records:
                 if user[0] == row[0]:
                     print(row[4])
@@ -141,7 +141,7 @@ class Level:
                 self.conn.close()
 
         try:
-            self.conn = sqlite3.connect('users.db')
+            self.conn = sqlite3.connect('../users.db')
             self.cur = self.conn.cursor()
             self.cur.execute("SELECT * from game")
             if self.step == 4:
@@ -209,6 +209,13 @@ class Level:
                     self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
                     self.conn.commit()
                     self.cur.close()
+                elif mssAssets[0] == self.businessFunc() and mssAssets[1] == self.stockMarket() and mssAssets[2] == self.businessFunc():
+                    self.cur.execute(f"""Update game set move1 = "{self.move_1()}" where userid = {self.userid}""")
+                    self.cur.execute(f"""Update game set move2 = "{self.stockMarket()}" where userid = {self.userid}""")
+                    self.cur.execute(f"""Update game set move3 = "{self.investmentFunc()}" where userid = {self.userid}""")
+                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
+                    self.conn.commit()
+                    self.cur.close()
                 else:
                     self.cur.execute(f"""Update game set move1 = "{mssAssets[0]}" where userid = {self.userid}""")
                     self.cur.execute(f"""Update game set move2 = "{mssAssets[1]}" where userid = {self.userid}""")
@@ -227,7 +234,7 @@ class Level:
         sqlite_select_query = """SELECT * FROM game"""
         self.cur.execute(sqlite_select_query)
         records = self.cur.fetchall()
-        user = data.data(self.userid).dataUser()
+        user = CashFlow.data.data(self.userid).dataUser()
         for row in records:
             if user[0] == row[0]:
                 self.step = row[4]
