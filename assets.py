@@ -114,16 +114,20 @@ class assets:
     def database_buys_businesses(self):
         dataUser = data.data(self.userid).dataUser()
         dataBusinesses = self.database_user_businesses()
+        bussines = ['0', 'AMD', '1', 'Intel', '1', 'Nvidia', '1', 'Apple', '1']
         if self.number * self.price <= dataUser[4]:
-            if self.business == dataBusinesses[1]:
-                businesses = dataBusinesses[1]
-                self.number += businesses
+            for i in range(1, 8):
+                print(self.business, dataBusinesses[i])
+                if self.business == bussines[i]:
+                    coin = dataBusinesses[i]
+                    self.number += coin
+                    break
             summ = dataUser[4] - (self.number * self.price)
             self.cur.execute(f"""Update businesses set {self.business} = {self.number} where userid = {self.userid}""")
-            self.cur.execute(f"""Update businesses set ДоходAMD = {self.number * 500} where userid = {self.userid}""")
-            self.cur.execute(f"""Update businesses set ДоходIntel = {self.number * 700} where userid = {self.userid}""")
-            self.cur.execute(f"""Update businesses set ДоходNvidia = {self.number * 900} where userid = {self.userid}""")
-            self.cur.execute(f"""Update businesses set ДоходApple = {self.number * 1200} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходAMD = {self.number} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходIntel = {self.number} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходNvidia = {self.number} where userid = {self.userid}""")
+            self.cur.execute(f"""Update businesses set ДоходApple = {self.number} where userid = {self.userid}""")
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
         else:
@@ -182,10 +186,22 @@ class assets:
     def crediUser(self):
         dataUser = data.data(self.userid).dataUser()
         self.credit = dataUser[11]
-        self.cur.execute(f"""Update stock set {self.coin} = {self.number} where userid = {self.userid}""")
-        self.cur.execute(f"""Update bondes set {self.bondes} = {self.number} where userid = {self.userid}""")
-        self.cur.execute(f"""Update businesses set {self.business} = {self.number} where userid = {self.userid}""")
-        self.cur.execute(f"""Update users set credit = {self.credit + self.number * self.price} where userid = {self.userid}""")
+        try:
+            self.cur.execute(f"""Update stock set {self.coin} = {self.number} where userid = {self.userid}""")
+        except sqlite3.OperationalError as e:
+            print(e)
+        try:
+            self.cur.execute(f"""Update bondes set {self.bondes} = {self.number} where userid = {self.userid}""")
+        except sqlite3.OperationalError as e:
+            print(e)
+        try:
+            self.cur.execute(f"""Update businesses set {self.business} = {self.number} where userid = {self.userid}""")
+        except sqlite3.OperationalError as e:
+            print(e)
+        try:
+            self.cur.execute(f"""Update users set credit = {self.number * self.price} where userid = {self.userid}""")
+        except sqlite3.OperationalError as e:
+            print(e)
         self.conn.commit()
         self.conn.close()
 

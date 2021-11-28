@@ -62,6 +62,11 @@ class data:
         Intel INT, ДоходIntel, Nvidia INT, ДоходNvidia, Apple INT, ДоходApple INT);""")
         self.conn.commit()
 
+    def dataChangesGame(self):
+        self.cur.execute(f"""Update users set {self.column} = {self.changes} where userid = {self.userid}""")
+        self.conn.commit()
+        self.cur.close()
+
     def dataChanges(self):
         self.cur.execute(f"""Update users set {self.column} = {self.changes} where userid = {self.userid}""")
         self.conn.commit()
@@ -87,13 +92,13 @@ class data:
         if self.dataUser() == False:
             try:
                 self.cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                                 (self.userid, self.userName, self.userFirst, self.userLast, 0, False, 1, 0, False, 0, True, 0))
+                                 (self.userid, self.userName, self.userFirst, self.userLast, 2000, False, 1, 0, False, 0, True, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO coins VALUES(?, ?, ?, ?, ?, ?, ?);",(self.userid, assets.assets(self.userid, 0, 0).random_cript(), 0, 0, 0, 0, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO stock VALUES(?, ?, ?, ?, ?, ?);",(self.userid, 0, 0, 0, 0, 0))
                 self.conn.commit()
-                self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", (self.userid, levels.Level(0, 0, 0, 0, self.userid).move_1(),levels.Level(0, 0, 0, 0, self.userid).move_1(), levels.Level(0, 0, 0, 0, self.userid).move_1(), 1, 0, 0, 0, 0, levels.Level.work(self.userid)))
+                self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", (self.userid, levels.Level(0, 0, 0, 0, self.userid).move_1(),levels.Level(0, 0, 0, 0, self.userid).move_1(), levels.Level(0, 0, 0, 0, self.userid).move_1(), 1, 0, 0, 0, 0, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO bondes VALUES(?, ?, ?);",(self.userid, 0, 0))
                 self.conn.commit()

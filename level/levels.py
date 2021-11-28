@@ -16,12 +16,19 @@ class Level:
 
     def work(self):
         num = random.randint(0, 12)
-        works = [['Строитель', 'Менеджер продаж', 'Бариста', 'Продавец-консультант', 'Администратор магазина',
-                  'Бармен', 'Банкир', 'Юрист', 'Копирайтер', 'Логопед', 'Системный администратор', 'Социальный педагог','курьер'],
-                  [25000, 20000, 11000, 11500, 13000, 11000, 12000, 14000, 14000, 10000, 21500, 8500,16500]
-                 ]
-        return works[0][num] + ' ' + str(works[1][num])
+        works = ['Строитель', 'Менеджер продаж', 'Бариста', 'Продавец-консультант', 'Администратор магазина',
+                  'Бармен', 'Банкир', 'Юрист', 'Копирайтер', 'Логопед', 'Системный администратор', 'Социальный педагог','Курьер']
+        dataGame = data.data(self.userid).dataGame()
+        conn = sqlite3.connect('users.db')
+        cur = conn.cursor()
+        cur.execute(f"""Update game set profession = (?) where userid = {self.userid}""", (works[num] + ' ' + str(dataGame[6]),))
+        conn.commit()
 
+    def writeCosts(self):
+        return self.costs
+
+    def writeTarget(self):
+        return self.target
 
     def unexpectedExpensesFunc(self):
         UnexpectedExpenses = (f'(СИ) Непредвиденные расходы вы попали в ДТП -800',
@@ -94,7 +101,6 @@ class Level:
         rand = random.randint(0, len(business) - 1)
         return str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
     def move_1(self):
-        self.work()
         mssAssets = [self.stockMarket(), self.investmentFunc(), self.businessFunc(), self.unexpectedExpensesFunc()]
         random.shuffle(mssAssets)
         for i in mssAssets:
