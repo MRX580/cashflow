@@ -1,5 +1,7 @@
 import random, sqlite3, data
 
+import level.levels
+
 
 class assets:
     def __init__(self, userid, number, price, coin=None, bondes=None, business=None, credit=None):
@@ -21,10 +23,23 @@ class assets:
         avax_price = random.randint(80, 102)
         sol_price = random.randint(150, 197)
         eth_price = random.randint(3950, 4022)
-
-        return str('Выбери крипту:\n1.Bitcoin ' + str(btc_price) + '$\n2.Binance Coin ' + str(
+        coin = str('Выбери крипту:\n1.Bitcoin ' + str(btc_price) + '$\n2.Binance Coin ' + str(
             bnb_price) + '$\n3.Avalanche ' + str(avax_price) + '$\n4.Solana ' + str(sol_price) + '$\n5.Ethereum ' + str(
             eth_price) + '$')
+        return coin
+
+    def random_criptWrite(self):
+        btc_price = random.randint(54000, 64000)
+        bnb_price = random.randint(450, 540)
+        avax_price = random.randint(80, 102)
+        sol_price = random.randint(150, 197)
+        eth_price = random.randint(3950, 4022)
+        coin = str('Выбери крипту:\n1.Bitcoin ' + str(btc_price) + '$\n2.Binance Coin ' + str(
+            bnb_price) + '$\n3.Avalanche ' + str(avax_price) + '$\n4.Solana ' + str(sol_price) + '$\n5.Ethereum ' + str(
+            eth_price) + '$')
+        self.cur.execute(f"""UPDATE coins SET coinRand = (?) WHERE userid = {self.userid}""", (coin,))
+        self.conn.commit()
+        return coin
 
     def choise_insurance(self):
         return str('1.Страховка на жизнь - 5 000 руб\n2.Страховка на имущество - 3000 руб')
@@ -187,10 +202,5 @@ class assets:
 
 
 if __name__ == '__main__':
-    assets = assets(672532296, coin='Связьком', bondes='Вексель', business='AMD', number=10, price=80)
-    assets.database_buys_stock()
-    assets.database_buys_bondes()
-    assets.database_buys_businesses()
-    assets.database_sell_stock()
-    assets.database_sell_bondes()
-    assets.database_sell_businesses()
+    assets = assets(951679992, coin='Связьком', bondes='Вексель', business='AMD', number=10, price=80)
+    assets.random_criptWrite()

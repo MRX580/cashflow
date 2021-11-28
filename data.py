@@ -1,6 +1,10 @@
-import sqlite3, random, string, datetime, CashFlow.level.levels as levels
+import sqlite3, random, string, datetime, level.levels as levels
+
+import assets
+
+
 class data:
-    def __init__(self, userid, column = None, changes = None, userName = None, userFirst = None, userLast = None, money = None):
+    def __init__(self, userid, column=None, changes=None, userName=None, userFirst=None, userLast=None, money=None):
         self.userid = userid
         self.userName = userName
         self.userFirst = userFirst
@@ -27,6 +31,7 @@ class data:
         self.conn.commit()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS coins(
                                    userid INT PRIMARY KEY,
+                                   coinRand TEXT,
                                    btc INT,
                                    bnb INT,
                                    avax INT,
@@ -50,7 +55,8 @@ class data:
                                             comment TEXT,
                                             time TEXT);""")
         self.conn.commit()
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS bondes(userid INT PRIMARY KEY, Вексель INT, Доход_вексель INT);""")
+        self.cur.execute(
+            """CREATE TABLE IF NOT EXISTS bondes(userid INT PRIMARY KEY, Вексель INT, Доход_вексель INT);""")
         self.conn.commit()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS businesses(userid INT PRIMARY KEY, AMD INT, ДоходAMD INT, 
         Intel INT, ДоходIntel, Nvidia INT, ДоходNvidia, Apple INT, ДоходApple INT);""")
@@ -60,7 +66,6 @@ class data:
         self.cur.execute(f"""Update users set {self.column} = {self.changes} where userid = {self.userid}""")
         self.conn.commit()
         self.cur.close()
-
 
     def donate(self):
         code = ''.join(random.sample(string.ascii_lowercase + string.ascii_uppercase + string.digits, 6))
@@ -82,26 +87,21 @@ class data:
         if self.dataUser() == False:
             try:
                 self.cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                            (self.userid, self.userName, self.userFirst, self.userLast, 0, False, 1, 0, False, 0, True, 0))
+                                 (self.userid, self.userName, self.userFirst, self.userLast, 0, False, 1, 0, False, 0,
+                                  True, 0))
                 self.conn.commit()
-                self.cur.execute("INSERT INTO coins VALUES(?, ?, ?, ?, ?, ?);",
-                                 (self.userid, 0, 0, 0, 0, 0))
+                self.cur.execute("INSERT INTO coins VALUES(?, ?, ?, ?, ?, ?, ?);",(self.userid, assets.assets(self.userid, 0, 0).random_cript(), 0, 0, 0, 0, 0))
                 self.conn.commit()
-                self.cur.execute("INSERT INTO stock VALUES(?, ?, ?, ?, ?, ?);",
-                                 (self.userid, 0, 0, 0, 0, 0))
+                self.cur.execute("INSERT INTO stock VALUES(?, ?, ?, ?, ?, ?);",(self.userid, 0, 0, 0, 0, 0))
                 self.conn.commit()
-                self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                                 (self.userid, levels.Level(0,0,0,0, self.userid).move_1(), levels.Level(0,0,0,0, self.userid).move_1(), levels.Level(0,0,0,0, self.userid).move_1(), 1, 0, 0, 0, 0))
+                self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",(self.userid, levels.Level(0,0,0,0, self.userid).move_1(), levels.Level(0,0,0,0, self.userid).move_1(), levels.Level(0,0,0,0, self.userid).move_1(), 1, 0, 0, 0, 0)),(self.userid, levels.Level(0, 0, 0, 0, self.userid).stockMarket(),levels.Level(0, 0, 0, 0, self.userid).move_1(),levels.Level(0, 0, 0, 0, self.userid).move_1(), 1, 0, 0, 0, 0)
                 self.conn.commit()
-                self.cur.execute("INSERT INTO bondes VALUES(?, ?, ?);",
-                                (self.userid, 0, 0))
+                self.cur.execute("INSERT INTO bondes VALUES(?, ?, ?);",(self.userid, 0, 0))
                 self.conn.commit()
-                self.cur.execute("INSERT INTO businesses VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                                 (self.userid, 0, 0, 0, 0, 0, 0, 0, 0))
+                self.cur.execute("INSERT INTO businesses VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",(self.userid, 0, 0, 0, 0, 0, 0, 0, 0))
                 self.conn.commit()
             except sqlite3.IntegrityError as e:
                 print(e)
-
 
     def dataGame(self):
         sqlite_select_query = """SELECT * FROM game"""
@@ -111,7 +111,6 @@ class data:
             if i[0] == self.userid:
                 return i
         return False
-
 
     def dataDonate(self):
         sqlite_select_query = """SELECT * FROM donate"""
@@ -131,7 +130,6 @@ class data:
                 return i
         return False
 
-
     def dataStock(self):
         sqlite_select_query = """SELECT * FROM stock"""
         self.cur.execute(sqlite_select_query)
@@ -140,7 +138,6 @@ class data:
             if i[0] == self.userid:
                 return i
         return False
-
 
     def dataBonds(self):
         sqlite_select_query = """SELECT * FROM bondes"""
@@ -151,7 +148,6 @@ class data:
                 return i
         return False
 
-
     def dataCoins(self):
         sqlite_select_query = """SELECT * FROM coins"""
         self.cur.execute(sqlite_select_query)
@@ -161,7 +157,6 @@ class data:
                 return i
         return False
 
-
     def dataBusinesses(self):
         sqlite_select_query = """SELECT * FROM businesses"""
         self.cur.execute(sqlite_select_query)
@@ -170,6 +165,7 @@ class data:
             if i[0] == self.userid:
                 return i
         return False
+
 
 if __name__ == "__main__":
     data(0)
