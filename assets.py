@@ -1,8 +1,5 @@
 import random, sqlite3, data
 
-import level.levels
-
-
 class assets:
     def __init__(self, userid, number, price, coin=None, bondes=None, business=None, credit=None):
         self.userid = userid
