@@ -31,8 +31,8 @@ class Level:
         return self.target
 
     def unexpectedExpensesFunc(self):
-        UnexpectedExpenses = (f'(СИ) Непредвиденные расходы вы попали в ДТП -800',
-                              f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -1000')
+        UnexpectedExpenses = (f'(СИ) Непредвиденные расходы вы попали в ДТП -800 $',
+                              f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -1000 $')
         rand = random.randint(0, len(UnexpectedExpenses) - 1)
         return UnexpectedExpenses[rand]
 
@@ -60,7 +60,7 @@ class Level:
                   'price': random.randint(45, 70)},
                  ]
         rand = random.randint(0, len(stock) - 1)
-        return str('Акция ' + str(stock[rand]['name']) + '\nЦена: ' + str(stock[rand]['price']) + ' руб\nСправедливая цена: ' + str(stock[rand]['defaultPrice']) + ' руб')
+        return str('Акция ' + str(stock[rand]['name']) + '\nЦена: ' + str(stock[rand]['price']) + ' $\nСправедливая цена: ' + str(stock[rand]['defaultPrice']) + ' $')
 
 
     def investmentFunc(self):
@@ -73,7 +73,7 @@ class Level:
                        'passive': 300},
                       ]
         rand = random.randint(0, len(investment) - 1)
-        return str('Облигация ' + str(investment[rand]['name']) + '\nЦена: ' + str(investment[rand]['price']) + ' руб\nСправедливая цена: ' + str(investment[rand]['defaultPrice']) + ' руб\nПассивный доход ' + str(investment[rand]['passive']) + ' руб')
+        return str('Облигация ' + str(investment[rand]['name']) + '\nЦена: ' + str(investment[rand]['price']) + ' $\nСправедливая цена: ' + str(investment[rand]['defaultPrice']) + ' $\nПассивный доход ' + str(investment[rand]['passive']) + ' $')
 
 
     def businessFunc(self):
@@ -81,25 +81,25 @@ class Level:
                      'name': 'AMD',
                      'startPrice': 19000,
                      'fullPrice': 100000,
-                     'passive': 500},
+                     'passive': 5000},
                     {'type': 'business',
                      'name': 'Intel',
                      'startPrice': 21000,
                      'fullPrice': 120000,
-                     'passive': 700},
+                     'passive': 7000},
                     {'type': 'business',
                      'name': 'Nvidia',
                      'startPrice': 25000,
                      'fullPrice': 125000,
-                     'passive': 900},
+                     'passive': 9000},
                     {'type': 'business',
                      'name': 'Apple',
                      'startPrice': 35000,
                      'fullPrice': 135000,
-                     'passive': 1200}
+                     'passive': 12000}
                     ]
         rand = random.randint(0, len(business) - 1)
-        return str(f'Бизнес %s стоимостью %s руб\nСтартовая цена %s руб\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]}\nПассивный доход %s руб' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
+        return str(f'Бизнес %s стоимостью %s $\nСтартовая цена %s $\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]} $\nПассивный доход %s $' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
     def move_1(self):
         mssAssets = [self.stockMarket(), self.investmentFunc(), self.businessFunc(), self.unexpectedExpensesFunc()]
         random.shuffle(mssAssets)
@@ -266,18 +266,22 @@ class Level:
         self.cur.execute(sqlite_select_query)
         records = self.cur.fetchall()
         for row in records:
-            row[5] = self.moves
+            self.moves = row[5]
             print(self.moves)
+        print(self.moves)
         self.cur.close()
 
         try:
-            self.conn = sqlite3.connect('users.db')
-            self.cur = self.conn.cursor()
-            self.cur.execute("SELECT * from game")
-            self.moves =  -1
-            self.cur.execute(f"""Update game set moves = {self.moves} where userid = {self.userid}""")
-            self.conn.commit()
-            self.cur.close()
+            for row in records:
+                if self.userid == row[0]:
+                    self.conn = sqlite3.connect('users.db')
+                    self.cur = self.conn.cursor()
+                    self.cur.execute("SELECT * from game")
+                    self.moves += -1
+                    print(self.moves)
+                    self.cur.execute(f"""Update game set moves = {self.moves} where userid = {self.userid}""")
+                    self.conn.commit()
+                    self.cur.close()
         except sqlite3.Error as error:
             print(error)
         finally:

@@ -102,11 +102,31 @@ class data:
                 self.conn.commit()
                 self.cur.execute("INSERT INTO bondes VALUES(?, ?, ?);",(self.userid, 0, 0))
                 self.conn.commit()
-                self.cur.execute("INSERT INTO businesses VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",(self.userid, 0, 0, 0, 0, 0, 0, 0, 0))
+                self.cur.execute("INSERT INTO businesses VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",(self.userid, 0, 5000, 0, 7000, 0, 9000, 0, 12000))
                 self.conn.commit()
             except sqlite3.IntegrityError as e:
                 print(e)
-
+    def dataNewGame(self):
+        self.cur.execute(f'Update users set money = 2000 where userid = {self.userid}')
+        self.cur.execute(f'Update bondes set Вексель = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update bondes set Доход_вексель = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update businesses set AMD = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update businesses set Intel = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update businesses set Nvidia = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update businesses set Apple = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update coins set btc = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update coins set bnb = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update coins set avax = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update coins set sol = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update coins set eth = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update stock set Связьком = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update stock set Нефтехим = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update stock set Инвестбанк = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update stock set Агросбыт = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update stock set Металлпром = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update users set levelNow = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update users set credit = 0 where userid = {self.userid}')
+        self.conn.commit()
     def dataGame(self):
         sqlite_select_query = """SELECT * FROM game"""
         self.cur.execute(sqlite_select_query)
