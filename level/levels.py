@@ -21,6 +21,7 @@ class Level:
         dataGame = data.data(self.userid).dataGame()
         conn = sqlite3.connect('users.db')
         cur = conn.cursor()
+
         cur.execute(f"""Update game set profession = (?) where userid = {self.userid}""", (works[num] + ' ' + str(dataGame[6]),))
         conn.commit()
 
@@ -31,11 +32,22 @@ class Level:
         return self.target
 
     def unexpectedExpensesFunc(self):
-        UnexpectedExpenses = (f'(СИ) Непредвиденные расходы вы попали в ДТП -800 $',
-                              f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -1000 $')
-        rand = random.randint(0, len(UnexpectedExpenses) - 1)
-        return UnexpectedExpenses[rand]
-
+        dataGame = data.data(self.userid).dataGame()
+        dataBonds = data.data(self.userid).dataBonds()
+        dataBusinesses = data.data(self.userid).dataBusinesses()
+        try:
+            bussines = (dataBusinesses[1] * dataBusinesses[2]) + (dataBusinesses[3] * dataBusinesses[4]) + (
+                        dataBusinesses[5] * dataBusinesses[6]) + (dataBusinesses[7] * dataBusinesses[8])
+            UnexpectedExpenses = (f'(СИ) Непредвиденные расходы вы попали в ДТП -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                                  f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $')
+            rand = random.randint(0, len(UnexpectedExpenses) - 1)
+            return UnexpectedExpenses[rand]
+        except Exception as e:
+            UnexpectedExpenses = (
+            f'(СИ) Непредвиденные расходы вы попали в ДТП -500 $',
+            f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -500 $')
+            rand = random.randint(0, len(UnexpectedExpenses) - 1)
+            return UnexpectedExpenses[rand]
 
     def stockMarket(self):
         stock = [{'type': 'stock',
@@ -81,28 +93,33 @@ class Level:
                      'name': 'AMD',
                      'startPrice': 19000,
                      'fullPrice': 100000,
-                     'passive': 5000},
+                     'passive': 2500},
                     {'type': 'business',
                      'name': 'Intel',
                      'startPrice': 21000,
-                     'fullPrice': 120000,
-                     'passive': 7000},
+                     'fullPrice': 110000,
+                     'passive': 3500},
                     {'type': 'business',
                      'name': 'Nvidia',
                      'startPrice': 25000,
                      'fullPrice': 125000,
-                     'passive': 9000},
+                     'passive': 4000},
                     {'type': 'business',
                      'name': 'Apple',
                      'startPrice': 35000,
-                     'fullPrice': 135000,
-                     'passive': 12000}
+                     'fullPrice': 150000,
+                     'passive': 5000}
                     ]
         rand = random.randint(0, len(business) - 1)
         return str(f'Бизнес %s стоимостью %s $\nСтартовая цена %s $\nДолг {business[rand]["fullPrice"] - business[rand]["startPrice"]} $\nПассивный доход %s $' % (business[rand]['name'], business[rand]['fullPrice'], business[rand]['startPrice'],business[rand]['passive']))
     def move_1(self):
         mssAssets = [self.stockMarket(), self.investmentFunc(), self.businessFunc(), self.unexpectedExpensesFunc()]
         random.shuffle(mssAssets)
+        rand = random.randint(0,7)
+        if rand >= 5 and mssAssets[0].split()[0].lower() == '(си)' or mssAssets[0].split()[0].lower() == '(сж)':
+            random.shuffle(mssAssets)
+        else:
+            pass
         for i in mssAssets:
             return i
     def database_connect(self):
@@ -125,8 +142,12 @@ class Level:
         except sqlite3.IntegrityError:
             pass
     def dataBaseUpt(self):
-        mssAssets = [self.stockMarket(), self.investmentFunc(), self.businessFunc(), self.unexpectedExpensesFunc()]
-        random.shuffle(mssAssets)
+        while True:
+            mssAssets = [self.move_1(), self.move_1(), self.move_1()]
+            if mssAssets[0].split()[0] == mssAssets[1].split()[0] and mssAssets[0].split()[0] == mssAssets[2].split()[0] and mssAssets[1].split()[0] == mssAssets[2].split()[0]:
+                random.shuffle(mssAssets)
+            else:
+                break
         try:
             self.conn = sqlite3.connect('users.db')
             self.cur = self.conn.cursor()
@@ -136,7 +157,6 @@ class Level:
             user = data.data(self.userid).dataUser()
             for row in records:
                 if user[0] == row[0]:
-                    print(row[4])
                     self.step = row[4]
 
             self.cur.close()
@@ -152,83 +172,12 @@ class Level:
             self.cur.execute("SELECT * from game")
             if self.step == 4:
                 self.step = 0
-                if mssAssets[0] == self.stockMarket() and mssAssets[1] == self.stockMarket() and mssAssets[2] == self.stockMarket() or mssAssets[0] == self.businessFunc() and mssAssets[1] == self.businessFunc() and mssAssets[2] == self.businessFunc() or mssAssets[0] == self.investmentFunc() and mssAssets[1] == self.investmentFunc() and mssAssets[2] == self.investmentFunc() or mssAssets[0] == self.unexpectedExpensesFunc() and mssAssets[1] == self.unexpectedExpensesFunc() and mssAssets[2] == self.unexpectedExpensesFunc():
-                    self.cur.execute(f"""Update game set move1 = "{self.stockMarket()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move2 = "{self.investmentFunc()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move3 = "{self.businessFunc()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                    self.conn.commit()
-                    self.cur.close()
-                elif mssAssets[0] == self.stockMarket() and mssAssets[1] == self.unexpectedExpensesFunc() and mssAssets[2] == self.stockMarket() or mssAssets[0] == self.stockMarket() and mssAssets[1] == self.investmentFunc() and mssAssets[2] == self.stockMarket() or mssAssets[0] == self.stockMarket() and mssAssets[1] == self.stockMarket() and mssAssets[2] == self.investmentFunc():
-                    self.cur.execute(f"""Update game set move1 = "{self.businessFunc()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move2 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move3 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                    self.conn.commit()
-                    self.cur.close()
-                elif mssAssets[0] == self.investmentFunc() and mssAssets[1] == self.investmentFunc() and mssAssets[2] == self.businessFunc() or mssAssets[0] == self.investmentFunc() and mssAssets[1] == self.businessFunc() and mssAssets[2] == self.investmentFunc():
-                    self.cur.execute(f"""Update game set move1 = "{self.stockMarket()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move2 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move3 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                    self.conn.commit()
-                    self.cur.close()
-                elif mssAssets[0] == self.businessFunc() and mssAssets[1] == self.businessFunc() and self.stockMarket() or mssAssets[0] == self.stockMarket() and mssAssets[1] == self.stockMarket() and mssAssets[2] == self.unexpectedExpensesFunc() or mssAssets[0] == self.stockMarket() and mssAssets[1] == self.stockMarket() and mssAssets[2] == self.businessFunc():
-                    self.cur.execute(f"""Update game set move1 = "{self.investmentFunc()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move2 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move3 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                    self.conn.commit()
-                    self.cur.close()
-                elif mssAssets[0] == self.stockMarket() and mssAssets[1] == self.stockMarket() and mssAssets[1] == self.investmentFunc() or mssAssets[0] == self.stockMarket() and mssAssets[1] == self.businessFunc() and mssAssets[1] == self.stockMarket():
-                    self.cur.execute(f"""Update game set move1 = "{self.investmentFunc()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move2 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move3 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                    self.conn.commit()
-                    self.cur.close()
-                elif mssAssets[0] == self.businessFunc() and mssAssets[1] == self.investmentFunc() and mssAssets[2] == self.investmentFunc():
-                    self.cur.execute(f"""Update game set move1 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move2 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move3 = "{self.stockMarket()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                    self.conn.commit()
-                    self.cur.close()
-                elif mssAssets[0] == self.businessFunc() and mssAssets[1] == self.businessFunc() and mssAssets[2] == self.unexpectedExpensesFunc():
-                    self.cur.execute(f"""Update game set move1 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move2 = "{self.stockMarket()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move3 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                    self.conn.commit()
-                    self.cur.close()
-                elif mssAssets[0] == self.investmentFunc() and mssAssets[1] == self.businessFunc() and mssAssets[2] == self.businessFunc():
-                    self.cur.execute(f"""Update game set move1 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move2 = "{self.stockMarket()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move3 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                    self.conn.commit()
-                    self.cur.close()
-                elif mssAssets[0] == self.businessFunc() and mssAssets[1] == self.investmentFunc() and mssAssets[2] == self.investmentFunc():
-                    self.cur.execute(f"""Update game set move1 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move2 = "{self.stockMarket()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move3 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                    self.conn.commit()
-                    self.cur.close()
-                elif mssAssets[0] == self.businessFunc() and mssAssets[1] == self.stockMarket() and mssAssets[2] == self.businessFunc():
-                    self.cur.execute(f"""Update game set move1 = "{self.move_1()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move2 = "{self.stockMarket()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move3 = "{self.investmentFunc()}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                    self.conn.commit()
-                    self.cur.close()
-                else:
-                    self.cur.execute(f"""Update game set move1 = "{mssAssets[0]}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move2 = "{mssAssets[1]}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move3 = "{mssAssets[2]}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                    self.conn.commit()
-                    self.cur.close()
+                self.cur.execute(f"""Update game set move1 = "{mssAssets[0]}" where userid = {self.userid}""")
+                self.cur.execute(f"""Update game set move2 = "{mssAssets[1]}" where userid = {self.userid}""")
+                self.cur.execute(f"""Update game set move3 = "{mssAssets[2]}" where userid = {self.userid}""")
+                self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
+                self.conn.commit()
+                self.cur.close()
         except sqlite3.Error as error:
             print(error)
         finally:
@@ -266,9 +215,8 @@ class Level:
         self.cur.execute(sqlite_select_query)
         records = self.cur.fetchall()
         for row in records:
-            self.moves = row[5]
-            print(self.moves)
-        print(self.moves)
+            if self.userid == row[0]:
+                self.moves = row[5]
         self.cur.close()
 
         try:
@@ -278,7 +226,6 @@ class Level:
                     self.cur = self.conn.cursor()
                     self.cur.execute("SELECT * from game")
                     self.moves += -1
-                    print(self.moves)
                     self.cur.execute(f"""Update game set moves = {self.moves} where userid = {self.userid}""")
                     self.conn.commit()
                     self.cur.close()
