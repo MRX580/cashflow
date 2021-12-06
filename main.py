@@ -1360,8 +1360,9 @@ async def sells(message: types.Message, state: FSMContext):
                                            'Погасить кредит')
                             else:
                                 markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок')
-                            await bot.send_message(message.chat.id, 'У вас нету облигаций', reply_markup=markup)
+                            await bot.send_message(message.chat.id, 'У вас нету этой акции', reply_markup=markup)
                             await game.waitingGame.set()
+                            return
                         if int(datas['num']) <= dataStock[i]:
                             pass
                         else:
@@ -1377,8 +1378,9 @@ async def sells(message: types.Message, state: FSMContext):
                                    'Погасить кредит')
                     else:
                         markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок')
-                    await bot.send_message(message.chat.id, 'У вас нету облигаций', reply_markup=markup)
+                    await bot.send_message(message.chat.id, 'У вас нету этой облигации', reply_markup=markup)
                     await game.waitingGame.set()
+                    return
                 if int(datas['num']) <= dataBondes[1]:
                     pass
                 else:
@@ -1397,8 +1399,9 @@ async def sells(message: types.Message, state: FSMContext):
                                        'Погасить кредит')
                         else:
                             markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок')
-                        await bot.send_message(message.chat.id, 'У вас нету облигаций', reply_markup=markup)
+                        await bot.send_message(message.chat.id, 'У вас нету этой криптовалюты', reply_markup=markup)
                         await game.waitingGame.set()
+                        return
                     if int(datas['num']) <= dataCoin[i]:
                         pass
                     else:

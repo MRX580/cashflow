@@ -162,6 +162,17 @@ class data:
         self.cur.execute(f'Update users set credit = 0 where userid = {self.userid}')
         self.cur.execute(f'Update insurance set СЖ = 0 where userid = {self.userid}')
         self.cur.execute(f'Update insurance set СИ = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update buying set Связьком = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update buying set Нефтехим = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update buying set Инвестбанк = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update buying set Агросбыт = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update buying set Металлпром = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update buying set Bitcoin = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update buying set XRP = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update buying set Avalanche = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update buying set Solana = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update buying set Ethereum = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update buying set Вексель = 0 where userid = {self.userid}')
         self.conn.commit()
     def dataGame(self):
         sqlite_select_query = """SELECT * FROM game"""
