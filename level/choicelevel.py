@@ -12,7 +12,6 @@ def choiceLevel(num, userid):
             cur.execute(f"""Update game set moves = 35 where userid = {userid}""")
             conn.commit()
             cur.close()
-            print(1)
             return level.levels.Level(35, 5000, 4000, 50000, userid)
         elif num == 2:
             cur = conn.cursor()

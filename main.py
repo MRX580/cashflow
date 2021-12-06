@@ -31,6 +31,21 @@ async def start(message: types.Message):
         datetime.datetime.now()) + 'start')
     data.data(message.chat.id, userName=message.chat.username, userFirst=message.chat.first_name,
               userLast=message.chat.last_name).databaseNewUser()
+    try:
+        dataUser = data.data(message.chat.id).dataUser()
+        if dataUser[7] >= 1:
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=2)
+            if dataUser[11] > 0:
+                markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                           'Отключить/включить подтверждение', 'погасить кредит')
+            else:
+                markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                           'Отключить/включить подтверждение')
+            await bot.send_message(message.chat.id, 'Бот был перезапущен, игра продолжена', reply_markup=markup)
+            await game.waitingGame.set()
+            return
+    except TypeError:
+        pass
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     data.data(message.chat.id).donate()
     markup.add('Начать игру')
@@ -55,6 +70,21 @@ async def rules(message: types.Message):
         datetime.datetime.now()) + 'rules')
     data.data(message.chat.id, userName=message.chat.username, userFirst=message.chat.first_name,
               userLast=message.chat.last_name).databaseNewUser()
+    try:
+        dataUser = data.data(message.chat.id).dataUser()
+        if dataUser[7] >= 1:
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=2)
+            if dataUser[11] > 0:
+                markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                           'Отключить/включить подтверждение', 'погасить кредит')
+            else:
+                markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                           'Отключить/включить подтверждение')
+            await bot.send_message(message.chat.id, 'Бот был перезапущен, игра продолжена', reply_markup=markup)
+            await game.waitingGame.set()
+            return
+    except TypeError:
+        pass
     await bot.send_message(message.chat.id, md.text('coming soon'),
                            parse_mode=ParseMode.MARKDOWN)
 
@@ -68,6 +98,21 @@ async def donate(message: types.Message):
         datetime.datetime.now()) + 'donate')
     data.data(message.chat.id, userName=message.chat.username, userFirst=message.chat.first_name,
               userLast=message.chat.last_name).databaseNewUser()
+    try:
+        dataUser = data.data(message.chat.id).dataUser()
+        if dataUser[7] >= 1:
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=2)
+            if dataUser[11] > 0:
+                markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                           'Отключить/включить подтверждение', 'погасить кредит')
+            else:
+                markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                           'Отключить/включить подтверждение')
+            await bot.send_message(message.chat.id, 'Бот был перезапущен, игра продолжена', reply_markup=markup)
+            await game.waitingGame.set()
+            return
+    except TypeError:
+        pass
     await bot.send_message(message.chat.id, data.data(message.chat.id, money=200).donate())
 
 
@@ -80,6 +125,21 @@ async def main(message: types.Message):
     markup.add('Начать игру')
     data.data(message.chat.id, userName=message.chat.username, userFirst=message.chat.first_name,
               userLast=message.chat.last_name).databaseNewUser()
+    try:
+        dataUser = data.data(message.chat.id).dataUser()
+        if dataUser[7] >= 1:
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=2)
+            if dataUser[11] > 0:
+                markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                           'Отключить/включить подтверждение', 'погасить кредит')
+            else:
+                markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                           'Отключить/включить подтверждение')
+            await bot.send_message(message.chat.id, 'Бот был перезапущен, игра продолжена', reply_markup=markup)
+            await game.waitingGame.set()
+            return
+    except TypeError:
+        pass
     if message.text.lower() == 'начать игру':
         dataU = data.data(message.chat.id, userName=message.chat.username, userFirst=message.chat.first_name,
                           userLast=message.chat.last_name).dataUser()
@@ -128,6 +188,7 @@ async def choicelevel(message: types.Message):
                       userLast=message.chat.last_name).dataUser()
     dataGame = data.data(message.chat.id, userName=message.chat.username, userFirst=message.chat.first_name,
                          userLast=message.chat.last_name).dataGame()
+    levels.choiceLevel(dataU[7], message.chat.id).dataBaseUpt()
     await bot.send_message(message.chat.id, f'Уровень - {dataU[7]}\nПрофессия - ' + ' '.join(dataGame[9].split()[:-1]) +
                            f' зарплата - {"{0:,}".format(int(dataGame[9].split()[-1])).replace(",", " ")} $' + f''
                                                                                                                f'\nВаша цель собрать наличных(кредит учитывается) - ' + '{0:,}'.format(
@@ -453,7 +514,7 @@ async def choicelevel(message: types.Message, state: FSMContext):
                                        'Отключить/включить подтверждение')
                         mass[3] = "{0:,}".format(int(mass[3])).replace(",", " ")
                         mass[7] = "{0:,}".format(int(mass[7])).replace(",", " ")
-                        mass[10] = "{0:,}".format(int(mass[11])).replace(",", " ")
+                        mass[11] = "{0:,}".format(int(mass[11])).replace(",", " ")
                         for i in mass:
                             text += i + ' '
                         text += '\nУ вас облигаций: ' + str(dataBonds[1])
@@ -500,10 +561,10 @@ async def choicelevel(message: types.Message, state: FSMContext):
                     text = dataGame[dataGame[4]]
                 dataUser = data.data(message.chat.id).dataUser()
                 if text.split()[0] == '(СЖ)' and dataInsurance[1] > 0:
-                   await bot.send_message(message.chat.id, text + f'\nУ вас была стаховка наличные не сняты\nВаш баланс: {"{0:,}".format(dataUser[4]).replace(",", " ")}')
+                   await bot.send_message(message.chat.id, text + f'\nУ вас была страховка наличные не сняты\nВаш баланс: {"{0:,}".format(dataUser[4]).replace(",", " ")}')
                    return
                 elif text.split()[0] == '(СИ)' and dataInsurance[2] > 0:
-                    await bot.send_message(message.chat.id, text + f'\nУ вас была стаховка наличные не сняты\nВаш баланс: {"{0:,}".format(dataUser[4]).replace(",", " ")}')
+                    await bot.send_message(message.chat.id, text + f'\nУ вас была страховка наличные не сняты\nВаш баланс: {"{0:,}".format(dataUser[4]).replace(",", " ")}')
                     return
                 await bot.send_message(message.chat.id, text + f'\nВаш баланс: {"{0:,}".format(dataUser[4]).replace(",", " ")}', reply_markup=markup)
                 datas['time'] = datetime.datetime.now()

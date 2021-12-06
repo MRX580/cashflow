@@ -18,7 +18,7 @@ class assets:
         xrp_price = random.randint(3, 7)
         avax_price = random.randint(80, 102)
         sol_price = random.randint(150, 197)
-        eth_price = random.randint(3950, 4022)
+        eth_price = random.randint(3500, 4300)
         coin = str('Выбери крипту:\n1. Bitcoin ' + str(btc_price) + '\n2. XRP ' + str(
             xrp_price) + '\n3. Avalanche ' + str(avax_price) + '\n4. Solana ' + str(sol_price) + '\n5. Ethereum ' + str(
             eth_price) + '')
