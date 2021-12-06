@@ -31,6 +31,35 @@ class Level:
     def writeTarget(self):
         return self.target
 
+    def windfallIncomeFunc(self):
+        dataGame = data.data(self.userid).dataGame()
+        dataBonds = data.data(self.userid).dataBonds()
+        dataBusinesses = data.data(self.userid).dataBusinesses()
+        try:
+            bussines = (dataBusinesses[1] * dataBusinesses[2]) + (dataBusinesses[3] * dataBusinesses[4]) + (
+                    dataBusinesses[5] * dataBusinesses[6]) + (dataBusinesses[7] * dataBusinesses[8])
+            windfallIncome = (
+                f'(НД) Непредвиденный доход вы заработали денег в казино +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(НД) Непредвиденный доход вы заработали денег починив соседке раковину +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(НД) Непредвиденный доход вы заработали денег починив автомобиль +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(НД) Непредвиденный доход вы заработали денег на подработке охранником +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(НД) Непредвиденный доход вы заработали денег на продаже напитков +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(НД) Непредвиденный доход вы заработали денег на творческом конкурсе +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $'
+            )
+            rand = random.randint(0, len(windfallIncome) - 1)
+            return windfallIncome[rand]
+        except Exception as e:
+            windfallIncome = (
+                f'(НД) Непредвиденный доход вы заработали денег в казино +500 $',
+                f'(НД) Непредвиденный доход вы заработали денег в казино +700 $',
+                f'(НД) Непредвиденный доход вы заработали денег в казино +900 $',
+                f'(НД) Непредвиденный доход вы заработали денег в казино +1200 $',
+                f'(НД) Непредвиденный доход вы заработали денег в казино +1400 $',
+                f'(НД) Непредвиденный доход вы заработали денег в казино +1600 $'
+            )
+            rand = random.randint(0, len(windfallIncome) - 1)
+            return windfallIncome[rand]
+
     def unexpectedExpensesFunc(self):
         dataGame = data.data(self.userid).dataGame()
         dataBonds = data.data(self.userid).dataBonds()
@@ -38,14 +67,25 @@ class Level:
         try:
             bussines = (dataBusinesses[1] * dataBusinesses[2]) + (dataBusinesses[3] * dataBusinesses[4]) + (
                         dataBusinesses[5] * dataBusinesses[6]) + (dataBusinesses[7] * dataBusinesses[8])
-            UnexpectedExpenses = (f'(СИ) Непредвиденные расходы вы попали в ДТП -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
-                                  f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $')
+            UnexpectedExpenses = (
+                f'(СИ) Непредвиденные расходы вы попали в ДТП -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(СР) Непредвиденные расходы вы дали денег нуждающемуся -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(СH) Непредвиденные расходы вы уплатили налоги -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(CК) Непредвиденные расходы вы проиграли деньги в казино -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(CВ) Непредвиденные расходы вас ограбили -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $'
+            )
             rand = random.randint(0, len(UnexpectedExpenses) - 1)
             return UnexpectedExpenses[rand]
         except Exception as e:
             UnexpectedExpenses = (
             f'(СИ) Непредвиденные расходы вы попали в ДТП -500 $',
-            f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -500 $')
+            f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -700 $',
+            f'(СР) Непредвиденные расходы вы дали денег нуждающемуся -900 $',
+            f'(СH) Непредвиденные расходы вы уплатили налоги -1200 $',
+            f'(CК) Непредвиденные расходы вы проиграли деньги в казино -1400 $',
+            f'(CВ) Непредвиденные расходы вас ограбили -1600 $'
+            )
             rand = random.randint(0, len(UnexpectedExpenses) - 1)
             return UnexpectedExpenses[rand]
 
@@ -130,10 +170,10 @@ class Level:
             for i in mssAssets:
                 return i
         else:
-            mssAssets = [self.stockMarket(), self.investmentFunc(), self.businessFunc(), self.unexpectedExpensesFunc()]
+            mssAssets = [self.stockMarket(), self.investmentFunc(), self.businessFunc(), self.unexpectedExpensesFunc(), self.windfallIncomeFunc()]
             random.shuffle(mssAssets)
             rand = random.randint(0, 7)
-            if rand >= 5 and mssAssets[0].split()[0].lower() == '(си)' or mssAssets[0].split()[0].lower() == '(сж)':
+            if rand >= 5 and mssAssets[0].split()[0].lower() == '(си)' or mssAssets[0].split()[0].lower() == '(сж)' or mssAssets[0].split()[0].lower() == '(ср)' or mssAssets[0].split()[0].lower() == 'сн' or mssAssets[0].split()[0].lower() == 'ск' or mssAssets[0].split()[0].lower() == 'св':
                 random.shuffle(mssAssets)
             else:
                 pass
