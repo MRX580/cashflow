@@ -122,6 +122,7 @@ class Level:
             pass
         for i in mssAssets:
             return i
+
     def database_connect(self):
         self.step = 0
         self.sqlite_select_query = """SELECT * from game"""
@@ -172,12 +173,20 @@ class Level:
             self.cur.execute("SELECT * from game")
             if self.step == 4:
                 self.step = 0
-                self.cur.execute(f"""Update game set move1 = "{mssAssets[0]}" where userid = {self.userid}""")
-                self.cur.execute(f"""Update game set move2 = "{mssAssets[1]}" where userid = {self.userid}""")
-                self.cur.execute(f"""Update game set move3 = "{mssAssets[2]}" where userid = {self.userid}""")
-                self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                self.conn.commit()
-                self.cur.close()
+                if mssAssets[0] == self.unexpectedExpensesFunc() and mssAssets[1] == self.unexpectedExpensesFunc() or mssAssets[1] == self.unexpectedExpensesFunc() and mssAssets[2] == self.unexpectedExpensesFunc() or mssAssets[0] == self.unexpectedExpensesFunc() and mssAssets[2] == self.unexpectedExpensesFunc():
+                    self.cur.execute(f"""Update game set move1 = "{self.investmentFunc()}" where userid = {self.userid}""")
+                    self.cur.execute(f"""Update game set move2 = "{self.businessFunc()}" where userid = {self.userid}""")
+                    self.cur.execute(f"""Update game set move3 = "{self.stockMarket()}" where userid = {self.userid}""")
+                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
+                    self.conn.commit()
+                    self.cur.close()
+                else:
+                    self.cur.execute(f"""Update game set move1 = "{mssAssets[0]}" where userid = {self.userid}""")
+                    self.cur.execute(f"""Update game set move2 = "{mssAssets[1]}" where userid = {self.userid}""")
+                    self.cur.execute(f"""Update game set move3 = "{mssAssets[2]}" where userid = {self.userid}""")
+                    self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
+                    self.conn.commit()
+                    self.cur.close()
         except sqlite3.Error as error:
             print(error)
         finally:
