@@ -31,63 +31,62 @@ class Level:
     def writeTarget(self):
         return self.target
 
-    def windfallIncomeFunc(self):
+    def unexpectedExpensesFunc(self):
         dataGame = data.data(self.userid).dataGame()
         dataBonds = data.data(self.userid).dataBonds()
         dataBusinesses = data.data(self.userid).dataBusinesses()
         try:
-            bussines = (dataBusinesses[1] * dataBusinesses[2]) + (dataBusinesses[3] * dataBusinesses[4]) + (
-                    dataBusinesses[5] * dataBusinesses[6]) + (dataBusinesses[7] * dataBusinesses[8])
-            windfallIncome = (
-                f'(НД) Непредвиденный доход вы заработали денег в казино +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
-                f'(НД) Непредвиденный доход вы заработали денег починив соседке раковину +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
-                f'(НД) Непредвиденный доход вы заработали денег починив автомобиль +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
-                f'(НД) Непредвиденный доход вы заработали денег на подработке охранником +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
-                f'(НД) Непредвиденный доход вы заработали денег на продаже напитков +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
-                f'(НД) Непредвиденный доход вы заработали денег на творческом конкурсе +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $'
+            bussines = (dataBusinesses[1] * dataBusinesses[2]) + (dataBusinesses[3] * dataBusinesses[4]) + (dataBusinesses[5] * dataBusinesses[6]) + (dataBusinesses[7] * dataBusinesses[8])
+            UnexpectedExpenses = (
+                f'(СИ) Непредвиденные расходы вы попали в ДТП -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(CИ) Непредвиденные расходы вас ограбили -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(БС) Непредвиденные расходы вы дали денег нуждающемуся -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(БС) Непредвиденные расходы вы уплатили налоги -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(БС) Непредвиденные расходы вы проиграли деньги в казино -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
             )
-            rand = random.randint(0, len(windfallIncome) - 1)
-            return windfallIncome[rand]
+            rand = random.randint(0, len(UnexpectedExpenses) - 1)
+            return UnexpectedExpenses[rand]
         except Exception as e:
-            windfallIncome = (
-                f'(НД) Непредвиденный доход вы заработали денег в казино +500 $',
-                f'(НД) Непредвиденный доход вы заработали денег в казино +700 $',
-                f'(НД) Непредвиденный доход вы заработали денег в казино +900 $',
-                f'(НД) Непредвиденный доход вы заработали денег в казино +1200 $',
-                f'(НД) Непредвиденный доход вы заработали денег в казино +1400 $',
-                f'(НД) Непредвиденный доход вы заработали денег в казино +1600 $'
+            UnexpectedExpenses = (
+                f'(СИ) Непредвиденные расходы вы попали в ДТП -500 $',
+                f'(CИ) Непредвиденные расходы вас ограбили -1600 $',
+                f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -700 $',
+                f'(БС) Непредвиденные расходы вы дали денег нуждающемуся -900 $',
+                f'(БС) Непредвиденные расходы вы уплатили налоги -1200 $',
+                f'(БС) Непредвиденные расходы вы проиграли деньги в казино -1400 $'
             )
-            rand = random.randint(0, len(windfallIncome) - 1)
-            return windfallIncome[rand]
+            rand = random.randint(0, len(UnexpectedExpenses) - 1)
+            return UnexpectedExpenses[rand]
 
-    def unexpectedExpensesFunc(self):
+    def windfallIncome(self):
         dataGame = data.data(self.userid).dataGame()
         dataBonds = data.data(self.userid).dataBonds()
         dataBusinesses = data.data(self.userid).dataBusinesses()
         try:
             bussines = (dataBusinesses[1] * dataBusinesses[2]) + (dataBusinesses[3] * dataBusinesses[4]) + (
                         dataBusinesses[5] * dataBusinesses[6]) + (dataBusinesses[7] * dataBusinesses[8])
-            UnexpectedExpenses = (
-                f'(СИ) Непредвиденные расходы вы попали в ДТП -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
-                f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
-                f'(Без_страховки) Непредвиденные расходы вы дали денег нуждающемуся -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
-                f'(Без_страховки) Непредвиденные расходы вы уплатили налоги -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
-                f'(Без_страховки) Непредвиденные расходы вы проиграли деньги в казино -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
-                f'(CИ) Непредвиденные расходы вас ограбили -{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $'
+            windfallIncome = (
+                f'(НД) Непредвиденные доходы вы заработали денег в казино +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(НД) Непредвиденные доходы вы заработали денег починив соседке раковину +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(НД) Непредвиденные доходы вы заработали денег починив автомобиль +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(НД) Непредвиденные доходы вы заработали денег на подработке охранником +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(НД) Непредвиденные доходы вы заработали денег на продаже напитков +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $',
+                f'(НД) Непредвиденные доходы вы заработали денег на творческом конкурсе +{(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10} $'
             )
-            rand = random.randint(0, len(UnexpectedExpenses) - 1)
-            return UnexpectedExpenses[rand]
+            rand = random.randint(0, len(windfallIncome) - 1)
+            return windfallIncome[rand]
         except Exception as e:
-            UnexpectedExpenses = (
-            f'(СИ) Непредвиденные расходы вы попали в ДТП -500 $',
-            f'(СЖ) Непредвиденные расходы вы заболели и попали в больницу -700 $',
-            f'(Без_страховки) Непредвиденные расходы вы дали денег нуждающемуся -900 $',
-            f'(Без_страховки) Непредвиденные расходы вы уплатили налоги -1200 $',
-            f'(Без_страховки) Непредвиденные расходы вы проиграли деньги в казино -1400 $',
-            f'(CИ) Непредвиденные расходы вас ограбили -1600 $'
+            windfallIncome = (
+                f'(НД) Непредвиденный доход вы заработали денег в казино +500 $',
+                f'(НД) Непредвиденный доход вы заработали денег починив соседке раковину +700 $',
+                f'(НД) Непредвиденный доход вы заработали денег починив автомобиль +900 $',
+                f'(НД) Непредвиденный доход вы заработали денег на подработке охранником +1200 $',
+                f'(НД) Непредвиденный доход вы заработали денег на продаже напитков +1400 $',
+                f'(НД) Непредвиденный доход вы заработали денег на творческом конкурсе +1600 $'
             )
-            rand = random.randint(0, len(UnexpectedExpenses) - 1)
-            return UnexpectedExpenses[rand]
+            rand = random.randint(0, len(windfallIncome) - 1)
+            return windfallIncome[rand]
 
     def stockMarket(self):
         stock = [{'type': 'stock',
@@ -170,10 +169,10 @@ class Level:
             for i in mssAssets:
                 return i
         else:
-            mssAssets = [self.stockMarket(), self.investmentFunc(), self.businessFunc(), self.unexpectedExpensesFunc(), self.windfallIncomeFunc()]
+            mssAssets = [self.stockMarket(), self.investmentFunc(), self.businessFunc(), self.unexpectedExpensesFunc(), self.windfallIncome()]
             random.shuffle(mssAssets)
             rand = random.randint(0, 7)
-            if rand >= 5 and mssAssets[0].split()[0].lower() == '(си)' or mssAssets[0].split()[0].lower() == '(сж)' or mssAssets[0].split()[0].lower() == '(ср)' or mssAssets[0].split()[0].lower() == 'сн' or mssAssets[0].split()[0].lower() == 'ск' or mssAssets[0].split()[0].lower() == 'св':
+            if rand >= 5 and mssAssets[0].split()[0].lower() == '(си)' or mssAssets[0].split()[0].lower() == '(сж)':
                 random.shuffle(mssAssets)
             else:
                 pass
@@ -230,7 +229,6 @@ class Level:
         finally:
             if self.conn:
                 self.conn.close()
-
         try:
             self.conn = sqlite3.connect('users.db')
             self.cur = self.conn.cursor()
@@ -239,14 +237,16 @@ class Level:
                 if not dataUser[7] == 2 and dataGame[5] >= 36 and self.step == 1:
                     pass
                 else:
+                    print('Рабочее 1')
                     self.cur.execute(f"""Update game set move1 = "{mssAssets[0]}" where userid = {self.userid}""")
                     self.cur.execute(f"""Update game set move2 = "{mssAssets[1]}" where userid = {self.userid}""")
                     self.cur.execute(f"""Update game set move3 = "{mssAssets[2]}" where userid = {self.userid}""")
                     self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
                     self.conn.commit()
             else:
-                self.cur.execute(f"""Update game set move1 = "{mssAssets[0]}" where userid = {self.userid}""")
-                self.cur.execute(f"""Update game set move2 = "{mssAssets[1]}" where userid = {self.userid}""")
+                print('Рабочее 2')
+                self.cur.execute(f"""Update game set move1 = "{mssAssets[1]}" where userid = {self.userid}""")
+                self.cur.execute(f"""Update game set move2 = "{self.stockMarket()}" where userid = {self.userid}""")
                 self.cur.execute(f"""Update game set move3 = "{mssAssets[2]}" where userid = {self.userid}""")
                 self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
                 self.conn.commit()
@@ -255,31 +255,27 @@ class Level:
                 print(self.step)
                 if not dataUser[7] == 1 and dataGame[5] >= 31:
                     if not dataUser[7] == 2 and dataGame[5] >= 32:
-                        if mssAssets[0] == self.unexpectedExpensesFunc() and mssAssets[1] == self.unexpectedExpensesFunc() or mssAssets[1] == self.unexpectedExpensesFunc() and mssAssets[2] == self.unexpectedExpensesFunc() or mssAssets[0] == self.unexpectedExpensesFunc() and mssAssets[2] == self.unexpectedExpensesFunc():
-                            self.cur.execute(f"""Update game set move1 = "{self.investmentFunc()}" where userid = {self.userid}""")
-                            self.cur.execute(f"""Update game set move2 = "{self.businessFunc()}" where userid = {self.userid}""")
-                            self.cur.execute(f"""Update game set move3 = "{self.stockMarket()}" where userid = {self.userid}""")
-                            self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                            self.conn.commit()
-                        else:
-                            self.cur.execute(f"""Update game set move1 = "{mssAssets[0]}" where userid = {self.userid}""")
-                            self.cur.execute(f"""Update game set move2 = "{mssAssets[1]}" where userid = {self.userid}""")
-                            self.cur.execute(f"""Update game set move3 = "{mssAssets[2]}" where userid = {self.userid}""")
-                            self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
-                            self.conn.commit()
-                    else:
-                        self.cur.execute(
-                            f"""Update game set move1 = "{mssAssets[0]}" where userid = {self.userid}""")
-                        self.cur.execute(
-                            f"""Update game set move2 = "{mssAssets[1]}" where userid = {self.userid}""")
-                        self.cur.execute(
-                            f"""Update game set move3 = "{mssAssets[2]}" where userid = {self.userid}""")
+                        self.cur.execute(f"""Update game set move1 = "{mssAssets[0]}" where userid = {self.userid}""")
+                        self.cur.execute(f"""Update game set move2 = "{mssAssets[1]}" where userid = {self.userid}""")
+                        self.cur.execute(f"""Update game set move3 = "{mssAssets[2]}" where userid = {self.userid}""")
                         self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
                         self.conn.commit()
+                    else:
+                        print('Рабочее 3')
+                        self.cur.execute(f"""Update game set move1 = "{mssAssets[0]}" where userid = {self.userid}""")
+                        self.cur.execute(f"""Update game set move2 = "{mssAssets[1]}" where userid = {self.userid}""")
+                        self.cur.execute(f"""Update game set move3 = "{mssAssets[2]}" where userid = {self.userid}""")
+                        self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
+                        self.conn.commit()
+
                 else:
-                    self.cur.execute(f"""Update game set move1 = "{mssAssets[0]}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move2 = "{mssAssets[1]}" where userid = {self.userid}""")
-                    self.cur.execute(f"""Update game set move3 = "{mssAssets[2]}" where userid = {self.userid}""")
+                    mssAssetss = [self.stockMarket(), self.investmentFunc()]
+                    rand = random.randint(0,len(mssAssetss) - 1)
+                    print(rand)
+                    print('Рабочее 4')
+                    self.cur.execute(f"""Update game set move1 = "{mssAssetss[rand]}" where userid = {self.userid}""")
+                    self.cur.execute(f"""Update game set move2 = "{mssAssetss[rand]}" where userid = {self.userid}""")
+                    self.cur.execute(f"""Update game set move3 = "{self.businessFunc()}" where userid = {self.userid}""")
                     self.cur.execute(f"""Update game set step = {self.step} where userid = {self.userid}""")
                     self.conn.commit()
         except sqlite3.Error as error:

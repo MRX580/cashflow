@@ -544,19 +544,37 @@ async def choicelevel(message: types.Message, state: FSMContext):
                 elif dataGame[dataGame[4]].split()[0].lower() == '(си)':
                     if text == '':
                         text = dataGame[dataGame[4]]
-                    if text.split()[0] == '(СИ)' and dataInsurance[2] > 0:
+                    if text.split()[0] == '(СИ)' and dataInsurance[1] > 0:
                         pass
                     else:
-                        data.data(message.chat.id, column='money', changes=dataUser[4] - (
-                                    int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10).dataChanges()
+                        print('проверка на си')
+                        data.data(message.chat.id, column='money', changes=dataUser[4] - (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10).dataChanges()
                 elif dataGame[dataGame[4]].split()[0].lower() == '(сж)':
                     if text == '':
                         text = dataGame[dataGame[4]]
                     if text.split()[0] == '(СЖ)' and dataInsurance[1] > 0:
                         pass
                     else:
-                        data.data(message.chat.id, column='money', changes=dataUser[4] - (
-                                    int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10).dataChanges()
+                        print('проверка на сж')
+                        data.data(message.chat.id, column='money', changes=dataUser[4] - (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10).dataChanges()
+                elif dataGame[dataGame[4]].split()[0].lower() == '(бс)':
+                    if text == '':
+                        text = dataGame[dataGame[4]]
+                    if text.split()[0] == '(БС)' and dataInsurance[1] > 0:
+                        pass
+                    else:
+                        print('проверка на бс')
+                        data.data(message.chat.id, column='money', changes=dataUser[4] - (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10).dataChanges()
+                elif dataGame[dataGame[4]].split()[0].lower() == '(нд)':
+                    if text == '':
+                        text = dataGame[dataGame[4]]
+                    if text.split()[0] == '(НД)' and dataInsurance[1] > 0:
+                        pass
+                    else:
+                        print('проверка на нд')
+                        data.data(message.chat.id, column='money', changes=dataUser[4] + (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10).dataChanges()
+
+
                 if text == '':
                     text = dataGame[dataGame[4]]
                 dataUser = data.data(message.chat.id).dataUser()
