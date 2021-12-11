@@ -417,11 +417,11 @@ async def choicelevel(message: types.Message, state: FSMContext):
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=5)
             markup.add('1', '2', '3', '4', '5', 'Отмена')
             await bot.send_message(message.chat.id,
-                                   f'Выберите криптовалюту:\n1 - {dataCoins[1].split()[3]} цена: {"{0:,}".format(int(dataCoins[1].split()[4])).replace(",", " ")} $'
-                                   f'\n2 - {dataCoins[1].split()[6]} цена: {"{0:,}".format(int(dataCoins[1].split()[7])).replace(",", " ")} $'
-                                   f'\n3 - {dataCoins[1].split()[9]} цена: {"{0:,}".format(int(dataCoins[1].split()[10])).replace(",", " ")} $'
-                                   f'\n4 - {dataCoins[1].split()[12]} цена: {"{0:,}".format(int(dataCoins[1].split()[13])).replace(",", " ")} $'
-                                   f'\n5 - {dataCoins[1].split()[15]} цена: {"{0:,}".format(int(dataCoins[1].split()[16])).replace(",", " ")} $\n(Обновляется каждый месяц)',
+                                   f'Выберите криптовалюту:\n1 - {dataCoins[1].split()[3]} цена: {"{0:,}".format(int(dataCoins[1].split()[4])).replace(",", " ")} $ У вас {dataCoins[2]}'
+                                   f'\n2 - {dataCoins[1].split()[6]} цена: {"{0:,}".format(int(dataCoins[1].split()[7])).replace(",", " ")} $ У вас {dataCoins[3]}'
+                                   f'\n3 - {dataCoins[1].split()[9]} цена: {"{0:,}".format(int(dataCoins[1].split()[10])).replace(",", " ")} $ У вас {dataCoins[4]}'
+                                   f'\n4 - {dataCoins[1].split()[12]} цена: {"{0:,}".format(int(dataCoins[1].split()[13])).replace(",", " ")} $ У вас {dataCoins[5]}'
+                                   f'\n5 - {dataCoins[1].split()[15]} цена: {"{0:,}".format(int(dataCoins[1].split()[16])).replace(",", " ")} $ У вас {dataCoins[6]}\n(Обновляется каждый месяц)',
                                    reply_markup=markup)
         if message.text.lower() == 'продолжить':
             datas['ismagazine'] = False
