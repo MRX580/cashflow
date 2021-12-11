@@ -1,7 +1,7 @@
 import random, sqlite3, data
 
 class assets:
-    def __init__(self, userid, number, price, coin=None, bondes=None, business=None, insurance = None):
+    def __init__(self, userid = None, number = None, price = None, coin=None, bondes=None, business=None, insurance = None):
         self.userid = userid
         self.coin = coin
         self.bondes = bondes
@@ -37,7 +37,7 @@ class assets:
             if i[0] == self.userid:
                 return i[1]
     def choise_insurance(self):
-        return str('1.Страховка на жизнь - 5 000 $\n2.Страховка на имущество - 3000 $')
+        return str('1.Страховка на жизнь - 5 000 $\n2.Страховка на имущество - 3000 $\n3.Страховка на раздачу - 1500 $\n4.Страховка на налоги - 1150 $\n5.Страховка от казино - 1000 $\n6.Страховка от ограблений - 900 $')
 
     def insuranceUser(self):
         sqlite_select_query = """SELECT * FROM game"""
@@ -146,7 +146,7 @@ class assets:
         else:
             return str('У вас нет денег!')
 
-    # Покупка облигаций
+    # Покупка страховок
     def database_buys_insurance(self):
         dataInsurance = data.data(self.userid).dataInsurance()
         sqlite_select_query = """SELECT * FROM insurance"""
@@ -155,14 +155,23 @@ class assets:
         self.number = 12
         for row in records:
             if self.userid == row[0]:
-                if self.insurance == 'СИ':
-                    self.number += dataInsurance[2]
-                elif self.insurance == 'СЖ':
+                if self.insurance == 'СЖ':
                     self.number += dataInsurance[1]
+                elif self.insurance == 'СИ':
+                    self.number += dataInsurance[2]
+                elif self.insurance == 'СД':
+                    self.number += dataInsurance[3]
+                elif self.insurance == 'СН':
+                    self.number += dataInsurance[4]
+                elif self.insurance == 'СК':
+                    self.number += dataInsurance[5]
+                elif self.insurance == 'СО':
+                    self.number += dataInsurance[6]
+
         self.cur.execute(f"""Update insurance set {self.insurance} = {self.number} where userid = {self.userid}""")
         self.conn.commit()
 
-
+    # Покупка облигаций
     def database_buys_bondes(self):
         dataUser = data.data(self.userid).dataUser()
         dataBondes = self.database_user_bondes()
@@ -363,12 +372,24 @@ class assets:
             record = self.cur.fetchall()
             for row in record:
                 if row[0] == self.userid:
-                    if self.insurance == 'СИ':
+                    if self.insurance == 'СЖ':
+                        self.number += dataInsurance[1]
                         self.number = 12
+                    elif self.insurance == 'СИ':
                         self.number += dataInsurance[2]
                         self.number = 12
-                    elif self.insurance == 'СЖ':
-                        self.number += dataInsurance[1]
+                    elif self.insurance == 'СД':
+                        self.number += dataInsurance[3]
+                        self.number = 12
+                    elif self.insurance == 'СН':
+                        self.number += dataInsurance[4]
+                        self.number = 12
+                    elif self.insurance == 'СК':
+                        self.number += dataInsurance[5]
+                        self.number = 12
+                    elif self.insurance == 'СО':
+                        self.number += dataInsurance[6]
+                        self.number = 12
             self.cur.execute(f"""Update insurance set {self.insurance} = {self.number} where userid = {self.userid}""")
             self.number = 1
         except Exception as e:
@@ -393,5 +414,5 @@ class assets:
 
 
 if __name__ == '__main__':
-    assets = assets(userid=672532296, number=10)
+    assets = assets()
     assets.random_criptWrite()

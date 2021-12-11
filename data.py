@@ -74,7 +74,11 @@ class data:
         self.cur.execute("""CREATE TABLE IF NOT EXISTS insurance(
                                                     userid INT PRIMARY KEY,
                                                     СЖ INT,
-                                                    СИ INT);""")
+                                                    СИ INT,
+                                                    CД INT,
+                                                    СН INT,
+                                                    СК INT,
+                                                    СО INT);""")
         self.conn.commit()
         self.cur.execute(
             """CREATE TABLE IF NOT EXISTS bondes(userid INT PRIMARY KEY, Вексель INT, Доход_вексель INT);""")
@@ -130,7 +134,7 @@ class data:
                 self.conn.commit()
                 self.cur.execute("INSERT INTO stock VALUES(?, ?, ?, ?, ?, ?);",(self.userid, 0, 0, 0, 0, 0))
                 self.conn.commit()
-                self.cur.execute("INSERT INTO insurance VALUES(?, ?, ?);", (self.userid, 0, 0))
+                self.cur.execute("INSERT INTO insurance VALUES(?, ?, ?, ?, ?, ?, ?);", (self.userid, 0, 0, 0, 0, 0, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", (self.userid, 0, 0, 0, 1, 0, 0, 0, 0, 0))
                 self.conn.commit()
