@@ -6,8 +6,8 @@ class assets:
         self.coin = coin
         self.bondes = bondes
         self.business = business
-        self.number = int(number)
-        self.price = int(price)
+        self.number = float(number)
+        self.price = float(price)
         self.insurance = insurance
         self.conn = sqlite3.connect('users.db')
         self.cur = self.conn.cursor()
@@ -110,6 +110,7 @@ class assets:
                             buying = dataBuying[i]
                             self.number += coin
                             break
+            print(buying)
             self.cur.execute(f"""Update buying set {self.coin} = (?) where userid = {self.userid}""", (str(int(buying.split()[0]) + self.price) + ' ' + str(int(buying.split()[1])+1),))
             self.cur.execute(f"""Update stock set {self.coin} = {self.number} where userid = {self.userid}""")
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
@@ -138,8 +139,9 @@ class assets:
                             print(buying)
                             self.number += coin
                             break
+            print(buying)
             self.cur.execute(f"""Update buying set {self.coin} = (?) where userid = {self.userid}""",
-                             (str(int(buying.split()[0]) + self.price) + ' ' + str(int(buying.split()[1]) + 1),))
+                             (str(float(buying.split()[0]) + self.price) + ' ' + str(float(buying.split()[1]) + 1),))
             self.cur.execute(f"""Update coins set {self.coin} = {self.number} where userid = {self.userid}""")
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
@@ -186,8 +188,9 @@ class assets:
                 if self.userid == row[0]:
                         buying = dataBuying[11]
                         self.number += dataBondes[1]
+            print(buying)
             self.cur.execute(f"""Update buying set {self.bondes} = (?) where userid = {self.userid}""",
-                             (str(int(buying.split()[0]) + self.price) + ' ' + str(int(buying.split()[1]) + 1),))
+                             (str(float(buying.split()[0]) + self.price) + ' ' + str(float(buying.split()[1]) + 1),))
             self.cur.execute(f"""Update bondes set {self.bondes} = {self.number} where userid = {self.userid}""")
             self.cur.execute(f"""Update bondes set Доход_вексель = {self.number * 300} where userid = {self.userid}""")
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
@@ -256,9 +259,11 @@ class assets:
                 if self.userid == row[0]:
                     if self.coin == coinMass[i]:
                         coin = dataCoin[i]
+                        print(coin)
                         coin -= self.number
+                        print(coin)
                         break
-            self.cur.execute(f"""Update coins set {self.coin} = {coin} where userid = {self.userid}""")
+            self.cur.execute(f"""Update coins set {self.coin} = (?) where userid = {self.userid}""", (coin,))
             self.cur.execute(f"""Update users set money = {summ} where userid = {self.userid}""")
             self.conn.commit()
         else:
@@ -312,16 +317,17 @@ class assets:
         credit = dataUser[11]
         stockMass = [0, 'Связьком', 'Нефтехим', 'Инвестбанк', 'Агросбыт', 'Металлпром']
         try:
-            self.cur.execute("""SELECT * FROM stock""")
-            record = self.cur.fetchall()
-            for row in record:
-                if row[0] == self.userid:
-                    for i in range(len(stockMass)):
-                        if self.coin == stockMass[i]:
-                            self.stock = int(row[i])
-                            break
-            sum = int(self.stock) + int(self.number)
-            self.cur.execute(f"""Update stock set {self.coin} = {sum} where userid = {self.userid}""")
+            if self.coin in stockMass:
+                self.cur.execute("""SELECT * FROM stock""")
+                record = self.cur.fetchall()
+                for row in record:
+                    if row[0] == self.userid:
+                        for i in range(len(stockMass)):
+                            if self.coin == stockMass[i]:
+                                self.stock = int(row[i])
+                                break
+                sum = int(self.stock) + int(self.number)
+                self.cur.execute(f"""Update stock set {self.coin} = {sum} where userid = {self.userid}""")
         except Exception as e:
             print(e)
         try:
@@ -356,14 +362,15 @@ class assets:
             self.cur.execute("""SELECT * FROM coins""")
             record = self.cur.fetchall()
             coinMass = [0,0, 'Bitcoin', 'XRP', 'Avalanche', 'Solana', 'Ethereum', 0]
-            for row in record:
-                if row[0] == self.userid:
-                    for i in range(len(coinMass)):
-                        if self.business == coinMass[i]:
-                            self.CoinNum = dataCoins[i]
-                            self.number += self.CoinNum
-                            break
-            self.cur.execute(f"""Update coins set {data.data(self.userid).dataCoins()[7].split()[0]} = {self.number} where userid = {self.userid}""")
+            if self.coin in coinMass:
+                for row in record:
+                    if row[0] == self.userid:
+                        for i in range(len(coinMass)):
+                            if self.business == coinMass[i]:
+                                self.CoinNum = dataCoins[i]
+                                self.number += self.CoinNum
+                                break
+                self.cur.execute(f"""Update coins set {data.data(self.userid).dataCoins()[7].split()[0]} = {self.number} where userid = {self.userid}""")
         except Exception as e:
             print(e)
         try:
@@ -373,23 +380,11 @@ class assets:
             for row in record:
                 if row[0] == self.userid:
                     if self.insurance == 'СЖ':
+                        self.number = 12
                         self.number += dataInsurance[1]
-                        self.number = 12
                     elif self.insurance == 'СИ':
+                        self.number = 12
                         self.number += dataInsurance[2]
-                        self.number = 12
-                    elif self.insurance == 'СД':
-                        self.number += dataInsurance[3]
-                        self.number = 12
-                    elif self.insurance == 'СН':
-                        self.number += dataInsurance[4]
-                        self.number = 12
-                    elif self.insurance == 'СК':
-                        self.number += dataInsurance[5]
-                        self.number = 12
-                    elif self.insurance == 'СО':
-                        self.number += dataInsurance[6]
-                        self.number = 12
             self.cur.execute(f"""Update insurance set {self.insurance} = {self.number} where userid = {self.userid}""")
             self.number = 1
         except Exception as e:

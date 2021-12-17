@@ -1,4 +1,4 @@
-import sqlite3, random, string, datetime, level.levels as levels
+import sqlite3, random, string, datetime
 
 import assets
 
@@ -47,11 +47,11 @@ class data:
         self.cur.execute("""CREATE TABLE IF NOT EXISTS coins(
                                    userid INT PRIMARY KEY,
                                    coinRand TEXT,
-                                   Bitcoin INT,
-                                   XRP INT,
-                                   Avalanche INT,
-                                   Solana INT,
-                                   Ethereum INT,
+                                   Bitcoin FLOAT,
+                                   XRP FLOAT,
+                                   Avalanche FLOAT,
+                                   Solana FLOAT,
+                                   Ethereum FLOAT,
                                    choice TEXT);
                                 """)
         self.conn.commit()
@@ -74,11 +74,7 @@ class data:
         self.cur.execute("""CREATE TABLE IF NOT EXISTS insurance(
                                                     userid INT PRIMARY KEY,
                                                     СЖ INT,
-                                                    СИ INT,
-                                                    CД INT,
-                                                    СН INT,
-                                                    СК INT,
-                                                    СО INT);""")
+                                                    СИ INT);""")
         self.conn.commit()
         self.cur.execute(
             """CREATE TABLE IF NOT EXISTS bondes(userid INT PRIMARY KEY, Вексель INT, Доход_вексель INT);""")
@@ -97,6 +93,10 @@ class data:
         self.cur.close()
     def dataChanges(self):
         self.cur.execute(f"""Update users set {self.column} = {self.changes} where userid = {self.userid}""")
+        self.conn.commit()
+        self.cur.close()
+    def dataChangesBussines(self):
+        self.cur.execute(f"""Update businesses set {self.column} = {self.changes} where userid = {self.userid}""")
         self.conn.commit()
         self.cur.close()
     def dataChangesInsurance(self):
@@ -134,9 +134,9 @@ class data:
                 self.conn.commit()
                 self.cur.execute("INSERT INTO stock VALUES(?, ?, ?, ?, ?, ?);",(self.userid, 0, 0, 0, 0, 0))
                 self.conn.commit()
-                self.cur.execute("INSERT INTO insurance VALUES(?, ?, ?, ?, ?, ?, ?);", (self.userid, 0, 0, 0, 0, 0, 0))
+                self.cur.execute("INSERT INTO insurance VALUES(?, ?, ?);", (self.userid, 0, 0))
                 self.conn.commit()
-                self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", (self.userid, 0, 0, 0, 1, 0, 0, 0, 0, 0))
+                self.cur.execute("INSERT INTO game VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", (self.userid, 0, 0, 0, 4, 0, 0, 0, 0, 0))
                 self.conn.commit()
                 self.cur.execute("INSERT INTO bondes VALUES(?, ?, ?);",(self.userid, 0, 0))
                 self.conn.commit()
@@ -166,17 +166,17 @@ class data:
         self.cur.execute(f'Update users set credit = 0 where userid = {self.userid}')
         self.cur.execute(f'Update insurance set СЖ = 0 where userid = {self.userid}')
         self.cur.execute(f'Update insurance set СИ = 0 where userid = {self.userid}')
-        self.cur.execute(f'Update buying set Связьком = 0 where userid = {self.userid}')
-        self.cur.execute(f'Update buying set Нефтехим = 0 where userid = {self.userid}')
-        self.cur.execute(f'Update buying set Инвестбанк = 0 where userid = {self.userid}')
-        self.cur.execute(f'Update buying set Агросбыт = 0 where userid = {self.userid}')
-        self.cur.execute(f'Update buying set Металлпром = 0 where userid = {self.userid}')
-        self.cur.execute(f'Update buying set Bitcoin = 0 where userid = {self.userid}')
-        self.cur.execute(f'Update buying set XRP = 0 where userid = {self.userid}')
-        self.cur.execute(f'Update buying set Avalanche = 0 where userid = {self.userid}')
-        self.cur.execute(f'Update buying set Solana = 0 where userid = {self.userid}')
-        self.cur.execute(f'Update buying set Ethereum = 0 where userid = {self.userid}')
-        self.cur.execute(f'Update buying set Вексель = 0 where userid = {self.userid}')
+        self.cur.execute(f'Update buying set Связьком = (?) where userid = {self.userid}', ('0 0',))
+        self.cur.execute(f'Update buying set Нефтехим = (?) where userid = {self.userid}', ('0 0',))
+        self.cur.execute(f'Update buying set Инвестбанк = (?) where userid = {self.userid}', ('0 0',))
+        self.cur.execute(f'Update buying set Агросбыт = (?) where userid = {self.userid}', ('0 0',))
+        self.cur.execute(f'Update buying set Металлпром = (?) where userid = {self.userid}', ('0 0',))
+        self.cur.execute(f'Update buying set Bitcoin = (?) where userid = {self.userid}', ('0 0',))
+        self.cur.execute(f'Update buying set XRP = (?) where userid = {self.userid}', ('0 0',))
+        self.cur.execute(f'Update buying set Avalanche = (?) where userid = {self.userid}', ('0 0',))
+        self.cur.execute(f'Update buying set Solana = (?) where userid = {self.userid}', ('0 0',))
+        self.cur.execute(f'Update buying set Ethereum = (?) where userid = {self.userid}', ('0 0',))
+        self.cur.execute(f'Update buying set Вексель = (?) where userid = {self.userid}', ('0 0',))
         self.conn.commit()
     def dataGame(self):
         sqlite_select_query = """SELECT * FROM game"""

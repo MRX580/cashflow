@@ -1,4 +1,10 @@
-import sqlite3, logging, math, os, random, datetime, config, level.choicelevel as levels, data, assets
+import assets
+import config
+import data
+import datetime
+import level.choicelevel as levels
+import logging
+
 import aiogram.utils.markdown as md
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -23,6 +29,9 @@ class game(StatesGroup):
     resetCredit = State()
     sellOrBuy = State()
     insurance = State()
+    defeat = State()
+    defeatSell = State()
+
 
 @dp.message_handler(commands='start')
 async def start(message: types.Message):
@@ -192,7 +201,8 @@ async def choicelevel(message: types.Message):
     await bot.send_message(message.chat.id, f'Уровень - {dataU[7]}\nПрофессия - ' + ' '.join(dataGame[9].split()[:-1]) +
                            f' зарплата - {"{0:,}".format(int(dataGame[9].split()[-1])).replace(",", " ")} $' + f''
                                                                                                                f'\nВаша цель собрать наличных(кредит учитывается) - ' + '{0:,}'.format(
-        dataGame[8]).replace(',', ' ') + f' $\nЗа {dataGame[5]} месяцев\nВаши наличные - {dataU[4]}', reply_markup=markup)
+        dataGame[8]).replace(',', ' ') + f' $\nЗа {dataGame[5]} месяцев\nВаши наличные - {dataU[4]}',
+                           reply_markup=markup)
     await game.waitingGame.set()
 
 
@@ -218,21 +228,96 @@ async def choicelevel(message: types.Message, state: FSMContext):
     dataInsurance = data.data(message.chat.id).dataInsurance()
     dataBuying = data.data(message.chat.id).dataBuing()
     bussines = (dataBusinesses[1] * dataBusinesses[2]) + (dataBusinesses[3] * dataBusinesses[4]) + (
-                dataBusinesses[5] * dataBusinesses[6]) + (dataBusinesses[7] * dataBusinesses[8])
+            dataBusinesses[5] * dataBusinesses[6]) + (dataBusinesses[7] * dataBusinesses[8])
     async with state.proxy() as datas:
         if dataUser[4] <= -1:
-            await bot.send_message(message.chat.id, 'Вы проиграли, начните игру еще раз')
-            data.data(message.chat.id).dataNewGame()
-            await state.finish()
+            await bot.send_message(message.chat.id, 'вы проиграли, начните игру еще раз')
+            text = ''
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=2)
+            mass = ['0', 'Связьком', 'Нефтехим', 'Инвестбанк', 'Агросбыт', 'Металлпром', 'Bitcoin', 'XRP', 'Avalanche',
+                    'Solana', 'Ethereum', 'Вексель']
+            async with state.proxy():
+                if dataStock[1] == 0 and dataStock[2] == 0 and dataStock[3] == 0 and dataStock[4] == 0 and dataStock[
+                    5] == 0:
+                    pass
+                else:
+                    markup.add('Акции')
+                    stockMass1 = ['Связьком', 'Нефтехим', 'Инвестбанк', 'Агросбыт', 'Металлпром']
+                    stockMass2 = [dataStock[1], dataStock[2], dataStock[3], dataStock[4], dataStock[5]]
+                    stock = ''
+                    massive = [[],[]]
+                    for i in enumerate(stockMass2):
+                        if i[1] >= 1:
+                            massive[0].append(stockMass1[i[0]])
+                            massive[1].append(stockMass2[i[0]])
+                            text += 'Акция: ' + stockMass1[i[0]] + f' {stockMass2[i[0]]} шт\n'
+                            stock += 'Акция: ' + stockMass1[i[0]] + f' {stockMass2[i[0]]} шт\n'
+                if dataBonds[1] == 0:
+                    pass
+                else:
+                    bondes = ''
+                    markup.add('Облигации')
+                    massive[0].append(stockMass1[i[0]])
+                    massive[1].append(stockMass2[i[0]])
+                    text += 'Облигация: Вексель: ' + str(dataBonds[1]) + ' шт\n'
+                    bondes += 'Облигация: Вексель: ' + str(dataBonds[1]) + ' шт\n'
+                if dataCoins[2] == 0 and dataCoins[3] == 0 and dataCoins[4] == 0 and dataCoins[5] == 0 and dataCoins[
+                    6] == 0:
+                    pass
+                else:
+                    markup.add('Криптовалюты')
+                    coinMass1 = ['Bitcoin', 'XRP', 'Avalanche', 'Solana', 'Ethereum']
+                    coinMass2 = [dataCoins[2], dataCoins[3], dataCoins[4], dataCoins[5], dataCoins[6]]
+                    kripta = ''
+                    for i in enumerate(coinMass2):
+                        if i[1] >= 1:
+                            massive[0].append(stockMass1[i[0]])
+                            massive[1].append(stockMass2[i[0]])
+                            text += 'Криптовалюта: ' + coinMass1[i[0]] + f' {coinMass2[i[0]]} шт\n'
+                            kripta += 'Криптовалюта: ' + coinMass1[i[0]] + f' {coinMass2[i[0]]} шт\n'
+                if dataBusinesses[1] == 0 and dataBusinesses[3] == 0 and dataBusinesses[5] == 0 and dataBusinesses[
+                    7] == 0:
+                    pass
+                else:
+                    markup.add('Бизнесы')
+                    massBussines1 = ['AMD', 'Intel', 'Nvidia', 'Apple']
+                    massBussines2 = [dataBusinesses[2], dataBusinesses[4], dataBusinesses[6], dataBusinesses[8]]
+                    for i in enumerate(massBussines2):
+                        if i[1] >= 1:
+                            massive[0].append(stockMass1[i[0]])
+                            massive[1].append(stockMass2[i[0]])
+                            text += 'Бизнес: ' + massBussines1[i[0]] + '\n'
+
+            if text != '':
+                general = []
+                for i in enumerate(mass):
+                    if i[1].lower() in text.lower() and i[0] != 0:
+                        for j in enumerate(massive[0]):
+                            if j[1].lower() in i[1].lower():
+                                general.append(float(dataBuying[i[0]].split()[0]) / float(dataBuying[i[0]].split()[1]) * massive[1][j[0]])
+                if sum(general) < -(dataUser[4]):
+                    print(general)
+                    data.data(message.chat.id).dataNewGame()
+                    await state.finish()
+                    return
+                await bot.send_message(message.chat.id,
+                                       'Выбирите актив для продажи что бы погасить вернуть долг:\n' + text + f'\nВам нужно погасить {-(dataUser[4])} $',
+                                       reply_markup=markup)
+                await game.defeat.set()
+            else:
+                data.data(message.chat.id).dataNewGame()
+                await state.finish()
             return
         try:
             if datas['ismagazine']:
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=2)
                 if dataUser[11] > 0:
-                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                               'Магазин страховок',
                                'Отключить/включить подтверждение', 'Погасить кредит')
                 else:
-                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                               'Магазин страховок',
                                'Отключить/включить подтверждение')
                 if message.text.lower() == 'отмена':
                     await bot.send_message(message.chat.id, 'Действие отменено', reply_markup=markup)
@@ -297,7 +382,7 @@ async def choicelevel(message: types.Message, state: FSMContext):
             markup.add('Погасить на все', 'Отмена')
             await bot.send_message(message.chat.id,
                                    f'Ваш кредит {"{0:,}".format(int(dataUser[11])).replace(",", " ")} $'
-                                   f'\nВаш баланс {"{0:,}".format(int(dataUser[4])).replace(",", " ")} $'
+                                   f'\nВаш баланс {"{0:,}".format(round(dataUser[4], 4)).replace(",", " ")} $'
                                    f'\nНа какую сумму хотите погасить?', reply_markup=markup)
             await game.resetCredit.set()
         if message.text.lower() == 'отключить/включить подтверждение':
@@ -319,7 +404,7 @@ async def choicelevel(message: types.Message, state: FSMContext):
             await bot.send_message(message.chat.id,
                                    'Профессия - ' + ' '.join(dataGame[9].split()[:-1]) + f'\nЗарплата: '
                                                                                          f'{"{0:,}".format(int(dataGame[9].split()[-1])).replace(",", " ")} $'
-                                                                                         f'\nНаличные: {"{0:,}".format(dataUser[4]).replace(",", " ")} $\nОбщий доход: '
+                                                                                         f'\nНаличные: {"{0:,}".format(round(dataUser[4], 4)).replace(",", " ")} $\nОбщий доход: '
                                                                                          f'{"{0:,}".format((int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines))} $'
                                                                                          f'\nРасходы: {"{0:,}".format(int(dataGame[7] + (dataUser[11] / 100 * 4))).replace(",", " ")} $'
                                                                                          f'\nКредит: {"{0:,}".format(int(dataUser[11])).replace(",", " ")} $')
@@ -328,23 +413,23 @@ async def choicelevel(message: types.Message, state: FSMContext):
                 await bot.send_message(message.chat.id, 'У вас нет акций')
             else:
                 try:
-                    stock1 = round(int(dataBuying[1].split()[0]) / int(dataBuying[1].split()[1]),2)
+                    stock1 = round(float(dataBuying[1].split()[0]) / float(dataBuying[1].split()[1]), 2)
                 except ZeroDivisionError:
                     stock1 = 0
                 try:
-                    stock2 = round(int(dataBuying[2].split()[0]) / int(dataBuying[2].split()[1]),2)
+                    stock2 = round(float(dataBuying[2].split()[0]) / float(dataBuying[2].split()[1]), 2)
                 except ZeroDivisionError:
                     stock2 = 0
                 try:
-                    stock3 = round(int(dataBuying[3].split()[0]) / int(dataBuying[3].split()[1]),2)
+                    stock3 = round(float(dataBuying[3].split()[0]) / float(dataBuying[3].split()[1]), 2)
                 except ZeroDivisionError:
                     stock3 = 0
                 try:
-                    stock4 = round(int(dataBuying[4].split()[0]) / int(dataBuying[4].split()[1]),2)
+                    stock4 = round(float(dataBuying[4].split()[0]) / float(dataBuying[4].split()[1]), 2)
                 except ZeroDivisionError:
                     stock4 = 0
                 try:
-                    stock5 = round(int(dataBuying[5].split()[0]) / int(dataBuying[5].split()[1]),2)
+                    stock5 = round(float(dataBuying[5].split()[0]) / float(dataBuying[5].split()[1]), 2)
                 except ZeroDivisionError:
                     stock5 = 0
                 await bot.send_message(message.chat.id,
@@ -355,7 +440,7 @@ async def choicelevel(message: types.Message, state: FSMContext):
                 await bot.send_message(message.chat.id, 'У вас нет облигаций')
             else:
                 try:
-                    stock1 = round(int(dataBuying[11].split()[0]) / int(dataBuying[11].split()[1]),2)
+                    stock1 = round(float(dataBuying[11].split()[0]) / float(dataBuying[11].split()[1]), 2)
                 except ZeroDivisionError:
                     stock1 = 0
                 await bot.send_message(message.chat.id,
@@ -365,23 +450,23 @@ async def choicelevel(message: types.Message, state: FSMContext):
                 await bot.send_message(message.chat.id, 'У вас нету криптовалюты')
             else:
                 try:
-                    stock1 = round(int(dataBuying[6].split()[0]) / int(dataBuying[6].split()[1]),2)
+                    stock1 = round(float(dataBuying[6].split()[0]) / float(dataBuying[6].split()[1]), 2)
                 except ZeroDivisionError:
                     stock1 = 0
                 try:
-                    stock2 = round(int(dataBuying[7].split()[0]) / int(dataBuying[7].split()[1]),2)
+                    stock2 = round(float(dataBuying[7].split()[0]) / float(dataBuying[7].split()[1]), 2)
                 except ZeroDivisionError:
                     stock2 = 0
                 try:
-                    stock3 = round(int(dataBuying[8].split()[0]) / int(dataBuying[8].split()[1]),2)
+                    stock3 = round(float(dataBuying[8].split()[0]) / float(dataBuying[8].split()[1]), 2)
                 except ZeroDivisionError:
                     stock3 = 0
                 try:
-                    stock4 = round(int(dataBuying[9].split()[0]) / int(dataBuying[9].split()[1]),2)
+                    stock4 = round(float(dataBuying[9].split()[0]) / float(dataBuying[9].split()[1]), 2)
                 except ZeroDivisionError:
                     stock4 = 0
                 try:
-                    stock5 = round(int(dataBuying[10].split()[0]) / int(dataBuying[10].split()[1]),2)
+                    stock5 = round(float(dataBuying[10].split()[0]) / float(dataBuying[10].split()[1]), 2)
                 except ZeroDivisionError:
                     stock5 = 0
                 await bot.send_message(message.chat.id,
@@ -409,19 +494,28 @@ async def choicelevel(message: types.Message, state: FSMContext):
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=5)
             markup.add('Страховка на жизнь', 'Страховка на имущевство', 'Отмена')
             await bot.send_message(message.chat.id, f'Выберите что купить:\nСтраховка на жизнь/имущевство на 1 год '
-                                                    f'{"{0:,}".format((int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20).replace(",", " ")} $', reply_markup=markup)
+                                                    f'{"{0:,}".format((int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20).replace(",", " ")} $',
+                                   reply_markup=markup)
             await game.insurance.set()
             return
+
+        def TestFunc(number):
+            if dataUser[4] <= dataUser[4] / int(number):
+                return 0
+            else:
+                return dataUser[4] / int(number)
+            pass
+
         if message.text.lower() == 'магазин криптовалют':
             datas['ismagazine'] = True
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=5)
             markup.add('1', '2', '3', '4', '5', 'Отмена')
             await bot.send_message(message.chat.id,
-                                   f'Выберите криптовалюту:\n1 - {dataCoins[1].split()[3]} цена: {"{0:,}".format(int(dataCoins[1].split()[4])).replace(",", " ")} $ У вас {dataCoins[2]}'
-                                   f'\n2 - {dataCoins[1].split()[6]} цена: {"{0:,}".format(int(dataCoins[1].split()[7])).replace(",", " ")} $ У вас {dataCoins[3]}'
-                                   f'\n3 - {dataCoins[1].split()[9]} цена: {"{0:,}".format(int(dataCoins[1].split()[10])).replace(",", " ")} $ У вас {dataCoins[4]}'
-                                   f'\n4 - {dataCoins[1].split()[12]} цена: {"{0:,}".format(int(dataCoins[1].split()[13])).replace(",", " ")} $ У вас {dataCoins[5]}'
-                                   f'\n5 - {dataCoins[1].split()[15]} цена: {"{0:,}".format(int(dataCoins[1].split()[16])).replace(",", " ")} $ У вас {dataCoins[6]}\n(Обновляется каждый месяц)',
+                                   f'Выберите криптовалюту:\n1 - {dataCoins[1].split()[3]} цена: {"{0:,}".format(int(dataCoins[1].split()[4])).replace(",", " ")} $ У вас {dataCoins[2]}. Можете купить: {round(TestFunc(dataCoins[1].split()[4]), 7)}'
+                                   f'\n2 - {dataCoins[1].split()[6]} цена: {"{0:,}".format(int(dataCoins[1].split()[7])).replace(",", " ")} $ У вас {dataCoins[3]}. Можете купить: {round(TestFunc(dataCoins[1].split()[7]), 7)}'
+                                   f'\n3 - {dataCoins[1].split()[9]} цена: {"{0:,}".format(int(dataCoins[1].split()[10])).replace(",", " ")} $ У вас {dataCoins[4]}. Можете купить: {round(TestFunc(dataCoins[1].split()[10]), 7)}'
+                                   f'\n4 - {dataCoins[1].split()[12]} цена: {"{0:,}".format(int(dataCoins[1].split()[13])).replace(",", " ")} $ У вас {dataCoins[5]}. Можете купить: {round(TestFunc(dataCoins[1].split()[13]), 7)}'
+                                   f'\n5 - {dataCoins[1].split()[15]} цена: {"{0:,}".format(int(dataCoins[1].split()[16])).replace(",", " ")} $ У вас {dataCoins[6]}. Можете купить: {round(TestFunc(dataCoins[1].split()[16]), 7)}\n(Обновляется каждый месяц)',
                                    reply_markup=markup)
         if message.text.lower() == 'продолжить':
             datas['ismagazine'] = False
@@ -481,20 +575,24 @@ async def choicelevel(message: types.Message, state: FSMContext):
                 text = ''
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                 if dataUser[11] > 0:
-                    markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок', 'Погасить кредит')
+                    markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                               'Погасить кредит')
                 else:
                     markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок')
                 mass = list(dataGame[dataGame[4]].split())
+                print(dataGame[dataGame[4]].split()[0].lower())
                 if not mass[1].lower() == 'непредвиденные':
                     if dataGame[dataGame[4]].split()[0].lower() == 'акция':
                         datas['stock'] = True
                         stockMass = [0, 'Связьком', 'Нефтехим', 'Инвестбанк', 'Агросбыт', 'Металлпром']
                         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=2)
                         if dataUser[11] > 0:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение', 'погасить кредит')
                         else:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение')
                         mass[3] = "{0:,}".format(int(mass[3])).replace(",", " ")
                         mass[7] = "{0:,}".format(int(mass[7])).replace(",", " ")
@@ -507,10 +605,12 @@ async def choicelevel(message: types.Message, state: FSMContext):
                         datas['bonds'] = True
                         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=2)
                         if dataUser[11] > 0:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение', 'погасить кредит')
                         else:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение')
                         mass[3] = "{0:,}".format(int(mass[3])).replace(",", " ")
                         mass[7] = "{0:,}".format(int(mass[7])).replace(",", " ")
@@ -523,10 +623,12 @@ async def choicelevel(message: types.Message, state: FSMContext):
                         bussines = ['0', 'AMD', '5000', 'Intel', '7000', 'Nvidia', '9000', 'Apple', '12000']
                         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=2)
                         if dataUser[11] > 0:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение', 'погасить кредит')
                         else:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение')
                         mass = list(dataGame[dataGame[4]].split())
                         mass[3] = "{0:,}".format(int(mass[3])).replace(",", " ")
@@ -542,63 +644,45 @@ async def choicelevel(message: types.Message, state: FSMContext):
                                 else:
                                     text += '\nУ вас нету этого бизнеса'
                 elif dataGame[dataGame[4]].split()[0].lower() == '(си)':
+                    print(1)
                     if text == '':
                         text = dataGame[dataGame[4]]
                     if text.split()[0] == '(СИ)' and dataInsurance[1] > 0:
                         pass
                     else:
-                        print('проверка на си')
-                        data.data(message.chat.id, column='money', changes=dataUser[4] - (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10).dataChanges()
+                        data.data(message.chat.id, column='money', changes=dataUser[4] - (
+                                int(dataGame[9].split()[-1]) + int(
+                            dataBonds[1] * 300 + bussines)) / 10).dataChanges()
                 elif dataGame[dataGame[4]].split()[0].lower() == '(сж)':
+                    print(2)
                     if text == '':
                         text = dataGame[dataGame[4]]
                     if text.split()[0] == '(СЖ)' and dataInsurance[1] > 0:
                         pass
                     else:
-                        print('проверка на сж')
-                        data.data(message.chat.id, column='money', changes=dataUser[4] - (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10).dataChanges()
-                elif dataGame[dataGame[4]].split()[0].lower() == '(сд)':
+                        data.data(message.chat.id, column='money', changes=dataUser[4] - (
+                                int(dataGame[9].split()[-1]) + int(
+                            dataBonds[1] * 300 + bussines)) / 10).dataChanges()
+                elif dataGame[dataGame[4]].split()[0].lower() == '(нд)':
+                    print(3)
                     if text == '':
                         text = dataGame[dataGame[4]]
-                    if text.split()[0] == '(СД)' and dataInsurance[1] > 0:
-                        pass
-                    else:
-                        print('проверка на сд')
-                        data.data(message.chat.id, column='money', changes=dataUser[4] - (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10).dataChanges()
-                elif dataGame[dataGame[4]].split()[0].lower() == '(сн)':
-                    if text == '':
-                        text = dataGame[dataGame[4]]
-                    if text.split()[0] == '(СН)' and dataInsurance[1] > 0:
-                        pass
-                    else:
-                        print('проверка на сн')
-                        data.data(message.chat.id, column='money', changes=dataUser[4] - (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10).dataChanges()
-                elif dataGame[dataGame[4]].split()[0].lower() == '(ск)':
-                    if text == '':
-                        text = dataGame[dataGame[4]]
-                    if text.split()[0] == '(СК)' and dataInsurance[1] > 0:
-                        pass
-                    else:
-                        print('проверка на ск')
-                        data.data(message.chat.id, column='money', changes=dataUser[4] - (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10).dataChanges()
-                elif dataGame[dataGame[4]].split()[0].lower() == '(со)':
-                    if text == '':
-                        text = dataGame[dataGame[4]]
-                    if text.split()[0] == '(СО)' and dataInsurance[1] > 0:
-                        pass
-                    else:
-                        print('проверка на со')
-                        data.data(message.chat.id, column='money', changes=dataUser[4] - (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10).dataChanges()
+                    data.data(message.chat.id, column='money', changes=dataUser[4] + (
+                            int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 10).dataChanges()
                 if text == '':
                     text = dataGame[dataGame[4]]
                 dataUser = data.data(message.chat.id).dataUser()
                 if text.split()[0] == '(СЖ)' and dataInsurance[1] > 0:
-                   await bot.send_message(message.chat.id, text + f'\nУ вас была страховка наличные не сняты\nВаш баланс: {"{0:,}".format(dataUser[4]).replace(",", " ")}')
-                   return
-                elif text.split()[0] == '(СИ)' and dataInsurance[2] > 0:
-                    await bot.send_message(message.chat.id, text + f'\nУ вас была страховка наличные не сняты\nВаш баланс: {"{0:,}".format(dataUser[4]).replace(",", " ")}')
+                    await bot.send_message(message.chat.id,
+                                           text + f'\nУ вас была страховка наличные не сняты\nВаш баланс: {"{0:,}".format(round(dataUser[4], 4)).replace(",", " ")}')
                     return
-                await bot.send_message(message.chat.id, text + f'\nВаш баланс: {"{0:,}".format(dataUser[4]).replace(",", " ")}', reply_markup=markup)
+                elif text.split()[0] == '(СИ)' and dataInsurance[2] > 0:
+                    await bot.send_message(message.chat.id,
+                                           text + f'\nУ вас была страховка наличные не сняты\nВаш баланс: {"{0:,}".format(round(dataUser[4], 4)).replace(",", " ")}')
+                    return
+                await bot.send_message(message.chat.id,
+                                       text + f'\nВаш баланс: {"{0:,}".format(round(dataUser[4], 4)).replace(",", " ")}',
+                                       reply_markup=markup)
                 datas['time'] = datetime.datetime.now()
                 return
             else:
@@ -610,11 +694,12 @@ async def choicelevel(message: types.Message, state: FSMContext):
                 else:
                     markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок')
                 await bot.send_message(message.chat.id,
-                                       f'Итоги месяца. Осталось месяцев - {dataGame[5]}\nВаш прошлый баланс: {"{0:,}".format(int(dataUser[4])).replace(",", " ")} $\nОбщий доход: '
+                                       f'Итоги месяца. Осталось месяцев - {dataGame[5]}\nВаш прошлый баланс: {"{0:,}".format(round(dataUser[4]), 4).replace(",", " ")} $\nОбщий доход: '
                                        f'{"{0:,}".format(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)).replace(",", " ")} $'
                                        f'\nРасходы: {"{0:,}".format((dataGame[7] + (dataUser[11] / 100 * 4))).replace(",", " ")}'
                                        f' $\nИтог: {"{0:,}".format(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines) - (dataGame[7] + (dataUser[11] / 100 * 4))).replace(",", " ")} $\nВаш '
-                                       f'текущий баланс: {"{0:,}".format(int(int(dataUser[4]) + int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines) - (dataGame[7] + (dataUser[11] / 100 * 4)))).replace(",", " ")} $', reply_markup=markup)
+                                       f'текущий баланс: {"{0:,}".format(int(int(dataUser[4]) + int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines) - (dataGame[7] + (dataUser[11] / 100 * 4)))).replace(",", " ")} $',
+                                       reply_markup=markup)
                 data.data(message.chat.id, column='money',
                           changes=int(dataUser[4]) + int(dataGame[9].split()[-1]) + int(
                               dataBonds[1] * 300 + bussines) - (dataGame[7] + (dataUser[11] / 100 * 4))).dataChanges()
@@ -666,16 +751,18 @@ async def choicelevel(message: types.Message, state: FSMContext):
                     if dataUser[10] == False:
                         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                         if dataUser[11] > 0:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение', 'погасить кредит')
                         else:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение')
                         if dataGame[dataGame[4] - 1].split()[0].lower() == 'бизнес':
                             await bot.send_message(message.chat.id,
                                                    f'Вы купили бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                                    f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. С пассивным доходом {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                                   f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
+                                                   f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
                                                    reply_markup=markup)
                             assets.assets(userid=message.chat.id, number=1,
                                           price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -686,13 +773,14 @@ async def choicelevel(message: types.Message, state: FSMContext):
                         if message.text.lower() == 'да':
                             markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                             if dataUser[11] > 0:
-                                markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок' , 'Погасить кредит')
+                                markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                                           'Погасить кредит')
                             else:
                                 markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок')
                             await bot.send_message(message.chat.id,
                                                    f'Вы купили бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                                    f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. С пассивным доходом {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                                   f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
+                                                   f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
                                                    reply_markup=markup)
                             assets.assets(userid=message.chat.id, number=1,
                                           price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -708,7 +796,7 @@ async def choicelevel(message: types.Message, state: FSMContext):
                         await bot.send_message(message.chat.id,
                                                f'Хотите купить бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                                f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. С пассивным доходом {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                               f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}'
+                                               f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}'
                                                f'\nДа/Нет (Введите число акций еще раз если хотите купить другое '
                                                f'количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить '
                                                f'подтверждение"', reply_markup=markup)
@@ -717,10 +805,12 @@ async def choicelevel(message: types.Message, state: FSMContext):
                     datas['isbusinessell'] = True
                     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                     if dataUser[11] > 0:
-                        markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                        markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                   'Магазин страховок',
                                    'Отключить/включить подтверждение', 'погасить кредит')
                     else:
-                        markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                        markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                   'Магазин страховок',
                                    'Отключить/включить подтверждение')
                     massBussines = ['0', 'AMD', dataBusinesses[2], 'Intel', dataBusinesses[4], 'Nvidia',
                                     dataBusinesses[6],
@@ -739,7 +829,7 @@ async def choicelevel(message: types.Message, state: FSMContext):
                         await bot.send_message(message.chat.id,
                                                f'Вы продали бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                                f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. Пассивный доход -{"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                               f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
+                                               f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
                                                reply_markup=markup)
                         assets.assets(userid=message.chat.id, number=1,
                                       price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -751,7 +841,7 @@ async def choicelevel(message: types.Message, state: FSMContext):
                             await bot.send_message(message.chat.id,
                                                    f'Вы продали бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                                    f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. Пассивный доход -{"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                                   f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
+                                                   f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
                                                    reply_markup=markup)
                             assets.assets(userid=message.chat.id, number=1,
                                           price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -768,23 +858,26 @@ async def choicelevel(message: types.Message, state: FSMContext):
                         await bot.send_message(message.chat.id,
                                                f'Хотите продать бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                                f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. Пассивный доход -{"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                               f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}'
+                                               f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}'
                                                f'\nДа/Нет (Введите число акций еще раз если хотите купить другое '
                                                f'количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить '
                                                f'подтверждение"', reply_markup=markup)
                         return
                 elif message.text.lower() == 'взять кредит' and datas['business']:
                     datas['ismagazine'] = False
-                    if (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) >= int(
+                    if (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) + dataUser[4] >= int(
                             dataGame[dataGame[4] - 1].split()[3]) and (
-                            int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) - dataUser[11] >= int(
+                            int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) - dataUser[11] + \
+                            dataUser[4] >= int(
                         dataGame[dataGame[4] - 1].split()[3]):
                         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                         if dataUser[11] > 0:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение', 'погасить кредит')
                         else:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение')
                         assets.assets(userid=message.chat.id, number=1, price=int(dataGame[dataGame[4] - 1].split()[3]),
                                       business=dataGame[dataGame[4] - 1].split()[1]).crediUser()
@@ -797,10 +890,12 @@ async def choicelevel(message: types.Message, state: FSMContext):
                     else:
                         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                         if dataUser[11] > 0:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение', 'погасить кредит')
                         else:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение')
                         await bot.send_message(message.chat.id, 'Ваш общий доход должен быть больше чем сумма кредита '
                                                                 'или больше чем сама сумма кредита',
@@ -821,9 +916,10 @@ async def choicelevel(message: types.Message, state: FSMContext):
                     datas['ismagazine'] = False
                     datas['isbusiness'] = True
                     if int(dataUser[4]) - int(dataGame[dataGame[4] - 1].split()[3]) < 0:
-                        if (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) >= (
+                        if (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) + dataUser[4] >= (
                                 int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20 and (
-                                int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) - dataUser[11] >= (
+                                int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) - dataUser[11] + \
+                                dataUser[4] >= (
                                 int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20:
                             markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                             markup.add('Продолжить', 'Взять кредит')
@@ -851,16 +947,18 @@ async def choicelevel(message: types.Message, state: FSMContext):
                     if dataUser[10] == False:
                         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                         if dataUser[11] > 0:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение', 'погасить кредит')
                         else:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение')
                         if dataGame[dataGame[4] - 1].split()[0].lower() == 'бизнес':
                             await bot.send_message(message.chat.id,
                                                    f'Вы купили бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                                    f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. С пассивным доходом {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                                   f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
+                                                   f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
                                                    reply_markup=markup)
                             assets.assets(userid=message.chat.id, number=1,
                                           price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -871,13 +969,14 @@ async def choicelevel(message: types.Message, state: FSMContext):
                         if message.text.lower() == 'да':
                             markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                             if dataUser[11] > 0:
-                                markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок', 'Погасить кредит')
+                                markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                                           'Погасить кредит')
                             else:
                                 markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок')
                             await bot.send_message(message.chat.id,
                                                    f'Вы купили бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                                    f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. С пассивным доходом {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                                   f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
+                                                   f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
                                                    reply_markup=markup)
                             assets.assets(userid=message.chat.id, number=1,
                                           price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -894,7 +993,7 @@ async def choicelevel(message: types.Message, state: FSMContext):
                         await bot.send_message(message.chat.id,
                                                f'Хотите купить бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                                f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. С пассивным доходом {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                               f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}'
+                                               f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}'
                                                f'\nДа/Нет (Введите число акций еще раз если хотите купить другое '
                                                f'количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить '
                                                f'подтверждение"', reply_markup=markup)
@@ -902,10 +1001,12 @@ async def choicelevel(message: types.Message, state: FSMContext):
                     datas['isbusinessell'] = True
                     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                     if dataUser[11] > 0:
-                        markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                        markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                   'Магазин страховок',
                                    'Отключить/включить подтверждение', 'погасить кредит')
                     else:
-                        markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                        markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                   'Магазин страховок',
                                    'Отключить/включить подтверждение')
                     massBussines = ['0', 'AMD', dataBusinesses[2], 'Intel', dataBusinesses[4], 'Nvidia',
                                     dataBusinesses[6],
@@ -922,15 +1023,17 @@ async def choicelevel(message: types.Message, state: FSMContext):
                     if dataUser[10] == False:
                         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                         if dataUser[11] > 0:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение', 'погасить кредит')
                         else:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение')
                         await bot.send_message(message.chat.id,
                                                f'Вы продали бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                                f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. Пассивный доход -{"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                               f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
+                                               f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
                                                reply_markup=markup)
                         assets.assets(userid=message.chat.id, number=1,
                                       price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -941,15 +1044,17 @@ async def choicelevel(message: types.Message, state: FSMContext):
                         if message.text.lower() == 'да':
                             markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                             if dataUser[11] > 0:
-                                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                           'Магазин страховок',
                                            'Отключить/включить подтверждение', 'погасить кредит')
                             else:
-                                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                                markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                           'Магазин страховок',
                                            'Отключить/включить подтверждение')
                             await bot.send_message(message.chat.id,
                                                    f'Вы продали бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                                    f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. Пассивный доход -{"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                                   f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
+                                                   f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
                                                    reply_markup=markup)
                             assets.assets(userid=message.chat.id, number=1,
                                           price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -967,20 +1072,24 @@ async def choicelevel(message: types.Message, state: FSMContext):
                         await bot.send_message(message.chat.id,
                                                f'Хотите продать бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                                f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. Пассивный доход -{"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                               f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}'
+                                               f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}'
                                                f'\nДа/Нет (Введите число акций еще раз если хотите купить другое '
                                                f'количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить '
                                                f'подтверждение"', reply_markup=markup)
                         return
                 elif message.text.lower() == 'взять кредит' and datas['business']:
-                    if (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) >= dataGame[dataGame[4]-1].split()[3] and (
-                            int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) - dataUser[11] >= dataGame[dataGame[4]-1].split()[3]:
+                    if (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) + dataUser[4] >= \
+                            dataGame[dataGame[4] - 1].split()[3] and (
+                            int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) - dataUser[11] >= \
+                            dataGame[dataGame[4] - 1].split()[3]:
                         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                         if dataUser[11] > 0:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение', 'погасить кредит')
                         else:
-                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                            markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                                       'Магазин страховок',
                                        'Отключить/включить подтверждение')
                         assets.assets(userid=message.chat.id, number=1, price=int(dataGame[dataGame[4] - 1].split()[3]),
                                       business=dataGame[dataGame[4] - 1].split()[1]).crediUser()
@@ -1021,6 +1130,7 @@ async def cancel(message: types.Message, state: FSMContext):
         datas['iscoin'] = False
     await game.waitingGame.set()
 
+
 @dp.message_handler(state=game.insurance)
 async def insurance(message: types.Message, state: FSMContext):
     print('[INFO] ' + str(
@@ -1040,9 +1150,15 @@ async def insurance(message: types.Message, state: FSMContext):
         markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
                    'Отключить/включить подтверждение')
     async with state.proxy() as datas:
+        if message.text.lower() == 'страховка на жизнь':
+            datas['insurance'] = 'СЖ'
+        if message.text.lower() == 'страховка на имущевство':
+            datas['insurance'] = 'СИ'
         if message.text.lower() == 'взять кредит':
-            if (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) >= dataGame[dataGame[4]-1].split()[3] and (
-                    int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) - dataUser[11] >= dataGame[dataGame[4]-1].split()[3]:
+            if (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) + dataUser[4] >= (
+                    int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20 and (
+                    int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) - dataUser[11] + dataUser[4] >= (
+                    int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20:
                 assets.assets(userid=message.chat.id, number=0,
                               price=(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20,
                               insurance=datas['insurance']).crediUser()
@@ -1069,30 +1185,42 @@ async def insurance(message: types.Message, state: FSMContext):
         if int(dataUser[4]) < (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20:
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=2)
             markup.add('Отмена', 'Взять кредит')
-            await bot.send_message(message.chat.id, 'У вас нехватает наличных, но вы можете взять кредит - "Взять кредит"', reply_markup=markup)
+            await bot.send_message(message.chat.id,
+                                   'У вас нехватает наличных, но вы можете взять кредит - "Взять кредит"',
+                                   reply_markup=markup)
             return
         if message.text.lower() == 'страховка на жизнь':
             assets.assets(userid=message.chat.id, number=0,
-                          price=(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20, insurance='СЖ').database_buys_insurance()
-            data.data(message.chat.id, column='money', changes=int(dataUser[4]) - ((int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20)).dataChanges()
+                          price=(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20,
+                          insurance='СЖ').database_buys_insurance()
+            data.data(message.chat.id, column='money', changes=int(dataUser[4]) - (
+                    (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20)).dataChanges()
             dataUser = data.data(message.chat.id).dataUser()
-            await bot.send_message(message.chat.id, f'Страховка на жизнь куплена\nОстаток наличных: {"{0:,}".format(dataUser[4]).replace(",", " ")}', reply_markup=markup)
+            await bot.send_message(message.chat.id,
+                                   f'Страховка на жизнь куплена\nОстаток наличных: {"{0:,}".format(dataUser[4]).replace(",", " ")}',
+                                   reply_markup=markup)
             await game.waitingGame.set()
             datas['insurance'] = 'СЖ'
             return
         if message.text.lower() == 'страховка на имущевство':
             assets.assets(userid=message.chat.id, number=0,
-                         price=(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20,
-                         insurance='СИ').database_buys_insurance()
-            data.data(message.chat.id, column='money', changes=int(dataUser[4]) - ((int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20)).dataChanges()
+                          price=(int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20,
+                          insurance='СИ').database_buys_insurance()
+            data.data(message.chat.id, column='money', changes=int(dataUser[4]) - (
+                    (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300 + bussines)) / 100 * 20)).dataChanges()
             dataUser = data.data(message.chat.id).dataUser()
-            await bot.send_message(message.chat.id, f'Страховка на имущевство куплена\nОстаток наличных: {"{0:,}".format(dataUser[4]).replace(",", " ")}', reply_markup=markup)
+            await bot.send_message(message.chat.id,
+                                   f'Страховка на имущевство куплена\nОстаток наличных: {"{0:,}".format(dataUser[4]).replace(",", " ")}',
+                                   reply_markup=markup)
             await game.waitingGame.set()
             datas['insurance'] = 'СИ'
             return
+
+
 @dp.message_handler(
-    lambda message: not message.text.isdigit() and message.text.lower() != 'да' and message.text.lower() != 'нет' and message.text.lower() != 'взять кредит' and message.text.lower() != 'погасить на все',
-    state=[game.buys, game.sells, game.resetCredit])
+    lambda message: not message.text.replace('.', '').replace(',',
+                                                              '').isdigit() and message.text.lower() != 'да' and message.text.lower() != 'нет' and message.text.lower() != 'взять кредит' and message.text.lower() != 'погасить на все',
+    state=[game.buys, game.sells, game.resetCredit, game.defeatSell])
 async def error(message: types.Message):
     await bot.send_message(message.chat.id, 'Введите число')
 
@@ -1188,7 +1316,7 @@ async def buys(message: types.Message, state: FSMContext):
     if message.text == '0':
         await bot.send_message(message.chat.id, 'Число не может быть 0')
         return
-    if message.text.isdigit():
+    if message.text.replace('.', '').replace(',', '').isdigit():
         async with state.proxy() as datas:
             datas['num'] = message.text
     async with state.proxy() as datas:
@@ -1201,37 +1329,55 @@ async def buys(message: types.Message, state: FSMContext):
                        'Отключить/включить подтверждение')
 
         if message.text.lower() == 'взять кредит':
-            if not datas['iscoin'] and (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) >= int(datas['num']) *int(dataGame[dataGame[4] - 1].split()[3]) and (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) - dataUser[11] >= int(datas['num']) *int(dataGame[dataGame[4] - 1].split()[3]):
-                    if dataGame[dataGame[4] - 1].split()[0].lower() == 'акция':
-                        assets.assets(userid=message.chat.id, number=datas['num'],
-                                      price=int(dataGame[dataGame[4] - 1].split()[3]),
-                                      coin=dataGame[dataGame[4] - 1].split()[1]).crediUser()
-                    elif dataGame[dataGame[4] - 1].split()[0].lower() == 'облигация':
-                        assets.assets(userid=message.chat.id, number=datas['num'],
-                                      price=int(dataGame[dataGame[4] - 1].split()[3]),
-                                      bondes=dataGame[dataGame[4] - 1].split()[1]).crediUser()
-                    return
-            elif datas['iscoin'] and (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) >= int(datas['num']) * int(dataCoin[7].split()[1]) and (
-                        int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) - dataUser[11] >= int(
-                        datas['num']) * int(dataCoin[7].split()[1]):
+            if not datas['iscoin'] and (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) + dataUser[
+                4] >= int(datas['num']) * int(dataGame[dataGame[4] - 1].split()[3]) and (
+                    int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) - dataUser[11] + dataUser[
+                4] >= int(datas['num']) * int(dataGame[dataGame[4] - 1].split()[3]):
+                if dataGame[dataGame[4] - 1].split()[0].lower() == 'акция':
                     assets.assets(userid=message.chat.id, number=datas['num'],
-                                  price=int(dataCoin[7].split()[1])).crediUser()
+                                  price=int(dataGame[dataGame[4] - 1].split()[3]),
+                                  coin=dataGame[dataGame[4] - 1].split()[1]).crediUser()
                     dataUser = data.data(message.chat.id).dataUser()
-                    print(dataCoin[7].split()[1], datas['num'])
                     await bot.send_message(message.chat.id,
                                            f'Кредит взят теперь будет сниматься 4 % от вашей суммы кредита\nРассходы с кредитом - {dataUser[11] / 100 * 4}',
                                            reply_markup=markup)
                     await game.waitingGame.set()
-                    return
+                elif dataGame[dataGame[4] - 1].split()[0].lower() == 'облигация':
+                    assets.assets(userid=message.chat.id, number=datas['num'],
+                                  price=int(dataGame[dataGame[4] - 1].split()[3]),
+                                  bondes=dataGame[dataGame[4] - 1].split()[1]).crediUser()
+                    dataUser = data.data(message.chat.id).dataUser()
+                    await bot.send_message(message.chat.id,
+                                           f'Кредит взят теперь будет сниматься 4 % от вашей суммы кредита\nРассходы с кредитом - {dataUser[11] / 100 * 4}',
+                                           reply_markup=markup)
+                    await game.waitingGame.set()
+                return
+            elif datas['iscoin'] and (int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) + dataUser[
+                4] >= float(datas['num'].replace(',', '.')) * float(dataCoin[7].split()[1]) and (
+                    int(dataGame[9].split()[-1]) + int(dataBonds[1] * 300) + bussines) - dataUser[11] + dataUser[
+                4] >= float(
+                datas['num'].replace(',', '.')) * float(dataCoin[7].split()[1]):
+                assets.assets(userid=message.chat.id, number=datas['num'].replace(",", "."),
+                              price=float(dataCoin[7].split()[1])).crediUser()
+                dataUser = data.data(message.chat.id).dataUser()
+                await bot.send_message(message.chat.id,
+                                       f'Кредит взят теперь будет сниматься 4 % от вашей суммы кредита\nРассходы с кредитом - {dataUser[11] / 100 * 4}',
+                                       reply_markup=markup)
+                await game.waitingGame.set()
+                return
             else:
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                 if dataUser[11] > 0:
-                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                               'Магазин страховок',
                                'Отключить/включить подтверждение', 'погасить кредит')
                 else:
-                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                               'Магазин страховок',
                                'Отключить/включить подтверждение')
-                await bot.send_message(message.chat.id, 'Ваш общий доход должен быть больше чем сумма кредита или больше чем сама сумма кредита', reply_markup=markup)
+                await bot.send_message(message.chat.id,
+                                       'Ваш общий доход должен быть больше чем сумма кредита или больше чем сама сумма кредита',
+                                       reply_markup=markup)
                 await game.waitingGame.set()
                 return
         if not datas['iscoin']:
@@ -1252,7 +1398,7 @@ async def buys(message: types.Message, state: FSMContext):
                                        reply_markup=markup)
                 return
         else:
-            if int(dataUser[4]) - int(datas['num']) * int(dataCoin[7].split()[1]) <  0:
+            if int(dataUser[4]) - float(datas['num'].replace(',', '.')) * float(dataCoin[7].split()[1]) < 0:
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                 markup.add('Отмена', 'Взять кредит')
                 await bot.send_message(message.chat.id,
@@ -1276,7 +1422,7 @@ async def buys(message: types.Message, state: FSMContext):
                                                "{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",",
                                                                                                                  " "))
                                            + f' на сумму {"{0:,}".format(int(int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " ")}\n'
-                                             f'Остаток наличных {str("{0:,}".format(int(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
+                                             f'Остаток наличных {str("{0:,}".format(int(round(dataUser[4], 4) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
                                            reply_markup=markup)
                     assets.assets(userid=message.chat.id, number=datas["num"],
                                   price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -1289,7 +1435,7 @@ async def buys(message: types.Message, state: FSMContext):
                                                "{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",",
                                                                                                                  " "))
                                            + f' на сумму {"{0:,}".format(int(int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " ")}. С пассивным доходом {"{0:,}".format(int(datas["num"]) * 300).replace(",", " ")}\n'
-                                             f'Остаток наличных {str("{0:,}".format(int(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
+                                             f'Остаток наличных {str("{0:,}".format(int(round(dataUser[4], 4) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
                                            reply_markup=markup)
                     assets.assets(userid=message.chat.id, number=datas["num"],
                                   price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -1298,21 +1444,24 @@ async def buys(message: types.Message, state: FSMContext):
             else:
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                 if dataUser[11] > 0:
-                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                               'Магазин страховок',
                                'Отключить/включить подтверждение', 'погасить кредит')
                 else:
-                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                    markup.add('Купить', 'Продолжить', 'Продать', 'Статистика', 'Магазин криптовалют',
+                               'Магазин страховок',
                                'Отключить/включить подтверждение')
                 await bot.send_message(message.chat.id,
                                        f'Вы купили монету {dataCoin[7].split()[0]}.'
-                                       f' по цене {"{0:,}".format(int(dataCoin[7].split()[1])).replace(",", " ")}.\n'
-                                       f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) - int(datas["num"]) * int(dataCoin[7].split()[1])).replace(",", " "))}',
+                                       f' по цене {"{0:,}".format(float(dataCoin[7].split()[1])).replace(",", " ")}.\n'
+                                       f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) - float(datas["num"].replace(",", ".")) * float(dataCoin[7].split()[1])).replace(",", " "))}',
                                        reply_markup=markup)
-                assets.assets(userid=message.chat.id, number=datas['num'],
-                              price=int(dataCoin[7].split()[1]),
+                assets.assets(userid=message.chat.id, number=datas['num'].replace(",", "."),
+                              price=float(dataCoin[7].split()[1]),
                               coin=dataCoin[7].split()[0]).database_buys_coin()
                 await game.waitingGame.set()
                 return
+            await game.waitingGame.set()
         else:
             if message.text.lower() == 'да':
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
@@ -1327,13 +1476,13 @@ async def buys(message: types.Message, state: FSMContext):
                 if datas['iscoin'] == True:
                     await bot.send_message(message.chat.id,
                                            f'Вы купили монету {dataCoin[7].split()[0]}.'
-                                           f' по цене {"{0:,}".format(int(dataCoin[7].split()[1])).replace(",", " ")}.\n'
-                                           f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) - int(datas["num"]) * int(dataCoin[7].split()[1])).replace(",", " "))}'
+                                           f' по цене {"{0:,}".format(float(dataCoin[7].split()[1])).replace(",", " ")}.\n'
+                                           f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) - float(datas["num"].replace(",", ".")) * float(dataCoin[7].split()[1])).replace(",", " "))}'
                                            f'\nДа/Нет (Введите число акций еще раз если хотите купить другое '
                                            f'количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить '
                                            f'подтверждение"', reply_markup=markup)
-                    assets.assets(userid=message.chat.id, number=datas["num"],
-                                  price=int(dataCoin[7].split()[1]), coin=dataCoin[7].split()[0]).database_buys_coin()
+                    assets.assets(userid=message.chat.id, number=datas["num"].replace(",", "."),
+                                  price=float(dataCoin[7].split()[1]), coin=dataCoin[7].split()[0]).database_buys_coin()
                     await game.waitingGame.set()
                     return
                 if dataGame[dataGame[4] - 1].split()[0].lower() == 'акция':
@@ -1343,7 +1492,7 @@ async def buys(message: types.Message, state: FSMContext):
                                                "{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",",
                                                                                                                  " "))
                                            + f' на сумму {"{0:,}".format(int(int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " ")}\n'
-                                             f'Остаток наличных {str("{0:,}".format(int(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
+                                             f'Остаток наличных {str("{0:,}".format(int(round(dataUser[4], 4) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
                                            reply_markup=markup)
                     assets.assets(userid=message.chat.id, number=datas["num"],
                                   price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -1357,7 +1506,7 @@ async def buys(message: types.Message, state: FSMContext):
                                                "{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",",
                                                                                                                  " "))
                                            + f' на сумму {"{0:,}".format(int(int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " ")}. С пассивным доходом {"{0:,}".format(int(datas["num"]) * 300).replace(",", " ")}\n'
-                                             f'Остаток наличных {str("{0:,}".format(int(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
+                                             f'Остаток наличных {str("{0:,}".format(int(round(dataUser[4], 4) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
                                            reply_markup=markup)
                     assets.assets(userid=message.chat.id, number=datas["num"],
                                   price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -1368,7 +1517,7 @@ async def buys(message: types.Message, state: FSMContext):
                     await bot.send_message(message.chat.id,
                                            f'Вы купили бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                            f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. С пассивным доходом {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                           f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
+                                           f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
                                            reply_markup=markup)
                     assets.assets(userid=message.chat.id, number=1,
                                   price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -1389,7 +1538,7 @@ async def buys(message: types.Message, state: FSMContext):
                                                "{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",",
                                                                                                                  " "))
                                            + f' на сумму {"{0:,}".format(int(int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " ")}\n'
-                                             f'Остаток наличных {str("{0:,}".format(int(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}'
+                                             f'Остаток наличных {str("{0:,}".format(int(round(dataUser[4], 4) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}'
                                              f'\nДа/Нет (Введите число акций еще раз если хотите купить другое количвество)\nЭто сообщение '
                                              f'можно отключить кнопкой "Отключить/включить подтверждение"',
                                            reply_markup=markup)
@@ -1400,7 +1549,7 @@ async def buys(message: types.Message, state: FSMContext):
                                                "{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",",
                                                                                                                  " "))
                                            + f' на сумму {"{0:,}".format(int(int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " ")}. С пассивным доходом {"{0:,}".format(int(datas["num"]) * 300).replace(",", " ")}\n'
-                                             f'Остаток наличных {str("{0:,}".format(int(int(dataUser[4]) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}'
+                                             f'Остаток наличных {str("{0:,}".format(int(round(dataUser[4], 4) - int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}'
                                              f'\nДа/Нет (Введите число акций еще раз если хотите купить другое '
                                              f'количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить '
                                              f'подтверждение"', reply_markup=markup)
@@ -1408,15 +1557,15 @@ async def buys(message: types.Message, state: FSMContext):
                     await bot.send_message(message.chat.id,
                                            f'Хотите купить бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                            f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. С пассивным доходом {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                           f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}'
+                                           f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) - int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}'
                                            f'\nДа/Нет (Введите число акций еще раз если хотите купить другое '
                                            f'количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить '
                                            f'подтверждение"', reply_markup=markup)
             else:
                 await bot.send_message(message.chat.id,
                                        f'Хотите купить монету {dataCoin[7].split()[0]}.'
-                                       f' по цене {"{0:,}".format(int(dataCoin[7].split()[1])).replace(",", " ")}.\n'
-                                       f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) - int(datas["num"]) * int(dataCoin[7].split()[1])).replace(",", " "))}'
+                                       f' по цене {"{0:,}".format(float(dataCoin[7].split()[1])).replace(",", " ")}.\n'
+                                       f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) - float(datas["num"].replace(",", ".")) * float(dataCoin[7].split()[1])).replace(",", " "))}'
                                        f'\nДа/Нет (Введите число акций еще раз если хотите купить другое '
                                        f'количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить '
                                        f'подтверждение"', reply_markup=markup)
@@ -1435,7 +1584,7 @@ async def sells(message: types.Message, state: FSMContext):
     if message.text == '0':
         await bot.send_message(message.chat.id, 'Введите число больше 0')
         return
-    if message.text.isdigit():
+    if message.text.replace('.', '').replace(',', '').isdigit():
         async with state.proxy() as datas:
             datas['num'] = message.text
     async with state.proxy() as datas:
@@ -1464,7 +1613,7 @@ async def sells(message: types.Message, state: FSMContext):
                                                    reply_markup=markup)
                             return
             elif dataGame[dataGame[4] - 1].split()[0].lower() == 'облигация':
-                if dataBondes[1] <= 1:
+                if dataBondes[1] <= 0:
                     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                     if dataUser[11] > 0:
                         markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
@@ -1485,7 +1634,7 @@ async def sells(message: types.Message, state: FSMContext):
             coinMass = [0, 0, 'Bitcoin', 'XRP', 'Avalanche', 'Solana', 'Ethereum']
             for i in range(len(coinMass)):
                 if dataCoin[7].split()[0] == coinMass[i]:
-                    if dataCoin[i] <= 1:
+                    if dataCoin[i] == 0:
                         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
                         if dataUser[11] > 0:
                             markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
@@ -1495,7 +1644,7 @@ async def sells(message: types.Message, state: FSMContext):
                         await bot.send_message(message.chat.id, 'У вас нету этой криптовалюты', reply_markup=markup)
                         await game.waitingGame.set()
                         return
-                    if int(datas['num']) <= dataCoin[i]:
+                    if float(datas['num'].replace(",", ".")) <= dataCoin[i]:
                         pass
                     else:
                         await bot.send_message(message.chat.id, 'Нехватает монет, введите количевство '
@@ -1516,7 +1665,7 @@ async def sells(message: types.Message, state: FSMContext):
                                                "{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",",
                                                                                                                  " "))
                                            + f' на сумму {"{0:,}".format(int(int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " ")}\n'
-                                             f'Остаток наличных {str("{0:,}".format(int(int(dataUser[4]) + int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
+                                             f'Остаток наличных {str("{0:,}".format(int(round(dataUser[4], 4) + int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
                                            reply_markup=markup)
                     assets.assets(userid=message.chat.id, number=datas["num"],
                                   price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -1529,7 +1678,7 @@ async def sells(message: types.Message, state: FSMContext):
                                                "{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",",
                                                                                                                  " "))
                                            + f' на сумму {"{0:,}".format(int(int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " ")}. Пассивный доход {"{0:,}".format(int(datas["num"]) * 300).replace(",", " ")}\n'
-                                             f'Остаток наличных {str("{0:,}".format(int(int(dataUser[4]) + int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
+                                             f'Остаток наличных {str("{0:,}".format(int(round(dataUser[4], 4) + int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
                                            reply_markup=markup)
                     assets.assets(userid=message.chat.id, number=datas["num"],
                                   price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -1544,10 +1693,11 @@ async def sells(message: types.Message, state: FSMContext):
                     markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок')
                 await bot.send_message(message.chat.id,
                                        f'Вы продали монету {dataCoin[7].split()[0]}.'
-                                       f' по цене {"{0:,}".format(int(dataCoin[7].split()[1])).replace(",", " ")}.\n'
-                                       f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) + int(datas["num"]) * int(dataCoin[7].split()[1])).replace(",", " "))}', reply_markup=markup)
-                assets.assets(userid=message.chat.id, number=datas['num'],
-                              price=int(dataCoin[7].split()[1]),
+                                       f' по цене {"{0:,}".format(float(dataCoin[7].split()[1])).replace(",", " ")}.\n'
+                                       f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) + float(datas["num"].replace(",", ".")) * float(dataCoin[7].split()[1])).replace(",", " "))}',
+                                       reply_markup=markup)
+                assets.assets(userid=message.chat.id, number=datas['num'].replace(",", "."),
+                              price=float(dataCoin[7].split()[1]),
                               coin=dataCoin[7].split()[0]).database_sell_coin()
                 await game.waitingGame.set()
                 return
@@ -1568,7 +1718,7 @@ async def sells(message: types.Message, state: FSMContext):
                                                    "{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(
                                                        ",", " "))
                                                + f' на сумму {"{0:,}".format(int(int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " ")}\n'
-                                                 f'Остаток наличных {str("{0:,}".format(int(int(dataUser[4]) + int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
+                                                 f'Остаток наличных {str("{0:,}".format(int(round(dataUser[4], 4) + int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
                                                reply_markup=markup)
                         assets.assets(userid=message.chat.id, number=datas["num"],
                                       price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -1583,7 +1733,7 @@ async def sells(message: types.Message, state: FSMContext):
                                                        ",",
                                                        " "))
                                                + f' на сумму {"{0:,}".format(int(int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " ")}. Пассивный доход -{"{0:,}".format(int(datas["num"]) * 300).replace(",", " ")}\n'
-                                                 f'Остаток наличных {str("{0:,}".format(int(int(dataUser[4]) + int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
+                                                 f'Остаток наличных {str("{0:,}".format(int(round(dataUser[4], 4) + int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}',
                                                reply_markup=markup)
                         assets.assets(userid=message.chat.id, number=datas["num"],
                                       price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -1594,7 +1744,7 @@ async def sells(message: types.Message, state: FSMContext):
                         await bot.send_message(message.chat.id,
                                                f'Вы продали бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                                f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. Пассивный доход -{"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                               f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
+                                               f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}',
                                                reply_markup=markup)
                         assets.assets(userid=message.chat.id, number=datas['num'],
                                       price=int(dataGame[dataGame[4] - 1].split()[3]),
@@ -1604,12 +1754,13 @@ async def sells(message: types.Message, state: FSMContext):
                 else:
                     await bot.send_message(message.chat.id,
                                            f'Вы продали монету {dataCoin[7].split()[0]}.'
-                                           f' по цене {"{0:,}".format(int(dataCoin[7].split()[1])).replace(",", " ")}.\n'
-                                           f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) + int(datas["num"]) * int(dataCoin[7].split()[1])).replace(",", " "))}'
+                                           f' по цене {"{0:,}".format(float(dataCoin[7].split()[1])).replace(",", " ")}.\n'
+                                           f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) + float(datas["num"].replace(",", ".")) * float(dataCoin[7].split()[1])).replace(",", " "))}'
                                            f'\nДа/Нет (Введите число акций еще раз если хотите купить другое '
                                            f'количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить '
                                            f'подтверждение"', reply_markup=markup)
-                    assets.assets(userid=message.chat.id, number=datas['num'], price=int(dataCoin[7].split()[1]),
+                    assets.assets(userid=message.chat.id, number=datas['num'].replace(",", "."),
+                                  price=float(dataCoin[7].split()[1]),
                                   coin=dataCoin[7].split()[0]).database_sell_coin()
                     await game.waitingGame.set()
                     return
@@ -1627,7 +1778,7 @@ async def sells(message: types.Message, state: FSMContext):
                                                "{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",",
                                                                                                                  " "))
                                            + f' на сумму {"{0:,}".format(int(int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " ")}\n'
-                                             f'Остаток наличных {str("{0:,}".format(int(int(dataUser[4]) + int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}'
+                                             f'Остаток наличных {str("{0:,}".format(int(round(dataUser[4], 4) + int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}'
                                              f'\nДа/Нет (Введите число акций еще раз если хотите купить другое '
                                              f'количвество)\nЭто сообщение '
                                              f'можно отключить кнопкой "Отключить/включить подтверждение"',
@@ -1639,7 +1790,7 @@ async def sells(message: types.Message, state: FSMContext):
                                                "{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",",
                                                                                                                  " "))
                                            + f' на сумму {"{0:,}".format(int(int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " ")}. Пассивный доход {"{0:,}".format(int(datas["num"]) * 300).replace(",", " ")}\n'
-                                             f'Остаток наличных {str("{0:,}".format(int(int(dataUser[4]) + int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}'
+                                             f'Остаток наличных {str("{0:,}".format(int(round(dataUser[4], 4) + int(datas["num"]) * int(dataGame[dataGame[4] - 1].split()[3]))).replace(",", " "))}'
                                              f'\nДа/Нет (Введите число акций еще раз если хотите купить другое '
                                              f'количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить '
                                              f'подтверждение"', reply_markup=markup)
@@ -1647,18 +1798,109 @@ async def sells(message: types.Message, state: FSMContext):
                     await bot.send_message(message.chat.id,
                                            f'Хотите продать бизнес {dataGame[dataGame[4] - 1].split()[1]}.'
                                            f' по цене {"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " ")}. Пассивный доход -{"{0:,}".format(int(dataGame[dataGame[4] - 1].split()[14])).replace(",", " ")}\n'
-                                           f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}'
+                                           f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) + int(dataGame[dataGame[4] - 1].split()[3])).replace(",", " "))}'
                                            f'\nДа/Нет (Введите число акций еще раз если хотите купить другое '
                                            f'количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить '
                                            f'подтверждение"', reply_markup=markup)
             else:
                 await bot.send_message(message.chat.id,
                                        f'Хотите продать монету {dataCoin[7].split()[0]}.'
-                                       f' по цене {"{0:,}".format(int(dataCoin[7].split()[1])).replace(",", " ")}.\n'
-                                       f'Остаток наличных {str("{0:,}".format(int(dataUser[4]) + int(datas["num"]) * int(dataCoin[7].split()[1])).replace(",", " "))}'
+                                       f' по цене {"{0:,}".format(float(dataCoin[7].split()[1])).replace(",", " ")}.\n'
+                                       f'Остаток наличных {str("{0:,}".format(round(dataUser[4], 4) + float(datas["num"].replace(",", ".")) * float(dataCoin[7].split()[1])).replace(",", " "))}'
                                        f'\nДа/Нет (Введите число акций еще раз если хотите купить другое '
                                        f'количвество)\nЭто сообщение можно отключить кнопкой "Отключить/включить '
                                        f'подтверждение"', reply_markup=markup)
+
+
+@dp.message_handler(state=game.defeat)
+async def defeat(message: types.Message, state: FSMContext):
+    dataUser = data.data(message.chat.id).dataUser()
+    dataStock = data.data(message.chat.id).dataStock()
+    dataBonds = data.data(message.chat.id).dataBonds()
+    dataBusinesses = data.data(message.chat.id).dataBusinesses()
+    dataCoins = data.data(message.chat.id).dataCoins()
+    async with state.proxy() as datas:
+        stockMass1 = ['Связьком', 'Нефтехим', 'Инвестбанк', 'Агросбыт', 'Металлпром']
+        stockMass2 = [dataStock[1], dataStock[2], dataStock[3], dataStock[4], dataStock[5]]
+        for i in enumerate(stockMass1):
+            if message.text.lower() in i[1].lower() and stockMass2[i[0]] >= 1:
+                await bot.send_message(message.chat.id, 'Сколько акций ' + message.text.lower() + ' хотите продать')
+                datas['choice'] = 'stock'
+                datas['coind'] = stockMass2[i[0]]
+                datas['choiceCoin'] = message.text
+                await game.defeatSell.set()
+        bondes = dataBonds[1]
+        if message.text.lower() in 'вексель' and bondes >= 1:
+            await bot.send_message(message.chat.id, 'Сколько облигаций ' + message.text.lower() + ' хотите продать')
+            datas['choice'] = 'bondes'
+            datas['coind'] = 'Вексель'
+            datas['choiceCoin'] = message.text
+            await game.defeatSell.set()
+        coinMass1 = ['Bitcoin', 'XRP', 'Avalanche', 'Solana', 'Ethereum']
+        coinMass2 = [dataCoins[2], dataCoins[3], dataCoins[4], dataCoins[5], dataCoins[6]]
+        for i in enumerate(coinMass1):
+            if message.text.lower() in i[1].lower() and coinMass2[i[0]] >= 1:
+                await bot.send_message(message.chat.id,
+                                       'Сколько криптовалюты ' + message.text.lower() + ' хотите продать')
+                datas['choice'] = 'kripta'
+                datas['coind'] = coinMass2[i[0]]
+                datas['choiceCoin'] = message.text
+                await game.defeatSell.set()
+        massBussines1 = ['AMD', 'Intel', 'Nvidia', 'Apple']
+        massBussines2 = [dataBusinesses[2], dataBusinesses[4], dataBusinesses[6], dataBusinesses[8]]
+        massBussines3 = [100000, 110000, 125000, 150000]
+        for i in enumerate(massBussines1):
+            if message.text.lower() in i[1].lower() and massBussines2[i[0]] >= 1:
+                markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True, row_width=2)
+                if dataUser[11] > 0:
+                    markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                               'Отключить/включить подтверждение', 'погасить кредит')
+                else:
+                    markup.add('Продолжить', 'Статистика', 'Магазин криптовалют', 'Магазин страховок',
+                               'Отключить/включить подтверждение')
+                data.data(message.chat.id, column='money', changes=dataUser[4] + massBussines3[i[0]]).dataChanges()
+                data.data(message.chat.id, column=f'{massBussines1[i[0]]}', changes=0).dataChangesBussines()
+                await bot.send_message(message.chat.id, 'Бизнес продан', reply_markup=markup)
+                await game.waitingGame.set()
+
+
+@dp.message_handler(state=game.defeatSell)
+async def defeatSell(message: types.Message, state: FSMContext):
+    dataUser = data.data(message.chat.id).dataUser()
+    dataGame = data.data(message.chat.id).dataGame()
+    dataStock = data.data(message.chat.id).dataStock()
+    dataBonds = data.data(message.chat.id).dataBonds()
+    dataBusinesses = data.data(message.chat.id).dataBusinesses()
+    dataCoins = data.data(message.chat.id).dataCoins()
+    dataBuyed = data.data(message.chat.id).dataBuing()
+    mass = ['0', 'Связьком', 'Нефтехим', 'Инвестбанк', 'Агросбыт', 'Металлпром', 'Bitcoin', 'XRP', 'Avalanche', 'Solana', 'Ethereum', 'Вексель']
+    async with state.proxy() as datas:
+        for i in enumerate(mass):
+            if datas['choice'] == 'stock':
+                if message.text.isdigit():
+                    if i[1].lower() == datas['choiceCoin'].lower():
+                        assets.assets(message.chat.id, coin=datas['choiceCoin'].lower(), number=message.text.replace(",", "."), price=float(dataBuyed[i[0]].split()[0]) / float(dataBuyed[i[0]].split()[1])).database_sell_stock()
+                        await bot.send_message(message.chat.id, 'Вы продали акцию')
+                        await game.waitingGame.set()
+                        break
+                else:
+                    await bot.send_message(message.chat.id, 'Введите целое число')
+            elif datas['choice'] == 'bondes':
+                if message.text.isdigit():
+                    if i[1].lower() == datas['choiceCoin'].lower():
+                        assets.assets(message.chat.id, bondes='Вексель', number=message.text.replace(",", "."), price=float(dataBuyed[i[0]].split()[0]) / float(dataBuyed[i[0]].split()[1])).database_sell_bondes()
+                        await bot.send_message(message.chat.id, 'Вы продали облигацию')
+                        await game.waitingGame.set()
+                        break
+                else:
+                    await bot.send_message(message.chat.id, 'Введите целое число')
+            elif datas['choice'] == 'kripta':
+                if i[1].lower() == datas['choiceCoin'].lower():
+                    assets.assets(message.chat.id, coin=datas['choiceCoin'].lower(), number=message.text.replace(",", "."), price=float(dataBuyed[i[0]].split()[0]) / float(dataBuyed[i[0]].split()[1])).database_sell_coin()
+                    await bot.send_message(message.chat.id, 'Вы продали криптовалюту')
+                    await game.waitingGame.set()
+                    break
+
 
 
 if __name__ == '__main__':
